@@ -14,6 +14,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Coin Quest" />
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=MedievalSharp&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+<!-- Supabase JS SDK (loaded as a module, exposed globally as window.supabase) -->
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+  window.supabase = { createClient };
+  window.dispatchEvent(new Event('supabase-ready'));
+</script>
+<!-- Public config: Supabase URL + anon key -->
+<script src="./config.js"></script>
 <style>
   :root {
     --parchment: #f0dcb0;
@@ -1909,6 +1917,7 @@
     <button class="music-btn" id="langBtn" onclick="toggleLang()">🌐 DE</button>
     <button class="music-btn" id="narratorBtn" onclick="toggleNarrator()">🔇 <span data-i18n="narrator">Narrator</span></button>
     <button class="music-btn" id="musicBtn" onclick="toggleMusic()">🔇 <span data-i18n="music">Music</span></button>
+    <button class="music-btn" id="accountBtn" onclick="onAccountBtnClick()" style="display:none;">👤 <span id="accountBtnLabel" data-i18n="sign_in">Sign in</span></button>
     <div class="tabs">
       <button class="tab active" data-view="kids" data-i18n="tab_heroes">Heroes</button>
       <button class="tab" data-view="activities" data-i18n="tab_quests">Quests</button>
@@ -2120,6 +2129,18 @@
       <h2>⚠ Forbidden Rites</h2>
       <button class="btn btn-danger" onclick="resetAll()">🔥 Purge All Records</button>
     </div>
+    <div class="section" id="accountSection" style="display:none;">
+      <h2>👤 <span data-i18n="account_title">Account</span></h2>
+      <div id="accountPanel"></div>
+    </div>
+    <div class="section" id="adminSection" style="display:none;">
+      <h2>🛡 <span data-i18n="admin_title">Global Admin</span></h2>
+      <p style="color: var(--ink-muted); font-style: italic;" data-i18n="admin_desc">Read-only view of every family using this app.</p>
+      <div style="margin: 10px 0;">
+        <button class="btn btn-ghost btn-sm" onclick="loadAdminList()" data-i18n="admin_refresh">↻ Refresh</button>
+      </div>
+      <div id="adminList"></div>
+    </div>
     <div class="section">
       <h2 data-i18n="pin_backup_title">🔒 Backup & PIN</h2>
       <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top: 10px;">
@@ -2283,6 +2304,23 @@
   </div>
 </div>
 
+<!-- Sign-in Modal (magic link) -->
+<div class="modal-backdrop" id="signInModal">
+  <div class="modal">
+    <h3>👤 <span data-i18n="sign_in_title">Sign in</span></h3>
+    <p style="color: var(--ink-muted); font-style: italic; margin-bottom: 10px;" data-i18n="sign_in_desc">
+      Enter your email. We'll send you a one-tap link to sign in — no password needed.
+    </p>
+    <label for="signInEmail" data-i18n="email_label">Email</label>
+    <input type="email" id="signInEmail" placeholder="you@example.com" autocomplete="email" />
+    <div id="signInStatus" style="margin: 8px 0; font-size: 13px; color: var(--gold-bright); min-height: 18px;"></div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+      <button class="btn btn-ghost" onclick="closeSignInModal()" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-primary" id="signInSubmitBtn" onclick="submitSignIn()" data-i18n="send_magic_link">Send magic link</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -2371,6 +2409,29 @@ const TRANSLATIONS = {
     seq_your_turn: 'Your turn! Tap the tiles in order ({n})',
     seq_show_again: '↻ Show again',
     seq_try_again: 'Oops — watch the pattern one more time.',
+    sign_in: 'Sign in',
+    sign_out: 'Sign out',
+    sign_in_title: 'Sign in',
+    sign_in_desc: "Enter your email. We'll send you a one-tap link to sign in — no password needed.",
+    email_label: 'Email',
+    cancel: 'Cancel',
+    send_magic_link: 'Send magic link',
+    magic_link_sent: 'Check your email for the sign-in link.',
+    magic_link_error: 'Could not send link:',
+    signed_in_as: 'Signed in as',
+    cloud_synced: 'Cloud synced',
+    cloud_syncing: 'Syncing…',
+    cloud_offline: 'Offline — changes will sync when online',
+    cloud_never_synced: 'Not yet synced to cloud',
+    account_title: 'Account',
+    admin_title: 'Global Admin',
+    admin_desc: 'Read-only view of every family using this app.',
+    admin_refresh: '↻ Refresh',
+    admin_no_families: 'No families yet.',
+    admin_heroes: 'heroes',
+    admin_last_active: 'last active',
+    sign_out_confirm: 'Sign out? Your data stays safe in the cloud.',
+    invalid_email: 'Please enter a valid email.',
     mem_pairs_label: 'Pairs found',
     mem_misses_label: 'Misses',
     statcheck_prompt: "Pick the approach your party is best at:",
@@ -2569,6 +2630,29 @@ const TRANSLATIONS = {
     seq_your_turn: 'Ihr seid dran! Tippt die Kacheln in Reihenfolge ({n})',
     seq_show_again: '↻ Nochmal zeigen',
     seq_try_again: 'Ups — schaut das Muster noch einmal.',
+    sign_in: 'Anmelden',
+    sign_out: 'Abmelden',
+    sign_in_title: 'Anmelden',
+    sign_in_desc: 'Gib deine E-Mail ein. Wir schicken dir einen Anmeldelink — kein Passwort nötig.',
+    email_label: 'E-Mail',
+    cancel: 'Abbrechen',
+    send_magic_link: 'Link senden',
+    magic_link_sent: 'Schau in dein E-Mail-Postfach — Link zum Anmelden.',
+    magic_link_error: 'Link konnte nicht gesendet werden:',
+    signed_in_as: 'Angemeldet als',
+    cloud_synced: 'Cloud synchronisiert',
+    cloud_syncing: 'Synchronisiere…',
+    cloud_offline: 'Offline — wird später synchronisiert',
+    cloud_never_synced: 'Noch nicht mit der Cloud synchronisiert',
+    account_title: 'Konto',
+    admin_title: 'Globaler Admin',
+    admin_desc: 'Schreibgeschützter Überblick über alle Familien.',
+    admin_refresh: '↻ Aktualisieren',
+    admin_no_families: 'Noch keine Familien.',
+    admin_heroes: 'Helden',
+    admin_last_active: 'zuletzt aktiv',
+    sign_out_confirm: 'Abmelden? Deine Daten bleiben in der Cloud.',
+    invalid_email: 'Bitte eine gültige E-Mail eingeben.',
     mem_pairs_label: 'Paare gefunden',
     mem_misses_label: 'Fehler',
     statcheck_prompt: 'Wählt, worin eure Gruppe am besten ist:',
@@ -3954,7 +4038,11 @@ let selectedClass = CLASSES[0].id;
 let payoutKidId = null;
 let donateKidId = null;
 
-function save() { localStorage.setItem('piggyBankState', JSON.stringify(state)); }
+function save() {
+  localStorage.setItem('piggyBankState', JSON.stringify(state));
+  // If logged in, push this change to the cloud (debounced).
+  if (typeof scheduleCloudSync === 'function') scheduleCloudSync();
+}
 function load() {
   const raw = localStorage.getItem('piggyBankState');
   if (raw) {
@@ -7859,6 +7947,362 @@ function playFanfare() {
   playTone(NOTES.D5, 0.4, 'triangle', 0.18, 0.36);
 }
 
+// =====================================================================
+// SUPABASE — auth (magic link) + cloud state sync + admin dashboard
+// =====================================================================
+// Design notes:
+// - localStorage remains the fast synchronous source; the app always renders
+//   from it first, so there is no loading spinner on boot.
+// - Once a session is restored, we pull the cloud copy; if it has real data
+//   we replace the local state and re-render everything.
+// - Every save() schedules a debounced cloud push (800ms). Offline saves
+//   land in localStorage only; the next online save flushes.
+// - The anon key in config.js is public by Supabase design. Data isolation
+//   is enforced by Row-Level Security policies in the database.
+// =====================================================================
+
+let supaClient = null;
+let supaSession = null;
+let supaProfile = null;       // { user_id, email, is_admin }
+let cloudFamilyId = null;
+let cloudLastRemoteUpdatedAt = null;
+let cloudSyncTimer = null;
+let cloudSyncInFlight = false;
+let cloudLastSyncedAt = null;
+let cloudLastError = null;
+
+function supaConfigured() {
+  return !!(window.SUPABASE_URL && window.SUPABASE_ANON_KEY &&
+            window.supabase && typeof window.supabase.createClient === 'function');
+}
+
+async function initSupabase() {
+  if (!supaConfigured()) {
+    // No backend → keep the app in pure offline mode.
+    document.getElementById('accountBtn').style.display = 'none';
+    return;
+  }
+  supaClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,   // handles the magic-link callback
+      storage: window.localStorage
+    }
+  });
+  document.getElementById('accountBtn').style.display = '';
+
+  // Pick up an existing session (returning user), then react to changes.
+  const { data: { session } } = await supaClient.auth.getSession();
+  await applySession(session);
+
+  supaClient.auth.onAuthStateChange(async (_event, newSession) => {
+    await applySession(newSession);
+  });
+
+  // Online/offline affordance: nudge a sync when the network returns.
+  window.addEventListener('online', () => { if (supaSession) scheduleCloudSync(); });
+}
+
+async function applySession(session) {
+  supaSession = session || null;
+  updateAccountBtnLabel();
+  if (!supaSession) {
+    supaProfile = null;
+    cloudFamilyId = null;
+    cloudLastRemoteUpdatedAt = null;
+    renderAccountPanel();
+    renderAdminVisibility();
+    return;
+  }
+  // Load (or create) the profile row to read is_admin, then pull cloud state.
+  await loadOrCreateProfile();
+  await cloudLoad();
+  renderAccountPanel();
+  renderAdminVisibility();
+}
+
+function updateAccountBtnLabel() {
+  const btn = document.getElementById('accountBtn');
+  const label = document.getElementById('accountBtnLabel');
+  if (!btn || !label) return;
+  if (supaSession) {
+    const email = (supaSession.user && supaSession.user.email) || '';
+    label.textContent = email.split('@')[0] || t('signed_in_as');
+    btn.title = t('signed_in_as') + ' ' + email;
+  } else {
+    label.textContent = t('sign_in');
+    btn.title = '';
+  }
+}
+
+function onAccountBtnClick() {
+  // When signed in, clicking opens the Council → Account section.
+  if (supaSession) {
+    requirePin(() => {
+      switchTab('settings');
+      setTimeout(() => {
+        const sec = document.getElementById('accountSection');
+        if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    }, 'pin_council_reason');
+  } else {
+    openSignInModal();
+  }
+}
+
+function openSignInModal() {
+  document.getElementById('signInEmail').value = '';
+  document.getElementById('signInStatus').textContent = '';
+  document.getElementById('signInSubmitBtn').disabled = false;
+  openModal('signInModal');
+  setTimeout(() => document.getElementById('signInEmail').focus(), 50);
+}
+function closeSignInModal() { closeModal('signInModal'); }
+
+async function submitSignIn() {
+  const emailInput = document.getElementById('signInEmail');
+  const status = document.getElementById('signInStatus');
+  const btn = document.getElementById('signInSubmitBtn');
+  const email = (emailInput.value || '').trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    status.style.color = '#ff8080';
+    status.textContent = t('invalid_email');
+    return;
+  }
+  if (!supaClient) return;
+  btn.disabled = true;
+  status.style.color = 'var(--gold-bright)';
+  status.textContent = '…';
+  const { error } = await supaClient.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: location.origin + location.pathname }
+  });
+  if (error) {
+    status.style.color = '#ff8080';
+    status.textContent = t('magic_link_error') + ' ' + error.message;
+    btn.disabled = false;
+    return;
+  }
+  status.style.color = 'var(--gold-bright)';
+  status.textContent = '✉ ' + t('magic_link_sent');
+}
+
+async function signOutAccount() {
+  if (!supaClient) return;
+  if (!confirm(t('sign_out_confirm'))) return;
+  await supaClient.auth.signOut();
+  toast(t('sign_out'), 'success');
+}
+
+// ----- Profile + admin --------------------------------------------------
+async function loadOrCreateProfile() {
+  if (!supaSession) return;
+  const { data, error } = await supaClient
+    .from('profiles')
+    .select('user_id, email, is_admin')
+    .eq('user_id', supaSession.user.id)
+    .maybeSingle();
+  if (!error && data) {
+    supaProfile = data;
+    return;
+  }
+  // Fallback: trigger may not be set up yet → upsert ourselves.
+  const upsert = await supaClient
+    .from('profiles')
+    .upsert({ user_id: supaSession.user.id, email: supaSession.user.email }, { onConflict: 'user_id' })
+    .select('user_id, email, is_admin')
+    .single();
+  if (!upsert.error) supaProfile = upsert.data;
+}
+
+function isAdminUser() { return !!(supaProfile && supaProfile.is_admin); }
+
+// ----- Cloud state sync -------------------------------------------------
+async function cloudLoad() {
+  if (!supaSession || !supaClient) return;
+  try {
+    const { data, error } = await supaClient
+      .from('families')
+      .select('id, state, updated_at')
+      .eq('owner_user_id', supaSession.user.id)
+      .maybeSingle();
+    if (error) { cloudLastError = error.message; return; }
+    if (data && data.id) {
+      cloudFamilyId = data.id;
+      cloudLastRemoteUpdatedAt = data.updated_at;
+      const remoteState = data.state || {};
+      const remoteHasData = (remoteState.kids && remoteState.kids.length > 0) ||
+                            (remoteState.transactions && remoteState.transactions.length > 0);
+      if (remoteHasData) {
+        // Cloud wins — this is the multi-device case.
+        state = mergeLoadedState(remoteState);
+        save(); // write cache + schedule any no-op sync
+        rerenderAll();
+      } else {
+        // Empty cloud row → push what we have locally as the starting point.
+        scheduleCloudSync();
+      }
+    } else {
+      // No row yet → create one with current local state.
+      await supaClient.from('families').insert({
+        owner_user_id: supaSession.user.id,
+        name: supaSession.user.email,
+        state: state
+      }).select('id, updated_at').single().then(r => {
+        if (!r.error && r.data) {
+          cloudFamilyId = r.data.id;
+          cloudLastRemoteUpdatedAt = r.data.updated_at;
+          cloudLastSyncedAt = Date.now();
+        }
+      });
+    }
+  } catch (e) {
+    cloudLastError = String(e && e.message || e);
+  }
+  renderAccountPanel();
+}
+
+// Rebuild state from a cloud blob, re-applying migrations so older cloud
+// saves still load cleanly after schema bumps.
+function mergeLoadedState(remote) {
+  const DEFAULT_SETTINGS = { currency: '🪙', interestRate: 5, interestFreq: 'monthly',
+    lastInterestAt: null, musicOn: false, narratorOn: false, lang: 'en', maxTreasure: 20,
+    parentPinHash: null, pinAttempts: 0, pinLockedUntil: null, voiceEn: null, voiceDe: null,
+    narratorRate: 1.0, narratorPitch: 1.0, challengeDifficulty: 'squire', iTriedBonus: true,
+    paidAdventuresPerWeek: 1 };
+  const merged = { ...state, ...remote };
+  merged.settings = { ...DEFAULT_SETTINGS, ...(remote.settings || {}) };
+  merged.kids = Array.isArray(remote.kids) ? remote.kids : [];
+  merged.activities = Array.isArray(remote.activities) ? remote.activities : (state.activities || []);
+  merged.transactions = Array.isArray(remote.transactions) ? remote.transactions : [];
+  return merged;
+}
+
+function rerenderAll() {
+  try {
+    updateI18n();
+    renderSettings();
+    renderKids();
+    renderActivities();
+    renderHistoryFilter();
+    updateMusicBtn();
+    updateNarratorBtn();
+    renderAccountPanel();
+  } catch (e) { console.warn('[cloud] rerender failed:', e); }
+}
+
+function scheduleCloudSync() {
+  if (!supaSession || !supaClient || !cloudFamilyId) return;
+  if (!navigator.onLine) { renderAccountPanel(); return; }
+  clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(cloudSync, 800);
+  renderAccountPanel();
+}
+
+async function cloudSync() {
+  if (!supaSession || !supaClient || !cloudFamilyId) return;
+  if (cloudSyncInFlight) { // coalesce: reschedule after the in-flight one lands
+    clearTimeout(cloudSyncTimer);
+    cloudSyncTimer = setTimeout(cloudSync, 400);
+    return;
+  }
+  cloudSyncInFlight = true;
+  renderAccountPanel();
+  try {
+    const { data, error } = await supaClient
+      .from('families')
+      .update({ state: state })
+      .eq('id', cloudFamilyId)
+      .select('updated_at')
+      .single();
+    if (error) throw error;
+    cloudLastRemoteUpdatedAt = data && data.updated_at;
+    cloudLastSyncedAt = Date.now();
+    cloudLastError = null;
+  } catch (e) {
+    cloudLastError = String(e && e.message || e);
+  } finally {
+    cloudSyncInFlight = false;
+    renderAccountPanel();
+  }
+}
+
+// ----- Account panel UI -------------------------------------------------
+function renderAccountPanel() {
+  const sec = document.getElementById('accountSection');
+  const panel = document.getElementById('accountPanel');
+  if (!sec || !panel) return;
+  if (!supaConfigured()) { sec.style.display = 'none'; return; }
+  sec.style.display = '';
+  if (!supaSession) {
+    panel.innerHTML = `
+      <p style="color: var(--ink-muted); font-style: italic; margin-bottom: 10px;">
+        ${escapeHtml(t('sign_in_desc'))}
+      </p>
+      <button class="btn btn-primary" onclick="openSignInModal()">👤 ${t('sign_in')}</button>`;
+    return;
+  }
+  const email = (supaSession.user && supaSession.user.email) || '';
+  const statusTxt = !navigator.onLine ? t('cloud_offline')
+    : cloudSyncInFlight ? t('cloud_syncing')
+    : cloudLastError ? ('⚠ ' + cloudLastError)
+    : cloudLastSyncedAt ? (t('cloud_synced') + ' · ' + new Date(cloudLastSyncedAt).toLocaleTimeString())
+    : t('cloud_never_synced');
+  const statusColor = cloudLastError ? '#ff8080' : 'var(--gold-bright)';
+  const adminBadge = isAdminUser()
+    ? `<span style="display:inline-block; background: var(--royal); color:#fff; padding:2px 8px; border-radius:999px; font-size:11px; letter-spacing:1px; margin-left:8px;">ADMIN</span>`
+    : '';
+  panel.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div><strong>${escapeHtml(t('signed_in_as'))}:</strong> ${escapeHtml(email)} ${adminBadge}</div>
+      <div style="font-size: 13px; color: ${statusColor};">${escapeHtml(statusTxt)}</div>
+      <div><button class="btn btn-ghost btn-sm" onclick="signOutAccount()">${t('sign_out')}</button></div>
+    </div>`;
+}
+
+// ----- Admin dashboard --------------------------------------------------
+function renderAdminVisibility() {
+  const sec = document.getElementById('adminSection');
+  if (!sec) return;
+  sec.style.display = (supaSession && isAdminUser()) ? '' : 'none';
+  if (sec.style.display === '') loadAdminList();
+}
+
+async function loadAdminList() {
+  const box = document.getElementById('adminList');
+  if (!box || !supaClient || !isAdminUser()) return;
+  box.innerHTML = `<div style="color: var(--ink-muted); font-style: italic;">…</div>`;
+  // Families + profile join (both reads allowed by admin RLS policies).
+  const [famR, profR] = await Promise.all([
+    supaClient.from('families').select('id, owner_user_id, name, state, updated_at').order('updated_at', { ascending: false }),
+    supaClient.from('profiles').select('user_id, email, is_admin')
+  ]);
+  if (famR.error) { box.innerHTML = `<div style="color:#ff8080;">${escapeHtml(famR.error.message)}</div>`; return; }
+  const profiles = {};
+  (profR.data || []).forEach(p => { profiles[p.user_id] = p; });
+  const rows = famR.data || [];
+  if (rows.length === 0) { box.innerHTML = `<div style="color: var(--ink-muted); font-style: italic;">${t('admin_no_families')}</div>`; return; }
+  box.innerHTML = rows.map(f => {
+    const p = profiles[f.owner_user_id] || {};
+    const heroCount = (f.state && Array.isArray(f.state.kids)) ? f.state.kids.length : 0;
+    const totalCoin = (f.state && Array.isArray(f.state.kids))
+      ? f.state.kids.reduce((s, k) => s + (Number(k.balance) || 0), 0).toFixed(2)
+      : '0';
+    const last = f.updated_at ? new Date(f.updated_at).toLocaleString() : '—';
+    const adminMark = p.is_admin ? ' 🛡' : '';
+    return `
+      <div style="padding:10px 12px; border:1px solid var(--wood-dark); border-radius:6px; margin-bottom:8px; background: rgba(0,0,0,0.15);">
+        <div style="font-family:'MedievalSharp',cursive; color: var(--gold-bright); font-size:15px;">
+          ${escapeHtml(p.email || f.owner_user_id)}${adminMark}
+        </div>
+        <div style="font-size:12px; color: var(--ink-muted); margin-top:4px;">
+          ${heroCount} ${t('admin_heroes')} · 🪙 ${totalCoin} · ${t('admin_last_active')}: ${last}
+        </div>
+      </div>`;
+  }).join('');
+}
+
 // --- INIT ---
 load();
 updateI18n();
@@ -7874,6 +8318,23 @@ updateMusicBtn();
 updateNarratorBtn();
 // Pre-load TTS voices
 if ('speechSynthesis' in window) { speechSynthesis.getVoices(); }
+
+// Boot Supabase once the SDK module has resolved. The ESM <script> fires
+// 'supabase-ready'; if the event has already fired (SDK loaded before init),
+// window.supabase is present and we can boot immediately.
+if (window.supabase && typeof window.supabase.createClient === 'function') {
+  initSupabase();
+} else {
+  window.addEventListener('supabase-ready', initSupabase, { once: true });
+  // Safety fallback: if the SDK never loads (offline / CDN blocked), hide the
+  // Account button after a short wait so the UI doesn't hang on a stuck state.
+  setTimeout(() => {
+    if (!supaClient && !supaConfigured()) {
+      const b = document.getElementById('accountBtn');
+      if (b) b.style.display = 'none';
+    }
+  }, 3000);
+}
 
 // Expose top-level state + constants so automated tests (Playwright) can
 // reach them via page.evaluate(() => window.state). let/const declarations
