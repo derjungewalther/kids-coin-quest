@@ -970,6 +970,49 @@
     .pwa-install-chip { left: 10px; bottom: 10px; font-size: 12px; padding: 8px 14px; }
   }
 
+  /* ======================= AUTH (sign-in modal) ======================= */
+  .auth-google-btn {
+    width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 11px 14px;
+    background: #fff;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 14px;
+  }
+  .auth-google-btn:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    background: #f8f9fa;
+  }
+  .auth-google-btn:active { transform: translateY(1px); }
+  .auth-divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 10px 0 14px;
+    color: var(--parchment-darker);
+    font-family: 'Lora', serif;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+  }
+  .auth-divider::before,
+  .auth-divider::after {
+    content: ''; flex: 1; height: 1px; background: rgba(244,211,94,0.25);
+  }
+  .auth-link-btn {
+    background: none; border: none; padding: 0;
+    color: var(--gold-bright);
+    font-family: 'Lora', serif;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: underline;
+    opacity: 0.85;
+  }
+  .auth-link-btn:hover { opacity: 1; }
+
   /* ======================= LANDING PAGE ======================= */
   /* Shown to first-time, not-logged-in visitors. Hidden once user has
      dismissed it, signed in, or has existing local heroes. */
@@ -2886,19 +2929,61 @@
   </div>
 </div>
 
-<!-- Sign-in Modal (magic link) -->
+<!-- Sign-in / Sign-up Modal (password + Google SSO) -->
 <div class="modal-backdrop" id="signInModal">
   <div class="modal">
-    <h3>👤 <span data-i18n="sign_in_title">Sign in</span></h3>
-    <p style="color: var(--ink-muted); font-style: italic; margin-bottom: 10px;" data-i18n="sign_in_desc">
-      Enter your email. We'll send you a one-tap link to sign in — no password needed.
+    <h3 id="signInModalTitle">👤 <span data-i18n="sign_in_title">Sign in</span></h3>
+    <p id="signInModalDesc" style="color: var(--ink-muted); font-style: italic; margin-bottom: 12px;" data-i18n="sign_in_desc">
+      Sign in to sync your family's data across devices.
     </p>
+
+    <button class="auth-google-btn" id="googleSignInBtn" type="button" onclick="signInGoogle()">
+      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true" style="flex-shrink:0;">
+        <path fill="#FFC107" d="M43.6 20.5H42V20.5H24v7h11.3c-1.6 4.7-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5-5C33.4 6.4 28.9 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.4-.3-3.5z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l5.7 4.2C13.7 15.1 18.5 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5-5C33.4 6.4 28.9 4.5 24 4.5 17 4.5 10.9 8.3 6.3 14.7z"/>
+        <path fill="#4CAF50" d="M24 43.5c5 0 9.5-1.9 12.9-5l-6-5c-1.9 1.4-4.3 2.2-6.9 2.2-5.3 0-9.7-3.4-11.3-8l-5.6 4.3C10.7 39.6 16.8 43.5 24 43.5z"/>
+        <path fill="#1976D2" d="M43.6 20.5H42V20.5H24v7h11.3c-.8 2.3-2.2 4.3-4.1 5.8l6 5c2.6-2.4 5.3-6.3 5.3-13.3 0-1.2-.1-2.4-.3-3.5z"/>
+      </svg>
+      <span data-i18n="continue_with_google">Continue with Google</span>
+    </button>
+
+    <div class="auth-divider"><span data-i18n="or_label">or</span></div>
+
     <label for="signInEmail" data-i18n="email_label">Email</label>
     <input type="email" id="signInEmail" placeholder="you@example.com" autocomplete="email" />
+
+    <label for="signInPassword" style="margin-top:10px; display:block;" data-i18n="password_label">Password</label>
+    <input type="password" id="signInPassword" placeholder="••••••••" autocomplete="current-password" />
+
+    <div style="margin-top:6px; text-align:right;">
+      <button type="button" class="auth-link-btn" id="forgotPasswordLink" onclick="sendPasswordReset()" data-i18n="forgot_password">Forgot password?</button>
+    </div>
+
     <div id="signInStatus" style="margin: 8px 0; font-size: 13px; color: var(--gold-bright); min-height: 18px;"></div>
+
+    <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:12px; flex-wrap:wrap;">
+      <button type="button" class="auth-link-btn" id="authModeToggle" onclick="toggleAuthMode()" data-i18n="auth_switch_signup">Need an account? Sign up</button>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-ghost" onclick="closeSignInModal()" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-primary" id="signInSubmitBtn" onclick="submitSignIn()" data-i18n="sign_in_btn">Sign in</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Password-reset Modal (shown when returning from a recovery link) -->
+<div class="modal-backdrop" id="resetPasswordModal">
+  <div class="modal">
+    <h3>🔑 <span data-i18n="reset_password_title">Set a new password</span></h3>
+    <p style="color: var(--ink-muted); font-style: italic; margin-bottom: 10px;" data-i18n="reset_password_desc">
+      Enter a new password for your account.
+    </p>
+    <label for="resetNewPassword" data-i18n="new_password_label">New password</label>
+    <input type="password" id="resetNewPassword" placeholder="••••••••" autocomplete="new-password" />
+    <div id="resetPasswordStatus" style="margin: 8px 0; font-size: 13px; color: var(--gold-bright); min-height: 18px;"></div>
     <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
-      <button class="btn btn-ghost" onclick="closeSignInModal()" data-i18n="cancel">Cancel</button>
-      <button class="btn btn-primary" id="signInSubmitBtn" onclick="submitSignIn()" data-i18n="send_magic_link">Send magic link</button>
+      <button class="btn btn-ghost" onclick="closeModal('resetPasswordModal')" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-primary" id="resetPasswordSubmit" onclick="submitNewPassword()" data-i18n="set_password_btn">Set password</button>
     </div>
   </div>
 </div>
@@ -3024,12 +3109,28 @@ const TRANSLATIONS = {
     sign_in: 'Sign in',
     sign_out: 'Sign out',
     sign_in_title: 'Sign in',
-    sign_in_desc: "Enter your email. We'll send you a one-tap link to sign in — no password needed.",
+    sign_in_desc: "Sign in to sync your family's data across devices.",
+    sign_up_title: 'Create an account',
+    sign_up_desc: "A single account for your whole family. Takes 10 seconds.",
     email_label: 'Email',
+    password_label: 'Password',
+    new_password_label: 'New password',
     cancel: 'Cancel',
-    send_magic_link: 'Send magic link',
-    magic_link_sent: 'Check your email for the sign-in link.',
-    magic_link_error: 'Could not send link:',
+    sign_in_btn: 'Sign in',
+    sign_up_btn: 'Sign up',
+    continue_with_google: 'Continue with Google',
+    or_label: 'or',
+    auth_switch_signup: "Need an account? Sign up",
+    auth_switch_signin: 'Already have an account? Sign in',
+    forgot_password: 'Forgot password?',
+    password_too_short: 'Password must be at least 6 characters.',
+    enter_email_first: 'Enter your email first, then click Forgot password.',
+    password_reset_sent: 'Check your email for the reset link.',
+    password_updated: 'Password updated. You are signed in.',
+    sign_up_confirm_email: 'Account created — check your email to confirm it.',
+    reset_password_title: 'Set a new password',
+    reset_password_desc: 'Enter a new password for your account.',
+    set_password_btn: 'Set password',
     signed_in_as: 'Signed in as',
     cloud_synced: 'Cloud synced',
     cloud_syncing: 'Syncing…',
@@ -3275,12 +3376,28 @@ const TRANSLATIONS = {
     sign_in: 'Anmelden',
     sign_out: 'Abmelden',
     sign_in_title: 'Anmelden',
-    sign_in_desc: 'Gib deine E-Mail ein. Wir schicken dir einen Anmeldelink — kein Passwort nötig.',
+    sign_in_desc: 'Melde dich an, um die Daten deiner Familie geräteübergreifend zu synchronisieren.',
+    sign_up_title: 'Konto anlegen',
+    sign_up_desc: 'Ein Konto für die ganze Familie. Dauert 10 Sekunden.',
     email_label: 'E-Mail',
+    password_label: 'Passwort',
+    new_password_label: 'Neues Passwort',
     cancel: 'Abbrechen',
-    send_magic_link: 'Link senden',
-    magic_link_sent: 'Schau in dein E-Mail-Postfach — Link zum Anmelden.',
-    magic_link_error: 'Link konnte nicht gesendet werden:',
+    sign_in_btn: 'Anmelden',
+    sign_up_btn: 'Registrieren',
+    continue_with_google: 'Mit Google fortfahren',
+    or_label: 'oder',
+    auth_switch_signup: 'Noch kein Konto? Registrieren',
+    auth_switch_signin: 'Bereits ein Konto? Anmelden',
+    forgot_password: 'Passwort vergessen?',
+    password_too_short: 'Passwort muss mindestens 6 Zeichen haben.',
+    enter_email_first: 'Zuerst E-Mail eingeben, dann auf „Passwort vergessen" klicken.',
+    password_reset_sent: 'Schau in dein Postfach — Link zum Zurücksetzen.',
+    password_updated: 'Passwort aktualisiert. Du bist angemeldet.',
+    sign_up_confirm_email: 'Konto erstellt — bitte E-Mail bestätigen.',
+    reset_password_title: 'Neues Passwort setzen',
+    reset_password_desc: 'Gib ein neues Passwort für dein Konto ein.',
+    set_password_btn: 'Passwort setzen',
     signed_in_as: 'Angemeldet als',
     cloud_synced: 'Cloud synchronisiert',
     cloud_syncing: 'Synchronisiere…',
@@ -8697,9 +8814,17 @@ async function initSupabase() {
   const { data: { session } } = await supaClient.auth.getSession();
   await applySession(session);
 
-  supaClient.auth.onAuthStateChange(async (_event, newSession) => {
+  supaClient.auth.onAuthStateChange(async (event, newSession) => {
     await applySession(newSession);
+    // Password-reset links log the user in with a recovery token; open the
+    // "set new password" modal instead of silently dropping them in.
+    if (event === 'PASSWORD_RECOVERY') openPasswordRecoveryModal();
   });
+  // Also cover the case where the event already fired before we attached
+  // the listener (e.g. detectSessionInUrl handled it synchronously).
+  if ((new URLSearchParams(location.search)).get('type') === 'recovery') {
+    setTimeout(openPasswordRecoveryModal, 300);
+  }
 
   // Online/offline affordance: nudge a sync when the network returns.
   window.addEventListener('online', () => { if (supaSession) scheduleCloudSync(); });
@@ -8754,41 +8879,155 @@ function onAccountBtnClick() {
   }
 }
 
+// Modal remembers whether the user chose "sign in" or "sign up" between
+// openings — makes toggling predictable across a single session.
+let authMode = 'signin';
+
 function openSignInModal() {
   document.getElementById('signInEmail').value = '';
+  document.getElementById('signInPassword').value = '';
   document.getElementById('signInStatus').textContent = '';
   document.getElementById('signInSubmitBtn').disabled = false;
+  applyAuthMode();
   openModal('signInModal');
   setTimeout(() => document.getElementById('signInEmail').focus(), 50);
 }
 function closeSignInModal() { closeModal('signInModal'); }
 
+function applyAuthMode() {
+  const title = document.getElementById('signInModalTitle');
+  const desc = document.getElementById('signInModalDesc');
+  const submit = document.getElementById('signInSubmitBtn');
+  const toggle = document.getElementById('authModeToggle');
+  const pw = document.getElementById('signInPassword');
+  const forgot = document.getElementById('forgotPasswordLink');
+  if (authMode === 'signup') {
+    if (title) title.innerHTML = '👤 ' + escapeHtml(t('sign_up_title'));
+    if (desc) desc.textContent = t('sign_up_desc');
+    if (submit) submit.textContent = t('sign_up_btn');
+    if (toggle) toggle.textContent = t('auth_switch_signin');
+    if (pw) pw.setAttribute('autocomplete', 'new-password');
+    if (forgot) forgot.style.visibility = 'hidden';
+  } else {
+    if (title) title.innerHTML = '👤 ' + escapeHtml(t('sign_in_title'));
+    if (desc) desc.textContent = t('sign_in_desc');
+    if (submit) submit.textContent = t('sign_in_btn');
+    if (toggle) toggle.textContent = t('auth_switch_signup');
+    if (pw) pw.setAttribute('autocomplete', 'current-password');
+    if (forgot) forgot.style.visibility = '';
+  }
+}
+function toggleAuthMode() {
+  authMode = (authMode === 'signin') ? 'signup' : 'signin';
+  document.getElementById('signInStatus').textContent = '';
+  applyAuthMode();
+}
+
+function readEmailPassword() {
+  const email = (document.getElementById('signInEmail').value || '').trim().toLowerCase();
+  const password = document.getElementById('signInPassword').value || '';
+  return { email, password };
+}
+function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function setAuthStatus(msg, kind) {
+  const el = document.getElementById('signInStatus');
+  if (!el) return;
+  el.style.color = kind === 'error' ? '#ff8080' : 'var(--gold-bright)';
+  el.textContent = msg || '';
+}
+
 async function submitSignIn() {
-  const emailInput = document.getElementById('signInEmail');
-  const status = document.getElementById('signInStatus');
+  if (!supaClient) return;
+  const { email, password } = readEmailPassword();
   const btn = document.getElementById('signInSubmitBtn');
-  const email = (emailInput.value || '').trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!validEmail(email)) { setAuthStatus(t('invalid_email'), 'error'); return; }
+  if (!password || password.length < 6) { setAuthStatus(t('password_too_short'), 'error'); return; }
+  btn.disabled = true;
+  setAuthStatus('…', 'ok');
+  try {
+    if (authMode === 'signup') {
+      const { error } = await supaClient.auth.signUp({
+        email, password,
+        options: { emailRedirectTo: location.origin + location.pathname }
+      });
+      if (error) { setAuthStatus(error.message, 'error'); btn.disabled = false; return; }
+      // If email confirmation is enabled in Supabase, the user still needs to
+      // click the confirmation link. Surface that clearly.
+      setAuthStatus('✉ ' + t('sign_up_confirm_email'), 'ok');
+    } else {
+      const { error } = await supaClient.auth.signInWithPassword({ email, password });
+      if (error) { setAuthStatus(error.message, 'error'); btn.disabled = false; return; }
+      closeSignInModal();
+      toast(t('signed_in_as') + ' ' + email, 'success');
+    }
+  } catch (e) {
+    setAuthStatus(String(e && e.message || e), 'error');
+    btn.disabled = false;
+  }
+}
+
+async function signInGoogle() {
+  if (!supaClient) return;
+  setAuthStatus('…', 'ok');
+  try {
+    const { error } = await supaClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: location.origin + location.pathname }
+    });
+    if (error) setAuthStatus(error.message, 'error');
+    // On success the browser navigates away to Google — no further UI.
+  } catch (e) {
+    setAuthStatus(String(e && e.message || e), 'error');
+  }
+}
+
+async function sendPasswordReset() {
+  if (!supaClient) return;
+  const email = (document.getElementById('signInEmail').value || '').trim().toLowerCase();
+  if (!validEmail(email)) { setAuthStatus(t('enter_email_first'), 'error'); return; }
+  setAuthStatus('…', 'ok');
+  const { error } = await supaClient.auth.resetPasswordForEmail(email, {
+    // The '?type=recovery' lets us detect the callback and open the
+    // "set new password" modal. Supabase itself adds '#access_token=…'.
+    redirectTo: location.origin + location.pathname + '?type=recovery'
+  });
+  if (error) { setAuthStatus(error.message, 'error'); return; }
+  setAuthStatus('✉ ' + t('password_reset_sent'), 'ok');
+}
+
+// Called from the auth-state listener when we detect a PASSWORD_RECOVERY
+// event — Supabase fires this on arrival at the recovery callback URL.
+function openPasswordRecoveryModal() {
+  document.getElementById('resetNewPassword').value = '';
+  document.getElementById('resetPasswordStatus').textContent = '';
+  document.getElementById('resetPasswordSubmit').disabled = false;
+  openModal('resetPasswordModal');
+}
+
+async function submitNewPassword() {
+  if (!supaClient) return;
+  const pw = document.getElementById('resetNewPassword').value || '';
+  const status = document.getElementById('resetPasswordStatus');
+  const btn = document.getElementById('resetPasswordSubmit');
+  if (!pw || pw.length < 6) {
     status.style.color = '#ff8080';
-    status.textContent = t('invalid_email');
+    status.textContent = t('password_too_short');
     return;
   }
-  if (!supaClient) return;
   btn.disabled = true;
   status.style.color = 'var(--gold-bright)';
   status.textContent = '…';
-  const { error } = await supaClient.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: location.origin + location.pathname }
-  });
+  const { error } = await supaClient.auth.updateUser({ password: pw });
   if (error) {
     status.style.color = '#ff8080';
-    status.textContent = t('magic_link_error') + ' ' + error.message;
+    status.textContent = error.message;
     btn.disabled = false;
     return;
   }
-  status.style.color = 'var(--gold-bright)';
-  status.textContent = '✉ ' + t('magic_link_sent');
+  closeModal('resetPasswordModal');
+  toast(t('password_updated'), 'success');
+  // Clean the ?type=recovery from the URL so reloads don't re-open the modal.
+  history.replaceState(null, '', location.pathname);
 }
 
 async function signOutAccount() {
