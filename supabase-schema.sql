@@ -34,6 +34,19 @@ create trigger on_auth_user_created
 
 alter table public.profiles enable row level security;
 
+-- Helper: is the current user an admin? security definer so it bypasses RLS
+-- when checking; otherwise policies that reference profiles.is_admin would
+-- recurse into themselves (Postgres raises "infinite recursion in policy").
+create or replace function public.current_user_is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select coalesce((select is_admin from public.profiles where user_id = auth.uid()), false);
+$$;
+
 drop policy if exists "profiles_self_read" on public.profiles;
 create policy "profiles_self_read" on public.profiles
   for select using (auth.uid() = user_id);
@@ -45,10 +58,7 @@ create policy "profiles_self_update" on public.profiles
 -- Admins can read every profile (for the admin dashboard).
 drop policy if exists "profiles_admin_read_all" on public.profiles;
 create policy "profiles_admin_read_all" on public.profiles
-  for select using (
-    exists (select 1 from public.profiles p
-            where p.user_id = auth.uid() and p.is_admin = true)
-  );
+  for select using (public.current_user_is_admin());
 
 -- =============================================================
 -- families: one row per signed-in parent account (MVP)
@@ -94,10 +104,7 @@ create policy "families_owner_crud" on public.families
 -- Admins can read every family for the dashboard (read-only).
 drop policy if exists "families_admin_read" on public.families;
 create policy "families_admin_read" on public.families
-  for select using (
-    exists (select 1 from public.profiles p
-            where p.user_id = auth.uid() and p.is_admin = true)
-  );
+  for select using (public.current_user_is_admin());
 
 -- =============================================================
 -- After running this file:
