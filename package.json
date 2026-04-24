@@ -9,7 +9,9 @@
     "test:e2e": "playwright test tests/e2e.spec.mjs",
     "test:headed": "playwright test --headed",
     "test:report": "playwright show-report",
-    "serve": "python3 -m http.server 8765"
+    "serve": "python3 -m http.server 8765",
+    "extract-audio": "node scripts/extract-narration.mjs",
+    "generate-audio": "node scripts/generate-audio.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.47.0"

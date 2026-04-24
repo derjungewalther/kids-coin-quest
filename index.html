@@ -3620,7 +3620,10 @@ function narrateLast() {
   state.settings.narratorOn = wasOn;
 }
 function narratorSupported() { return 'speechSynthesis' in window; }
-function stopNarration() { if (narratorSupported()) window.speechSynthesis.cancel(); }
+function stopNarration() {
+  if (narratorSupported()) window.speechSynthesis.cancel();
+  if (typeof stopPrerenderedAudio === 'function') stopPrerenderedAudio();
+}
 // Voices that sound dreadful for narration — blocklist them outright.
 const NOVELTY_VOICES = /bad news|good news|bubbles|bells|boing|bahh|cellos|deranged|hysterical|trinoids|whisper|zarvox|albert|fred|junior|ralph|organ|pipe|drone|wobble|superstar|grandma|grandpa|reed|rocko|shelley|flo|sandy|eddy|jester|pog|wobble/i;
 
@@ -3674,18 +3677,70 @@ function pickBestVoice(lang) {
   return ranked[0] || voices[0] || null;
 }
 
+// Pre-rendered narration: generated once with OpenAI TTS (see scripts/),
+// hashed by (lang|text), served as audio/<id>.mp3. Loaded lazily from
+// audio/manifest.json on first narrate() call. Falls back to Web Speech
+// for any text that isn't pre-rendered (e.g. hero names the user typed).
+let narratorManifest = null;      // { en: { id: path }, de: { id: path } }
+let narratorManifestPromise = null;
+let narratorAudio = null;         // <audio> element currently playing
+
+async function loadNarratorManifest() {
+  if (narratorManifest) return narratorManifest;
+  if (narratorManifestPromise) return narratorManifestPromise;
+  narratorManifestPromise = fetch('audio/manifest.json', { cache: 'default' })
+    .then(r => r.ok ? r.json() : null)
+    .catch(() => null)
+    .then(m => { narratorManifest = m || { en: {}, de: {} }; return narratorManifest; });
+  return narratorManifestPromise;
+}
+
+async function hashNarrationKey(lang, text) {
+  const enc = new TextEncoder().encode(lang + '|' + text);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+}
+
+function stopPrerenderedAudio() {
+  if (narratorAudio) {
+    try { narratorAudio.pause(); narratorAudio.src = ''; } catch (e) {}
+    narratorAudio = null;
+  }
+}
+
+async function playPrerenderedAudio(path) {
+  stopPrerenderedAudio();
+  const a = new Audio(path);
+  a.preload = 'auto';
+  narratorAudio = a;
+  try { await a.play(); return true; }
+  catch (e) { return false; }
+}
+
 function narrate(text) {
   if (!state.settings.narratorOn) return;
-  if (!narratorSupported() || !text) return;
+  if (!text) return;
   stopNarration();
-  const clean = String(text).replace(/[⚔⚜✨🌟🪄🎵🏹🧙‍♂️🧝‍♀️🛡️🗡️🐉🎩📿⛑️🎓👑🔮🔨⚡🧪📖🏅👕🦺🥋👖🧵👢👟🥾💍🧠💪💛🤍🏡🌲💎🗼🌑🔥🌋🎲🏆🎁🟢🔴💰📊⭐🔒👋📷📜✎]/gu, '');
-  const u = new SpeechSynthesisUtterance(clean);
-  u.lang = state.settings.lang === 'de' ? 'de-DE' : 'en-US';
-  u.rate = state.settings.narratorRate || 1.0;
-  u.pitch = state.settings.narratorPitch || 1.0;
-  const voice = pickBestVoice(state.settings.lang);
-  if (voice) { u.voice = voice; u.lang = voice.lang; }
-  window.speechSynthesis.speak(u);
+  stopPrerenderedAudio();
+  const trimmed = String(text).trim();
+  const lang = state.settings.lang === 'de' ? 'de' : 'en';
+  // Try pre-rendered audio first. Async, but sync-looking fallback is fine.
+  (async () => {
+    const manifest = await loadNarratorManifest();
+    const key = await hashNarrationKey(lang, trimmed);
+    const path = manifest[lang] && manifest[lang][key];
+    if (path && await playPrerenderedAudio(path)) return; // done — premium voice
+    // Fallback: Web Speech (for custom hero names / anything not pre-rendered).
+    if (!narratorSupported()) return;
+    const clean = trimmed.replace(/[⚔⚜✨🌟🪄🎵🏹🧙‍♂️🧝‍♀️🛡️🗡️🐉🎩📿⛑️🎓👑🔮🔨⚡🧪📖🏅👕🦺🥋👖🧵👢👟🥾💍🧠💪💛🤍🏡🌲💎🗼🌑🔥🌋🎲🏆🎁🟢🔴💰📊⭐🔒👋📷📜✎]/gu, '');
+    const u = new SpeechSynthesisUtterance(clean);
+    u.lang = lang === 'de' ? 'de-DE' : 'en-US';
+    u.rate = state.settings.narratorRate || 1.0;
+    u.pitch = state.settings.narratorPitch || 1.0;
+    const voice = pickBestVoice(lang);
+    if (voice) { u.voice = voice; u.lang = voice.lang; }
+    window.speechSynthesis.speak(u);
+  })();
 }
 function toggleNarrator() {
   state.settings.narratorOn = !state.settings.narratorOn;

@@ -1,7 +1,7 @@
 // Kids Coin Quest — service worker
 // Bump CACHE_VERSION whenever index.html ships a change you want users to see
 // immediately after reload. Old caches are purged on activate.
-const CACHE_VERSION = 'kcq-v3';
+const CACHE_VERSION = 'kcq-v4';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -35,6 +35,22 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+
+  // Audio files are immutable (content-addressed by hash) — once cached,
+  // always serve from cache. That keeps narration instant and avoids
+  // re-downloading mp3s the user has already heard.
+  if (url.pathname.startsWith('/audio/') && url.pathname.endsWith('.mp3')) {
+    event.respondWith(
+      caches.open(CACHE_VERSION).then(async cache => {
+        const cached = await cache.match(req);
+        if (cached) return cached;
+        const res = await fetch(req);
+        if (res && res.ok) cache.put(req, res.clone());
+        return res;
+      })
+    );
+    return;
+  }
 
   event.respondWith(
     fetch(req)
