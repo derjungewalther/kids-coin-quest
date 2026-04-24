@@ -7982,6 +7982,17 @@ async function initSupabase() {
     document.getElementById('accountBtn').style.display = 'none';
     return;
   }
+  // Surface auth-callback errors (#error=otp_expired etc.) from the URL hash
+  // so the user isn't left wondering why "nothing happened" after clicking
+  // a stale magic link. Must run before createClient, because the SDK will
+  // strip the hash when detectSessionInUrl runs.
+  const hash = (location.hash || '').replace(/^#/, '');
+  if (hash.includes('error=')) {
+    const p = new URLSearchParams(hash);
+    const msg = p.get('error_description') || p.get('error') || 'Sign-in failed';
+    setTimeout(() => toast('⚠ ' + decodeURIComponent(msg.replace(/\+/g, ' ')), 'error'), 400);
+    history.replaceState(null, '', location.pathname + location.search);
+  }
   supaClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
     auth: {
       persistSession: true,
