@@ -1,0 +1,17 @@
+{
+  "name": "kids-coin-quest",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:functional": "playwright test tests/functional.spec.mjs",
+    "test:e2e": "playwright test tests/e2e.spec.mjs",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "serve": "python3 -m http.server 8765"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0"
+  }
+}

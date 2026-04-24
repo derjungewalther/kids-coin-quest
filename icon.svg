@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#3d2817"/>
+      <stop offset="100%" stop-color="#1f1208"/>
+    </radialGradient>
+    <linearGradient id="shield" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f4d35e"/>
+      <stop offset="55%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#8b6914"/>
+    </linearGradient>
+    <linearGradient id="coin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff5c4"/>
+      <stop offset="50%" stop-color="#f4d35e"/>
+      <stop offset="100%" stop-color="#b8860b"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <g opacity="0.18" filter="url(#soft)">
+    <circle cx="120" cy="110" r="6" fill="#f4d35e"/>
+    <circle cx="410" cy="140" r="5" fill="#f4d35e"/>
+    <circle cx="95" cy="390" r="5" fill="#f4d35e"/>
+    <circle cx="420" cy="400" r="7" fill="#f4d35e"/>
+    <circle cx="260" cy="60"  r="4" fill="#f4d35e"/>
+  </g>
+  <path d="M256 78 L404 128 L404 260 C404 352 336 416 256 444 C176 416 108 352 108 260 L108 128 Z"
+        fill="url(#shield)" stroke="#3d2817" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M256 94 L388 138 L388 260 C388 344 328 402 256 428 C184 402 124 344 124 260 L124 138 Z"
+        fill="none" stroke="#8b6914" stroke-width="3" opacity="0.6"/>
+  <circle cx="256" cy="262" r="90" fill="url(#coin)" stroke="#8b6914" stroke-width="8"/>
+  <circle cx="256" cy="262" r="76" fill="none" stroke="#8b6914" stroke-width="2" opacity="0.6"/>
+  <text x="256" y="295" text-anchor="middle"
+        font-family="Georgia, serif" font-size="110" font-weight="900"
+        fill="#8b6914">K</text>
+  <path d="M198 160 Q256 130 314 160" stroke="#fff5c4" stroke-width="5" fill="none" opacity="0.55" stroke-linecap="round"/>
+</svg>

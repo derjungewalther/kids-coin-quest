@@ -1,0 +1,27 @@
+{
+  "name": "Kids Coin Quest",
+  "short_name": "Coin Quest",
+  "description": "A medieval piggy-bank adventure for kids — earn coins, build heroes, go on quests.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1f1208",
+  "theme_color": "#d4af37",
+  "lang": "en",
+  "categories": ["education", "games", "kids", "finance"],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

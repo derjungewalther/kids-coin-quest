@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#3d2817"/>
+      <stop offset="100%" stop-color="#1f1208"/>
+    </radialGradient>
+    <linearGradient id="shield" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f4d35e"/>
+      <stop offset="55%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#8b6914"/>
+    </linearGradient>
+    <linearGradient id="coin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff5c4"/>
+      <stop offset="50%" stop-color="#f4d35e"/>
+      <stop offset="100%" stop-color="#b8860b"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <g transform="translate(256 256) scale(0.72) translate(-256 -256)">
+    <path d="M256 78 L404 128 L404 260 C404 352 336 416 256 444 C176 416 108 352 108 260 L108 128 Z"
+          fill="url(#shield)" stroke="#3d2817" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M256 94 L388 138 L388 260 C388 344 328 402 256 428 C184 402 124 344 124 260 L124 138 Z"
+          fill="none" stroke="#8b6914" stroke-width="3" opacity="0.6"/>
+    <circle cx="256" cy="262" r="90" fill="url(#coin)" stroke="#8b6914" stroke-width="8"/>
+    <circle cx="256" cy="262" r="76" fill="none" stroke="#8b6914" stroke-width="2" opacity="0.6"/>
+    <text x="256" y="295" text-anchor="middle"
+          font-family="Georgia, serif" font-size="110" font-weight="900"
+          fill="#8b6914">K</text>
+  </g>
+</svg>
