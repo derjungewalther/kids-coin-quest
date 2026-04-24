@@ -6,5 +6,5 @@
 //
 // Leave both null to run the app in offline-only mode (no login, no cloud
 // sync — localStorage only, same as before).
-window.SUPABASE_URL = null;       // e.g. 'https://abcd1234.supabase.co'
-window.SUPABASE_ANON_KEY = null;  // e.g. 'eyJhbGciOi...'
+window.SUPABASE_URL = 'https://dyfomoaxreoaceaakusg.supabase.co';
+window.SUPABASE_ANON_KEY = 'sb_publishable_hbcMI6sMKprB5X4gXy_Wag_iYTNZU1z';
