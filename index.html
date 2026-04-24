@@ -14,12 +14,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Coin Quest" />
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=MedievalSharp&family=Lora:wght@400;600&display=swap" rel="stylesheet">
-<!-- Supabase JS SDK (loaded as a module, exposed globally as window.supabase) -->
-<script type="module">
-  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
-  window.supabase = { createClient };
-  window.dispatchEvent(new Event('supabase-ready'));
-</script>
+<!-- Supabase JS SDK (self-hosted UMD bundle — attaches to window.supabase).
+     Self-hosted (not esm.sh / unpkg) because incognito/private browsing
+     modes often refuse third-party ESM imports, which silently broke the
+     sign-in buttons. -->
+<script src="./vendor/supabase-js-2.45.4.min.js"></script>
 <!-- Public config: Supabase URL + anon key -->
 <script src="./config.js"></script>
 <style>
@@ -9406,21 +9405,16 @@ updateNarratorBtn();
 // Pre-load TTS voices
 if ('speechSynthesis' in window) { speechSynthesis.getVoices(); }
 
-// Boot Supabase once the SDK module has resolved. The ESM <script> fires
-// 'supabase-ready'; if the event has already fired (SDK loaded before init),
-// window.supabase is present and we can boot immediately.
+// Boot Supabase. The self-hosted UMD script (loaded in <head> before this
+// one) attaches createClient to window.supabase synchronously, so we can
+// just call init directly — no ready event to wait for.
 if (window.supabase && typeof window.supabase.createClient === 'function') {
   initSupabase();
 } else {
-  window.addEventListener('supabase-ready', initSupabase, { once: true });
-  // Safety fallback: if the SDK never loads (offline / CDN blocked), hide the
-  // Account button after a short wait so the UI doesn't hang on a stuck state.
-  setTimeout(() => {
-    if (!supaClient && !supaConfigured()) {
-      const b = document.getElementById('accountBtn');
-      if (b) b.style.display = 'none';
-    }
-  }, 3000);
+  // Shouldn't happen with a same-origin script, but keep a graceful
+  // fallback: hide the Account button so the UI doesn't look broken.
+  const b = document.getElementById('accountBtn');
+  if (b) b.style.display = 'none';
 }
 
 // Expose top-level state + constants so automated tests (Playwright) can
