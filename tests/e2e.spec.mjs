@@ -7,7 +7,7 @@ import { test, expect, seedHero, setPin } from './fixtures.mjs';
 
 test.describe('First load', () => {
   test('shows the Heroes view with an empty-state prompt', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText(/Kids Coin Quest/i);
+    await expect(page.locator('header h1')).toContainText(/Kids Coin Quest/i);
     await expect(page.locator('#view-kids')).toBeVisible();
     await expect(page.locator('#kidsGrid')).toContainText(/no heroes/i);
   });

@@ -9,8 +9,16 @@ import { test as base, expect } from '@playwright/test';
 export const test = base.extend({
   page: async ({ page }, use) => {
     // Start from a clean localStorage before the app code runs.
+    // We also pre-seed the "landing dismissed" flag so every test lands
+    // straight in the app shell — the marketing page is covered by its
+    // own dedicated tests.
     await page.addInitScript(() => {
-      try { localStorage.clear(); } catch (e) {}
+      try {
+        localStorage.clear();
+        localStorage.setItem('piggyBankState', JSON.stringify({
+          settings: { landingDismissed: true }
+        }));
+      } catch (e) {}
     });
     await page.goto('/index.html');
     // Wait for the app to finish wiring up (indicator: the Heroes tab is active)
