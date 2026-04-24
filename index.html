@@ -3148,6 +3148,7 @@ const TRANSLATIONS = {
     password_reset_sent: 'Check your email for the reset link.',
     password_updated: 'Password updated. You are signed in.',
     sign_up_confirm_email: 'Account created — check your email to confirm it.',
+    auth_sdk_loading: 'Sign-in is still loading — try again in a moment.',
     reset_password_title: 'Set a new password',
     reset_password_desc: 'Enter a new password for your account.',
     set_password_btn: 'Set password',
@@ -3422,6 +3423,7 @@ const TRANSLATIONS = {
     password_reset_sent: 'Schau in dein Postfach — Link zum Zurücksetzen.',
     password_updated: 'Passwort aktualisiert. Du bist angemeldet.',
     sign_up_confirm_email: 'Konto erstellt — bitte E-Mail bestätigen.',
+    auth_sdk_loading: 'Anmeldung lädt noch — gleich nochmal probieren.',
     reset_password_title: 'Neues Passwort setzen',
     reset_password_desc: 'Gib ein neues Passwort für dein Konto ein.',
     set_password_btn: 'Passwort setzen',
@@ -9056,7 +9058,13 @@ async function submitSignIn() {
 }
 
 async function signInGoogle() {
-  if (!supaClient) return;
+  if (!supaClient) {
+    // Previously returned silently, which looked like a broken button.
+    // Common cause: slow first-time module import from esm.sh, or a
+    // browser that refuses ESM over the network (incognito restrictions).
+    setAuthStatus(t('auth_sdk_loading') || 'Sign-in is still loading, try again in a second…', 'error');
+    return;
+  }
   setAuthStatus('…', 'ok');
   try {
     const { error } = await supaClient.auth.signInWithOAuth({
