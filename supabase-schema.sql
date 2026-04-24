@@ -107,8 +107,38 @@ create policy "families_admin_read" on public.families
   for select using (public.current_user_is_admin());
 
 -- =============================================================
+-- delete_my_account: lets a signed-in user erase their own account
+-- (families row, profile row, and the auth.users record) in one call.
+-- Required for GDPR Art. 17 compliance — "right to erasure".
+-- security definer is necessary because clients cannot delete auth.users
+-- directly. The function only ever deletes auth.uid(), so there's no way
+-- to abuse it to delete someone else.
+-- =============================================================
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+begin
+  if uid is null then
+    raise exception 'Not authenticated';
+  end if;
+  delete from public.families where owner_user_id = uid;
+  delete from public.profiles where user_id = uid;
+  delete from auth.users where id = uid;
+end;
+$$;
+
+-- Any signed-in user may call delete_my_account for themselves.
+revoke all on function public.delete_my_account() from public;
+grant execute on function public.delete_my_account() to authenticated;
+
+-- =============================================================
 -- After running this file:
---   1. Sign up in the app with your email (magic link)
+--   1. Sign up in the app (password or Google)
 --   2. Come back here and run:
 --        update public.profiles set is_admin = true where email = 'you@example.com';
 --      to grant yourself the admin role.

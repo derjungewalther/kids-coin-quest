@@ -2549,6 +2549,10 @@
   <footer class="landing-footer">
     <span>Kids Coin Quest · v1.0</span>
     <span class="landing-footer-sep">·</span>
+    <a href="./privacy.html" data-i18n="privacy_link">Privacy</a>
+    <span class="landing-footer-sep">·</span>
+    <a href="./imprint.html" data-i18n="imprint_link">Imprint</a>
+    <span class="landing-footer-sep">·</span>
     <a href="https://github.com/derjungewalther/kids-coin-quest" target="_blank" rel="noopener">GitHub</a>
     <span class="landing-footer-sep">·</span>
     <span data-i18n="landing_footer_made">Made with ❤ for small brave hearts</span>
@@ -2971,6 +2975,22 @@
   </div>
 </div>
 
+<!-- Delete-account Modal (requires typing DELETE to enable the button) -->
+<div class="modal-backdrop" id="deleteAccountModal">
+  <div class="modal">
+    <h3>⚠ <span data-i18n="delete_account_title">Delete my account</span></h3>
+    <p style="color: #ff8080; font-style: italic; margin-bottom: 10px;" data-i18n="delete_account_warn">
+      This permanently erases your heroes, transactions, and account. This cannot be undone.
+    </p>
+    <label data-i18n="delete_account_confirm_label">Type DELETE to confirm</label>
+    <input type="text" id="deleteAccountConfirm" oninput="onDeleteAccountConfirmInput()" placeholder="DELETE" autocomplete="off" />
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+      <button class="btn btn-ghost" onclick="closeModal('deleteAccountModal')" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-danger" id="deleteAccountSubmit" onclick="submitDeleteAccount()" disabled data-i18n="delete_account_btn">Delete my account</button>
+    </div>
+  </div>
+</div>
+
 <!-- Password-reset Modal (shown when returning from a recovery link) -->
 <div class="modal-backdrop" id="resetPasswordModal">
   <div class="modal">
@@ -3131,6 +3151,13 @@ const TRANSLATIONS = {
     reset_password_title: 'Set a new password',
     reset_password_desc: 'Enter a new password for your account.',
     set_password_btn: 'Set password',
+    delete_account_title: 'Delete my account',
+    delete_account_warn: 'This permanently erases your heroes, transactions, and account. This cannot be undone.',
+    delete_account_confirm_label: 'Type DELETE to confirm',
+    delete_account_btn: 'Delete my account',
+    delete_account_done: 'Account deleted.',
+    privacy_link: 'Privacy',
+    imprint_link: 'Imprint',
     signed_in_as: 'Signed in as',
     cloud_synced: 'Cloud synced',
     cloud_syncing: 'Syncing…',
@@ -3398,6 +3425,13 @@ const TRANSLATIONS = {
     reset_password_title: 'Neues Passwort setzen',
     reset_password_desc: 'Gib ein neues Passwort für dein Konto ein.',
     set_password_btn: 'Passwort setzen',
+    delete_account_title: 'Mein Konto löschen',
+    delete_account_warn: 'Das löscht deine Helden, Transaktionen und dein Konto endgültig. Nicht rückgängig zu machen.',
+    delete_account_confirm_label: 'Tippe DELETE zum Bestätigen',
+    delete_account_btn: 'Konto löschen',
+    delete_account_done: 'Konto gelöscht.',
+    privacy_link: 'Datenschutz',
+    imprint_link: 'Impressum',
     signed_in_as: 'Angemeldet als',
     cloud_synced: 'Cloud synchronisiert',
     cloud_syncing: 'Synchronisiere…',
@@ -9199,8 +9233,55 @@ function renderAccountPanel() {
     <div style="display:flex; flex-direction:column; gap:10px;">
       <div><strong>${escapeHtml(t('signed_in_as'))}:</strong> ${escapeHtml(email)} ${adminBadge}</div>
       <div style="font-size: 13px; color: ${statusColor};">${escapeHtml(statusTxt)}</div>
-      <div><button class="btn btn-ghost btn-sm" onclick="signOutAccount()">${t('sign_out')}</button></div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="signOutAccount()">${t('sign_out')}</button>
+        <button class="btn btn-danger btn-sm" onclick="openDeleteAccountModal()">${t('delete_account_btn')}</button>
+      </div>
+      <div style="font-size: 12px; color: var(--ink-muted); margin-top:4px;">
+        <a href="./privacy.html" target="_blank" style="color: var(--gold-bright);">${t('privacy_link')}</a> ·
+        <a href="./imprint.html" target="_blank" style="color: var(--gold-bright);">${t('imprint_link')}</a>
+      </div>
     </div>`;
+}
+
+// Delete-my-account flow — irreversible, so gated behind typing DELETE.
+function openDeleteAccountModal() {
+  if (!supaSession) return;
+  openModal('deleteAccountModal');
+  const input = document.getElementById('deleteAccountConfirm');
+  if (input) { input.value = ''; setTimeout(() => input.focus(), 50); }
+  const btn = document.getElementById('deleteAccountSubmit');
+  if (btn) btn.disabled = true;
+}
+function onDeleteAccountConfirmInput() {
+  const input = document.getElementById('deleteAccountConfirm');
+  const btn = document.getElementById('deleteAccountSubmit');
+  if (!input || !btn) return;
+  btn.disabled = (input.value || '').trim().toUpperCase() !== 'DELETE';
+}
+async function submitDeleteAccount() {
+  if (!supaClient || !supaSession) return;
+  const btn = document.getElementById('deleteAccountSubmit');
+  btn.disabled = true;
+  try {
+    const { error } = await supaClient.rpc('delete_my_account');
+    if (error) {
+      toast('⚠ ' + error.message, 'error');
+      btn.disabled = false;
+      return;
+    }
+    // Clear everything local so no ghost data lingers on this device.
+    try { localStorage.clear(); } catch (e) {}
+    // The server has already invalidated the user; this just tells the SDK
+    // to wipe its cached session.
+    try { await supaClient.auth.signOut(); } catch (e) {}
+    closeModal('deleteAccountModal');
+    toast(t('delete_account_done'), 'success');
+    setTimeout(() => location.reload(), 800);
+  } catch (e) {
+    toast('⚠ ' + String(e && e.message || e), 'error');
+    btn.disabled = false;
+  }
 }
 
 // ----- Admin dashboard --------------------------------------------------

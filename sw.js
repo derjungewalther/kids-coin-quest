@@ -1,14 +1,16 @@
 // Kids Coin Quest — service worker
 // Bump CACHE_VERSION whenever index.html ships a change you want users to see
 // immediately after reload. Old caches are purged on activate.
-const CACHE_VERSION = 'kcq-v2';
+const CACHE_VERSION = 'kcq-v3';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon.svg',
   './icon-maskable.svg',
-  './config.js'
+  './config.js',
+  './privacy.html',
+  './imprint.html'
 ];
 
 self.addEventListener('install', (event) => {
