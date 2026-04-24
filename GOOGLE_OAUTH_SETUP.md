@@ -22,8 +22,8 @@ tell it about the Google client). ~10 minutes total.
    - **User support email:** your email
    - **App logo:** optional; you can skip for now
 4. App domain (all optional, can be left blank for testing):
-   - Application home page: `https://kidscoinadventure.netlify.app`
-5. **Authorized domains:** add `netlify.app` (or your custom domain later)
+   - Application home page: `https://kidscoinquest.app`
+5. **Authorized domains:** add `kidscoinquest.app`
 6. **Developer contact info:** your email. Save & continue.
 7. **Scopes:** don't add anything extra. Save & continue.
 8. **Test users:** add your own Google email (and any other family-member emails
@@ -62,7 +62,7 @@ tell it about the Google client). ~10 minutes total.
 
 ## Part 3 — Test
 
-1. Open the app in an incognito window: https://kidscoinadventure.netlify.app
+1. Open the app in an incognito window: https://kidscoinquest.app
 2. Landing page → **Get started** → sign-in modal
 3. Click **Continue with Google**
 4. Google consent screen appears. Pick your account → Continue
@@ -78,7 +78,7 @@ tell it about the Google client). ~10 minutes total.
   screen config.
 - **Returns to app but not signed in** — check that the Supabase **Site URL**
   and **Redirect URLs** (Authentication → URL Configuration) include
-  `https://kidscoinadventure.netlify.app`.
+  `https://kidscoinquest.app`.
 
 ## Going live (later)
 

@@ -45,11 +45,11 @@ Commit and push — Netlify auto-deploys.
 
 In the Supabase dashboard, open **Authentication → URL Configuration**:
 
-- **Site URL**: `https://kidscoinadventure.netlify.app`
+- **Site URL**: `https://kidscoinquest.app`
 - **Redirect URLs** (one per line):
   ```
-  https://kidscoinadventure.netlify.app/
-  https://kidscoinadventure.netlify.app/index.html
+  https://kidscoinquest.app/
+  https://kidscoinquest.app/index.html
   http://localhost:8765/
   http://localhost:8765/index.html
   ```
