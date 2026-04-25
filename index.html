@@ -3035,7 +3035,7 @@
         </div>
         <div>
           <label data-i18n="gold_reward">Gold Reward</label>
-          <input type="text" inputmode="decimal" id="actAmount" placeholder="1.00" />
+          <input type="text" inputmode="decimal" id="actAmount" placeholder="1.00" data-i18n-num-placeholder="1" />
         </div>
         <button class="btn btn-primary" onclick="addActivity()" data-i18n="proclaim">⚔ Proclaim</button>
       </div>
@@ -3594,6 +3594,12 @@ const TRANSLATIONS = {
     level_up_toast: "⭐ {name}'s {stat} leveled up! Now +{n}",
     treasure_word: 'treasure',
     gift_word: 'gift',
+    chronicle_interest: 'Treasury interest',
+    chronicle_withdrawal: 'Withdrawal',
+    chronicle_donation: 'Alms to',
+    royal_endowment: 'Royal endowment',
+    revoke_tx_title: 'Revoke this transaction',
+    banished: 'banished',
     cadence_label: 'Cadence',
     cadence_once: '∞ Whenever (no limit)',
     cadence_daily: '🔄 Daily',
@@ -3949,6 +3955,12 @@ const TRANSLATIONS = {
     level_up_toast: '⭐ {name} ist in {stat} aufgestiegen! Jetzt +{n}',
     treasure_word: 'Schatz',
     gift_word: 'Geschenk',
+    chronicle_interest: 'Schatzkammer-Zinsen',
+    chronicle_withdrawal: 'Abhebung',
+    chronicle_donation: 'Spende an',
+    royal_endowment: 'Königliche Stiftung',
+    revoke_tx_title: 'Diese Transaktion zurücknehmen',
+    banished: 'verbannt',
     cadence_label: 'Wiederholung',
     cadence_once: '∞ Beliebig (kein Limit)',
     cadence_daily: '🔄 Täglich',
@@ -4287,6 +4299,11 @@ function updateI18n() {
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+  // Locale-formatted numeric placeholder (e.g. "1,00" in DE, "1.00" in EN)
+  document.querySelectorAll('[data-i18n-num-placeholder]').forEach(el => {
+    const n = parseFloat(el.getAttribute('data-i18n-num-placeholder'));
+    if (!isNaN(n)) el.placeholder = (Math.round(n * 100) / 100).toFixed(2).replace('.', (state && state.settings && state.settings.lang === 'de') ? ',' : '.');
   });
   document.title = t('app_title');
   document.documentElement.lang = (state && state.settings && state.settings.lang) || 'en';
@@ -5766,6 +5783,9 @@ function load() {
       const parsed = JSON.parse(raw);
       state = { ...state, ...parsed };
       state.settings = { ...{ currency: '🪙', interestRate: 5, interestFreq: 'monthly', lastInterestAt: null, musicOn: false, narratorOn: false, lang: 'en', maxTreasure: 20, parentPinHash: null, pinAttempts: 0, pinLockedUntil: null, voiceEn: null, voiceDe: null, narratorRate: 1.0, narratorPitch: 1.0, challengeDifficulty: 'squire', iTriedBonus: true, paidAdventuresPerWeek: 1 }, ...state.settings };
+      // Migrate transactions written before structured event/payload existed.
+      // Pattern-match the well-known formats so language toggle re-localizes them.
+      if (Array.isArray(state.transactions)) state.transactions = state.transactions.map(migrateLegacyTx);
       // migrate kids
       state.kids.forEach(k => {
         if (!k.class) k.class = 'warrior';
@@ -6129,7 +6149,7 @@ function addKid() {
     xp: { brave: 0, clever: 0, kind: 0 }
   };
   state.kids.push(kid);
-  if (start > 0) logTx(kid.id, 'earn', start, 'Royal endowment');
+  if (start > 0) logTx(kid.id, 'earn', start, 'Royal endowment', { event: 'royal_endowment', payload: {} });
   save();
   renderKids();
   renderHistoryFilter();
@@ -6338,16 +6358,21 @@ function earn(kidId, actId) {
   const newLevel = xpLevelBonus(k.xp[st]);
   const leveledUp = newLevel > prevLevel;
 
-  // Note is a localized template so the Chronicle reads "+0,5 Mut-EP" in DE
-  // and "+0.5 Brave XP" in EN — instead of the previous mixed-language mess.
-  const noteTemplate = t('earn_note_template'); // "{icon} {name} · +{n} {stat} {xp}"
+  // The localized template stays as the legacy `note` for cloud syncs that
+  // only know about the string field; the structured event lets the
+  // Chronicle re-localize this entry on language toggle.
+  const noteTemplate = t('earn_note_template');
   const noteStr = noteTemplate
     .replace('{icon}', a.icon)
     .replace('{name}', L(a.name))
     .replace('{n}', fmtNumber(a.amount))
     .replace('{stat}', statLabel(st))
     .replace('{xp}', t('xp_short'));
-  logTx(kidId, 'earn', a.amount, noteStr, { xpStat: st, xpAmount: a.amount, activityId: a.id });
+  logTx(kidId, 'earn', a.amount, noteStr, {
+    xpStat: st, xpAmount: a.amount, activityId: a.id,
+    event: 'quest',
+    payload: { activityId: a.id, questIcon: a.icon, questName: L(a.name), xp: a.amount, stat: st }
+  });
   save();
   renderKids();
   playCoin();
@@ -6647,7 +6672,7 @@ function checkAutoAllowance() {
     k.balance += a.amount;
     k.totalEarned = (k.totalEarned || 0) + a.amount;
     a.lastPaidAt = today.toISOString();
-    logTx(k.id, 'earn', a.amount, `🏛 ${t('allowance_note')}`);
+    logTx(k.id, 'earn', a.amount, `🏛 ${t('allowance_note')}`, { event: 'allowance', payload: {} });
     creditedAny = true;
   });
   if (creditedAny) {
@@ -6870,7 +6895,7 @@ function confirmPayout() {
   if (amt > k.balance) { toast('Vault has insufficient gold!', 'error'); return; }
   k.balance -= amt;
   k.totalPaidOut = (k.totalPaidOut || 0) + amt;
-  logTx(payoutKidId, 'payout', -amt, note);
+  logTx(payoutKidId, 'payout', -amt, note, { event: 'withdrawal', payload: { reason: note } });
   save();
   renderKids();
   closeModal('payoutModal');
@@ -6895,7 +6920,7 @@ function confirmDonate() {
   if (!amt || amt <= 0) { toast('Enter a valid sum', 'error'); return; }
   if (amt > k.balance) { toast('Vault has insufficient gold!', 'error'); return; }
   k.balance -= amt;
-  logTx(donateKidId, 'donate', -amt, `❤ Alms to ${to}`);
+  logTx(donateKidId, 'donate', -amt, `❤ Alms to ${to}`, { event: 'donation', payload: { to } });
   checkAchievements(k, 'donate');
   save();
   renderKids();
@@ -7082,6 +7107,137 @@ function renderHistoryFilter() {
   sel.value = current;
 }
 
+// One-shot migration for transactions that pre-date the structured
+// event/payload model. Pattern-matches the formatted note string and
+// promotes it to a typed event so display-time localization works on
+// historic entries too. Idempotent — txs that already carry an `event`
+// pass through untouched.
+function migrateLegacyTx(tx) {
+  if (!tx || tx.event) return tx;
+  const note = String(tx.note || '');
+  // 🏆 <title> treasure / Schatz · <icon> <name>
+  const treasureMatch = note.match(/^🏆\s+(.+?)\s+(?:treasure|Schatz)(?:\s+·\s+(\S+)\s+(.+))?$/);
+  if (treasureMatch) {
+    const advTitle = treasureMatch[1];
+    const adv = ADVENTURES.find(a => L(a.title) === advTitle || a.title.en === advTitle || a.title.de === advTitle);
+    return Object.assign({}, tx, {
+      event: 'adventure_treasure',
+      payload: {
+        adventureId: adv ? adv.id : null,
+        adventureTitle: advTitle,
+        itemIcon: treasureMatch[2] || null,
+        itemName: treasureMatch[3] || null
+      }
+    });
+  }
+  // 🎁 <title> gift / Geschenk · <icon> <name>
+  const giftMatch = note.match(/^🎁\s+(.+?)\s+(?:gift|Geschenk)(?:\s+·\s+(\S+)\s+(.+))?$/);
+  if (giftMatch) {
+    const advTitle = giftMatch[1];
+    const adv = ADVENTURES.find(a => L(a.title) === advTitle || a.title.en === advTitle || a.title.de === advTitle);
+    return Object.assign({}, tx, {
+      event: 'adventure_gift',
+      payload: {
+        adventureId: adv ? adv.id : null,
+        adventureTitle: advTitle,
+        itemIcon: giftMatch[2] || null,
+        itemName: giftMatch[3] || null
+      }
+    });
+  }
+  // 🎁 <title> · You were very brave …  (consolation)
+  if (/^🎁\s+.+?\s+·/.test(note) && (note.includes('brave') || note.includes('tapfer'))) {
+    return Object.assign({}, tx, {
+      event: 'adventure_consolation',
+      payload: { adventureTitle: note.replace(/^🎁\s+/, '').split(' · ')[0] }
+    });
+  }
+  if (note.startsWith('🏛 ')) {
+    return Object.assign({}, tx, { event: 'allowance', payload: {} });
+  }
+  if (note.startsWith('🏦 ')) {
+    return Object.assign({}, tx, { event: 'interest', payload: {} });
+  }
+  // ❤ Alms to <recipient>
+  const donateMatch = note.match(/^❤\s+(?:Alms to|Spende an)\s+(.+)$/);
+  if (donateMatch) {
+    return Object.assign({}, tx, { event: 'donation', payload: { to: donateMatch[1] } });
+  }
+  if (tx.type === 'payout') {
+    return Object.assign({}, tx, { event: 'withdrawal', payload: { reason: note } });
+  }
+  if (note === 'Royal endowment') {
+    return Object.assign({}, tx, { event: 'royal_endowment', payload: {} });
+  }
+  // Quest entry from before structured data — best-effort: keep as
+  // 'legacy' so renderChronicleNote falls through to the stored string.
+  return Object.assign({}, tx, { event: 'legacy', payload: {} });
+}
+
+// Display-time localization for chronicle entries. The structured `event`
+// field + `payload` are the source of truth; the legacy `note` string is
+// only used as a fallback for entries that haven't been migrated yet.
+// Switching language re-renders the chronicle and every entry picks up
+// the active locale via this helper.
+function renderChronicleNote(tx) {
+  if (!tx) return '';
+  switch (tx.event) {
+    case 'quest': {
+      const p = tx.payload || {};
+      const xpStr = (typeof p.xp === 'number') ? fmtNumber(p.xp) : '';
+      const stat = p.stat || 'brave';
+      // Look up the activity by id so the name follows the current locale.
+      const a = p.activityId ? state.activities.find(x => x.id === p.activityId) : null;
+      const name = a ? L(a.name) : (p.questName || '');
+      const icon = (a && a.icon) || p.questIcon || '📜';
+      return `${icon} ${name} · +${xpStr} ${statLabel(stat)}-${t('xp_short')}`;
+    }
+    case 'adventure_treasure': {
+      const p = tx.payload || {};
+      const adv = p.adventureId ? ADVENTURES.find(a => a.id === p.adventureId) : null;
+      const title = adv ? L(adv.title) : (p.adventureTitle || '');
+      const itemPart = p.itemIcon && p.itemName ? ` · ${p.itemIcon} ${p.itemName}` : '';
+      return `🏆 ${title} ${t('treasure_word')}${itemPart}`;
+    }
+    case 'adventure_gift': {
+      const p = tx.payload || {};
+      const adv = p.adventureId ? ADVENTURES.find(a => a.id === p.adventureId) : null;
+      const title = adv ? L(adv.title) : (p.adventureTitle || '');
+      const itemPart = p.itemIcon && p.itemName ? ` · ${p.itemIcon} ${p.itemName}` : '';
+      return `🎁 ${title} ${t('gift_word')}${itemPart}`;
+    }
+    case 'adventure_consolation': {
+      const p = tx.payload || {};
+      const adv = p.adventureId ? ADVENTURES.find(a => a.id === p.adventureId) : null;
+      const title = adv ? L(adv.title) : (p.adventureTitle || '');
+      const reason = (typeof tx.amount === 'number' && tx.amount > 0)
+        ? t('consolation_note') : t('consolation_no_coin');
+      return `🎁 ${title} · ${reason}`;
+    }
+    case 'allowance':
+      return `🏛 ${t('allowance_note')}`;
+    case 'interest': {
+      const p = tx.payload || {};
+      const freq = p.freq ? t('freq_' + p.freq) : '';
+      return `🏦 ${t('chronicle_interest')}${p.rate ? ` (${fmtNumber(p.rate)}% ${freq})` : ''}`;
+    }
+    case 'withdrawal': {
+      const p = tx.payload || {};
+      const reason = p.reason ? ` · ${p.reason}` : '';
+      return `💰 ${t('chronicle_withdrawal')}${reason}`;
+    }
+    case 'donation': {
+      const p = tx.payload || {};
+      const to = p.to ? ` ${p.to}` : '';
+      return `❤ ${t('chronicle_donation')}${to}`;
+    }
+    case 'royal_endowment':
+      return `👑 ${t('royal_endowment')}`;
+  }
+  // Fallback: pre-migration entry. Render the stored string verbatim.
+  return tx.note || '';
+}
+
 function renderHistory() {
   const filter = document.getElementById('historyFilter').value;
   const list = document.getElementById('historyList');
@@ -7091,22 +7247,23 @@ function renderHistory() {
     list.innerHTML = `<div class="empty"><div class="empty-icon">📖</div><div>${escapeHtml(t('empty_chronicle'))}</div></div>`;
     return;
   }
-  list.innerHTML = txs.map(t => {
-    const k = kidById(t.kidId);
-    const typeEmoji = { earn: '⚔', payout: '💰', donate: '❤', interest: '🏦' }[t.type] || '•';
-    const kName = k ? `${k.avatar} ${escapeHtml(k.name)}` : '(banished)';
+  list.innerHTML = txs.map(tx => {
+    const k = kidById(tx.kidId);
+    const typeEmoji = { earn: '⚔', payout: '💰', donate: '❤', interest: '🏦' }[tx.type] || '•';
+    const kName = k ? `${k.avatar} ${escapeHtml(k.name)}` : `(${t('banished')})`;
+    const noteText = renderChronicleNote(tx);
     return `
       <div class="history-item">
         <div class="history-desc">
           <span style="font-size:22px;">${typeEmoji}</span>
           <div>
-            <div>${escapeHtml(t.note)} <span style="color:var(--ink-muted);">· ${kName}</span></div>
-            <div class="history-date">${fmtDateTime(t.at)}</div>
+            <div>${escapeHtml(noteText)} <span style="color:var(--ink-muted);">· ${kName}</span></div>
+            <div class="history-date">${fmtDateTime(tx.at)}</div>
           </div>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
-          <div class="${t.amount >= 0 ? 'amt-pos' : 'amt-neg'}">${t.amount >= 0 ? '+' : ''}${fmt(t.amount)}</div>
-          <button class="tx-revoke" onclick="revokeTransaction('${t.id}')" title="Revoke this transaction">✕</button>
+          <div class="${tx.amount >= 0 ? 'amt-pos' : 'amt-neg'}">${tx.amount >= 0 ? '+' : ''}${fmt(tx.amount)}</div>
+          <button class="tx-revoke" onclick="revokeTransaction('${tx.id}')" title="${escapeHtml(t('revoke_tx_title'))}">✕</button>
         </div>
       </div>
     `;
@@ -7161,7 +7318,8 @@ function applyInterestNow() {
       if (gain > 0) {
         k.balance += gain;
         k.totalEarned = (k.totalEarned || 0) + gain;
-        logTx(k.id, 'interest', gain, `🏦 Treasury interest (${state.settings.interestRate}% ${state.settings.interestFreq})`);
+        logTx(k.id, 'interest', gain, `🏦 Treasury interest (${state.settings.interestRate}% ${state.settings.interestFreq})`,
+          { event: 'interest', payload: { rate: state.settings.interestRate, freq: state.settings.interestFreq } });
         total += gain;
       }
     }
@@ -10220,7 +10378,11 @@ function awardConsolationTreasure() {
     const note = amount > 0
       ? `🎁 ${adv ? L(adv.title) : ''} · ${t('consolation_note')}`
       : `🎁 ${adv ? L(adv.title) : ''} · ${t('consolation_no_coin')}`;
-    logTx(h.id, 'earn', amount, note, { adventurePaid: mayPayCoins, adventureRunId: runId });
+    logTx(h.id, 'earn', amount, note, {
+      adventurePaid: mayPayCoins, adventureRunId: runId,
+      event: 'adventure_consolation',
+      payload: { adventureId: adv ? adv.id : null }
+    });
     if (amount > 0) bumpStreak(h);
     checkAchievements(h, 'adventure_consolation');
     return { kidId: h.id, amount, item: null };
@@ -10279,7 +10441,15 @@ function awardTreasure(tierMultiplier) {
               : `🏆 ${L(adv.title)} ${t('treasure_word')}`)
       : (item ? `🎁 ${L(adv.title)} ${t('gift_word')} · ${item.icon} ${item.name}`
               : `🎁 ${L(adv.title)} ${t('gift_word')}`);
-    logTx(h.id, 'earn', paidAmount, note, { adventurePaid: mayPayCoins, adventureRunId: runId, itemInstanceId: null });
+    logTx(h.id, 'earn', paidAmount, note, {
+      adventurePaid: mayPayCoins, adventureRunId: runId, itemInstanceId: null,
+      event: paidAmount > 0 ? 'adventure_treasure' : 'adventure_gift',
+      payload: {
+        adventureId: adv ? adv.id : null,
+        itemIcon: item ? item.icon : null,
+        itemName: item ? item.name : null
+      }
+    });
     bumpStreak(h);
     checkGoalReached(h);
     checkAchievements(h, 'adventure_win');
@@ -11136,9 +11306,10 @@ async function loadAdminList() {
   box.innerHTML = rows.map(f => {
     const p = profiles[f.owner_user_id] || {};
     const heroCount = (f.state && Array.isArray(f.state.kids)) ? f.state.kids.length : 0;
-    const totalCoin = (f.state && Array.isArray(f.state.kids))
-      ? f.state.kids.reduce((s, k) => s + (Number(k.balance) || 0), 0).toFixed(2)
-      : '0';
+    const totalCoinNum = (f.state && Array.isArray(f.state.kids))
+      ? f.state.kids.reduce((s, k) => s + (Number(k.balance) || 0), 0)
+      : 0;
+    const totalCoin = fmtNumber(totalCoinNum);
     const last = f.updated_at ? fmtDateTime(f.updated_at) : '—';
     const adminMark = p.is_admin ? ' 🛡' : '';
     return `
