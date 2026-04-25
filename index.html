@@ -239,6 +239,15 @@
     letter-spacing: 2px;
     line-height: 1;
   }
+  /* SVG pip row — identical rendering across platforms, distinct colour
+     per stat. Replaces the cross-platform-inconsistent emoji 💪🤍 mix. */
+  .stat-pips {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    line-height: 1;
+  }
+  .stat-pips .stat-pip { display: inline-block; vertical-align: middle; }
   .stat-box {
     text-align: center;
     padding: 4px;
@@ -5428,27 +5437,36 @@ function renderSceneIllustration(adv, sceneIdx) {
   const spacing = Math.min(90, 420 / count);
   const totalW = spacing * count;
   const startX = (600 - totalW) / 2 + spacing / 2;
-  // If a hero has uploaded a portrait, render that as the in-scene avatar
-  // so the kid sees themselves on the adventure, not a generic blocky
-  // figure. Falls back to the procedural character SVG otherwise.
+  // Wrap each hero in a circular gold-bordered frame in the scene so the
+  // in-scene sprite reads as the same character readers see on the
+  // Heroes tab — the card uses an identical circular portrait, just
+  // smaller. Inside the frame: uploaded photo if any, otherwise the
+  // procedural storybook character (same renderCharacterSVG either way).
   const heroSvgs = heroes.map((h, i) => {
     const x = startX + i * spacing - 40;
     const y = 175;
-    if (h.portrait) {
-      const cls = CLASSES.find(c => c.id === h.class) || CLASSES[0];
-      return `
-        <g transform="translate(${x}, ${y})">
-          <circle cx="40" cy="40" r="42" fill="rgba(0,0,0,0.4)"/>
-          <clipPath id="clip-portrait-${escapeHtml(h.id)}">
-            <circle cx="40" cy="40" r="38"/>
-          </clipPath>
-          <image href="${escapeHtml(h.portrait)}" x="2" y="2" width="76" height="76"
-                 preserveAspectRatio="xMidYMid slice"
-                 clip-path="url(#clip-portrait-${escapeHtml(h.id)})"/>
-          <circle cx="40" cy="40" r="38" fill="none" stroke="${cls.icon ? '#f4d35e' : '#8b6914'}" stroke-width="2.5"/>
-        </g>`;
-    }
-    return renderCharacterSVG(h, false, { x, y, size: 80 });
+    const cls = CLASSES.find(c => c.id === h.class) || CLASSES[0];
+    const safeId = escapeHtml(String(h.id || 'h')).replace(/[^a-z0-9_-]/gi, '');
+    const clipId = `clip-scene-portrait-${safeId}`;
+    const inner = h.portrait
+      ? `<image href="${escapeHtml(h.portrait)}" x="2" y="2" width="76" height="76"
+               preserveAspectRatio="xMidYMid slice"
+               clip-path="url(#${clipId})"/>`
+      : `<g clip-path="url(#${clipId})">
+           <rect x="2" y="2" width="76" height="76" fill="rgba(244,211,94,0.08)"/>
+           ${renderCharacterSVG(h, true, { x: 2, y: -8, size: 80 })}
+         </g>`;
+    return `
+      <g transform="translate(${x}, ${y})">
+        <ellipse cx="40" cy="80" rx="32" ry="4" fill="rgba(0,0,0,0.35)"/>
+        <circle cx="40" cy="40" r="42" fill="rgba(0,0,0,0.4)"/>
+        <clipPath id="${clipId}">
+          <circle cx="40" cy="40" r="38"/>
+        </clipPath>
+        ${inner}
+        <circle cx="40" cy="40" r="38" fill="none" stroke="#f4d35e" stroke-width="2.5"/>
+        <circle cx="40" cy="40" r="38" fill="none" stroke="#8b6914" stroke-width="0.8" opacity="0.6"/>
+      </g>`;
   }).join('');
   return `<div class="scene-illustration"><svg viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" class="scene-illustration-svg">${bg}${heroSvgs}</svg></div>`;
 }
@@ -5725,10 +5743,31 @@ function markLootDropped() {
 
 const STAT_KEYS = ['brave','clever','kind'];
 const STAT_META = {
-  brave:  { icon: '💪', empty: '🤍', label: 'Brave'  },
-  clever: { icon: '🧠', empty: '🤍', label: 'Clever' },
-  kind:   { icon: '💛', empty: '🤍', label: 'Kind'   }
+  brave:  { icon: '💪', empty: '🤍', label: 'Brave',  color: '#c8a44a' /* gold */ },
+  clever: { icon: '🧠', empty: '🤍', label: 'Clever', color: '#534ab7' /* purple */ },
+  kind:   { icon: '💛', empty: '🤍', label: 'Kind',   color: '#c25a8a' /* warm pink */ }
 };
+// SVG-based pip row: filled = solid disc in stat colour, empty = ring
+// only. Renders identically across iOS / Android / macOS / Windows
+// (was inconsistent emoji glyphs before). The whole row is a single
+// role=img with an aria-label so screen readers say "Brave 3 of 5"
+// instead of five emoji descriptions.
+function renderStatPips(stat, filled, max) {
+  max = max || STAT_MAX_DISPLAY;
+  const meta = STAT_META[stat] || STAT_META.brave;
+  const c = meta.color;
+  const pips = [];
+  for (let i = 0; i < max; i++) {
+    const isOn = i < filled;
+    pips.push(
+      `<svg class="stat-pip" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">` +
+      `<circle cx="8" cy="8" r="5.6" fill="${isOn ? c : 'transparent'}" stroke="${c}" stroke-width="1.6"/>` +
+      `</svg>`
+    );
+  }
+  const aria = `${t(stat)} ${filled} ${t('of_label')} ${max}`;
+  return `<span class="stat-pips" role="img" aria-label="${escapeHtml(aria)}">${pips.join('')}</span>`;
+}
 function renderStatIconRow(count, max) {
   max = max || STAT_MAX_DISPLAY;
   const clamped = Math.max(0, Math.min(max, count));
@@ -6213,15 +6252,13 @@ function renderKids() {
       const prog = Math.round(xpProgress(xpVal) * 100);
       const max = STAT_MAX_DISPLAY;
       const tooltip = `${t(sk)}: ${b.total}/${max}` + (b.xpBonus ? ` · +${b.xpBonus} XP` : '') + (b.itemBonus ? ` · +${b.itemBonus} Gear` : '');
-      const filledIcons = STAT_META[sk].icon.repeat(row.filled);
-      const emptyIcons = STAT_META[sk].empty.repeat(row.empty);
-      // role=group wraps the visual stat indicator + the XP progress so a
-      // screen-reader announces a meaningful "Brave 3 of 5, XP 40%" instead
-      // of "fire fire fire fire fire". Emoji decoration stays for sighted
-      // users, but is aria-hidden so it isn't read aloud as gibberish.
+      // SVG pip row: identical rendering across all platforms, distinct
+      // colour per stat (gold/purple/pink), filled = solid disc, empty
+      // = ring. Replaces the old emoji 💪🤍🤍🤍🤍 row.
+      const pipsHtml = renderStatPips(sk, row.filled);
       return `
       <div class="stat-row" role="group" title="${escapeHtml(tooltip)}" aria-label="${escapeHtml(tooltip)}">
-        <span class="stat-row-icons" aria-hidden="true">${filledIcons}${emptyIcons}</span>
+        ${pipsHtml}
         <div class="xp-bar" role="progressbar"
              aria-valuemin="0" aria-valuemax="100" aria-valuenow="${prog}"
              aria-label="${escapeHtml(t(sk) + ' XP')}">
@@ -7423,8 +7460,10 @@ function renderHeroSheet() {
     const totalXp = (k.xp && k.xp[sk]) || 0;
     const inLvl = xpInLevel(totalXp);
     const prog = Math.round(xpProgress(totalXp) * 100);
-    const filledIcons = STAT_META[sk].icon.repeat(row.filled);
-    const emptyIcons = STAT_META[sk].empty.repeat(row.empty);
+    const pipsHtml = renderStatPips(sk, row.filled);
+    // The breakdown legend keeps emoji glyphs because they're paired with
+    // explicit number labels — the SVG pip row above already gives the
+    // visual at-a-glance read.
     const breakdown = [];
     breakdown.push(`${t('starts_with')} ${STAT_META[sk].icon.repeat(b.base)}`);
     if (b.xpBonus) breakdown.push(`${t('xp_gives')} ${STAT_META[sk].icon.repeat(b.xpBonus)}`);
@@ -7435,7 +7474,7 @@ function renderHeroSheet() {
     <div class="hero-sheet-xp-row" role="group" aria-label="${escapeHtml(aria)}">
       <div class="hero-sheet-xp-head">
         <span class="hero-sheet-xp-label">${t(sk)}</span>
-        <span class="stat-row-icons" aria-hidden="true">${filledIcons}${emptyIcons}</span>
+        ${pipsHtml}
       </div>
       <div class="hero-sheet-xp-bar" role="progressbar"
            aria-valuemin="0" aria-valuemax="100" aria-valuenow="${prog}"
