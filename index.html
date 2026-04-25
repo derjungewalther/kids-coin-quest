@@ -4956,6 +4956,98 @@ function L(obj) {
   const lang = (state && state.settings && state.settings.lang) || 'en';
   return obj[lang] || obj.en || obj.de || '';
 }
+function LANG() { return (state && state.settings && state.settings.lang) || 'en'; }
+
+// =====================================================================
+// R3-S3 — DIALOGUE-VARIANT CONTENT SYSTEM
+// =====================================================================
+// pickVariant(pool, seed) — deterministic-by-seed selection from a pool
+// of equivalent strings. Same seed always picks the same variant; small
+// changes (e.g. a different runId) produce a different one. Backwards-
+// compatible: a string pool is returned verbatim.
+function fnv1aHash(seed) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h >>> 0;
+}
+function pickVariant(pool, seed) {
+  if (typeof pool === 'string') return pool;
+  if (!Array.isArray(pool) || pool.length === 0) return '';
+  if (pool.length === 1) return pool[0];
+  return pool[fnv1aHash(String(seed)) % pool.length];
+}
+// pickVariantWithMemory: avoids the last-N indices used for the same
+// (adventureId, sceneId, kind) tuple. Returns { index, text }. History
+// lives on state.narrationHistory[advId][sceneId][kind] = [idx, idx, ...].
+function pickVariantWithMemory(pool, seed, history, keepLast) {
+  if (typeof pool === 'string') return { index: 0, text: pool };
+  if (!Array.isArray(pool) || pool.length === 0) return { index: 0, text: '' };
+  if (pool.length === 1) return { index: 0, text: pool[0] };
+  const recent = new Set((history || []).slice(-(keepLast || 3)));
+  let candidates = pool.map((_, i) => i).filter(i => !recent.has(i));
+  if (!candidates.length) candidates = pool.map((_, i) => i);
+  const idx = candidates[fnv1aHash(String(seed)) % candidates.length];
+  return { index: idx, text: pool[idx] };
+}
+// getNarration(scene, kind, run) — primary read API. Accepts either:
+//   scene.narration === "string"   (legacy single string)
+//   scene.narration === { kind: "string" | [...] }   (R3-S3 pool)
+// `kind` is one of 'intro' | 'callToAction' | 'success' | 'fail'.
+// `run` carries the per-playthrough id so 🔊-replays read identical
+// text and a restart pulls a fresh variant.
+function getNarration(scene, kind, run) {
+  if (!scene) return '';
+  const lang = LANG();
+  let entry = scene.narration;
+  // Legacy: scene.text or {en,de} — promote into a single-element pool
+  // for the 'intro' kind so the rest of the rendering path is uniform.
+  if (entry == null) entry = scene.text;
+  // Locale-bucketed pool: { de: { intro: [...] }, en: { intro: [...] } }
+  if (entry && typeof entry === 'object' && (entry.de || entry.en) && !Array.isArray(entry)) {
+    if (entry[lang] && typeof entry[lang] === 'object' && !Array.isArray(entry[lang])) {
+      entry = entry[lang];
+    } else if (typeof entry[lang] === 'string') {
+      return entry[lang];
+    }
+  }
+  // Pool object keyed by kind: { intro: [...], success: [...], ... }
+  if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+    const pool = entry[kind];
+    if (pool == null) {
+      // Fall back to intro for missing kinds — better than empty string.
+      if (kind !== 'intro' && entry.intro) return getNarration({ narration: entry.intro }, 'intro', run);
+      return '';
+    }
+    const advId = (run && run.adventureId) || (currentAdventure && currentAdventure().id) || '';
+    const sceneId = (scene.id) || `scene_${(adventureState && adventureState.sceneIdx) || 0}`;
+    const seed = `${(run && run.id) || advId || ''}|${sceneId}|${kind}|${lang}`;
+    const history = (state.narrationHistory && state.narrationHistory[advId]
+                     && state.narrationHistory[advId][sceneId]
+                     && state.narrationHistory[advId][sceneId][kind]) || [];
+    const { index, text } = pickVariantWithMemory(pool, seed, history, 3);
+    // Lightly cache the picked index on the scene so the 🔊 replay reads
+    // exactly the same line, then bump history when the run completes.
+    scene._lastResolvedVariantIndex = scene._lastResolvedVariantIndex || {};
+    scene._lastResolvedVariantIndex[kind] = index;
+    rememberNarrationVariant(advId, sceneId, kind, index);
+    return text;
+  }
+  // String case (legacy or already-resolved object).
+  if (typeof entry === 'string') return entry;
+  return L(entry);
+}
+function rememberNarrationVariant(advId, sceneId, kind, index) {
+  if (!state.narrationHistory) state.narrationHistory = {};
+  if (!state.narrationHistory[advId]) state.narrationHistory[advId] = {};
+  if (!state.narrationHistory[advId][sceneId]) state.narrationHistory[advId][sceneId] = {};
+  const arr = state.narrationHistory[advId][sceneId][kind] || [];
+  arr.push(index);
+  while (arr.length > 6) arr.shift();
+  state.narrationHistory[advId][sceneId][kind] = arr;
+}
 function updateI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
@@ -10979,6 +11071,9 @@ function chooseAdventure(advId) {
   adventureState.legendaryFailedAtLeastOnce = false;
   adventureState.legendaryAbilityUsedThisRun = false;
   adventureState.lootMultiplier = 1;
+  // R3-S3: each playthrough gets a fresh runId so variant selection
+  // changes between restarts but stays stable for 🔊 replays.
+  adventureState.runId = 'run_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
   // R3-S4: prep legendary companion charges per the spec — every class
   // resets on adventure-start EXCEPT Erdheld:in, whose unspent charge
   // persists across adventures (the only "save it for later" option).
@@ -11080,6 +11175,7 @@ function persistAdventure() {
     mode: adventureState.mode,
     adventureId: adventureState.adventureId,
     party: [...adventureState.party],
+    runId: adventureState.runId || null,
     legendaryId: adventureState.legendaryId || null,
     legendaryFailedAtLeastOnce: !!adventureState.legendaryFailedAtLeastOnce,
     lootMultiplier: adventureState.lootMultiplier || 1,
@@ -11104,6 +11200,7 @@ function resumeSavedAdventure() {
     mode: s.mode || 'scene',
     adventureId: s.adventureId,
     party: [...(s.party || [])],
+    runId: s.runId || ('run_' + Date.now().toString(36)),
     legendaryId: s.legendaryId || null,
     legendaryFailedAtLeastOnce: !!s.legendaryFailedAtLeastOnce,
     legendaryAbilityUsedThisRun: false,
@@ -11388,7 +11485,7 @@ function renderAdventureScene() {
   // Every choice scene has .options[] with 3 entries. Option picked → hero choice.
   if (scene.options && !adventureState.chosenOption) {
     const heroesE = adventureState.party.map(pid => kidById(pid)).filter(Boolean);
-    const sceneText = L(scene.text);
+    const sceneText = (scene.narration && typeof scene.narration === "object") ? getNarration(scene, "intro", adventureState) : L(scene.text);
     const partyNames = partyNamesLine();
     const partyMention = partyNames
       ? `<div class="party-mentions">${t(adventureState.party.length === 1 ? 'hero_stands_one' : 'fellowship_stands').replace('{names}', escapeHtml(partyNames))}</div>`
@@ -11498,7 +11595,7 @@ function renderAdventureScene() {
     <div class="adventure-scene">
       <h3>${escapeHtml(L(scene.title))}</h3>
       ${renderSceneIllustration(a, adventureState.sceneIdx)}
-      <div class="adventure-narrative">${escapeHtmlMultiline(L(scene.text))}</div>
+      <div class="adventure-narrative">${escapeHtmlMultiline(scene.narration && typeof scene.narration === 'object' ? getNarration(scene, 'intro', adventureState) : L(scene.text))}</div>
       ${approachLine}
       <div class="adventure-challenge">
         <div class="adv-chal-title">⚠ ${t('challenge')} · DC ${dcFor(challenge.dc)}${adventureState.nextRollBonus && state.settings.iTriedBonus !== false ? ` <span class="pity-badge">+${adventureState.nextRollBonus} ${t('pity_label')}</span>` : ''}</div>
@@ -11532,7 +11629,7 @@ function chosenOptionBack() {
 // ===== PUZZLE SCENE (riddle, no dice) =====
 // scene shape: { type:'puzzle', title, text, question, answers: [{label, correct?}], hint? }
 function renderPuzzleScene(a, scene, c) {
-  const sceneText = L(scene.text);
+  const sceneText = (scene.narration && typeof scene.narration === "object") ? getNarration(scene, "intro", adventureState) : L(scene.text);
   const question = L(scene.question);
   const state_ = adventureState.puzzleState || (adventureState.puzzleState = { tried: [], solved: false, failed: false });
   const answers = scene.answers || [];
@@ -11629,7 +11726,7 @@ function answerPuzzle(idx) {
 // ===== SEQUENCE SCENE (Simon-says, no dice) =====
 // scene shape: { type:'sequence', title, text, tiles:['🌲','⭐','🌙','☀'], length:4 }
 function renderSequenceScene(a, scene, c) {
-  const sceneText = L(scene.text);
+  const sceneText = (scene.narration && typeof scene.narration === "object") ? getNarration(scene, "intro", adventureState) : L(scene.text);
   const s = adventureState.sequenceState;
   // First visit: build the pattern and mark as "showing"
   if (!s) {
@@ -11810,7 +11907,7 @@ function pickChoiceOption(optIdx) {
 // scene shape: { type:'memory', title, text, icons:['🌙','⭐','🌲','🐿'], success, failure }
 // icons: unique symbols; each becomes a pair. missesAllowed = icons.length (forgiving).
 function renderMemoryScene(a, scene, c) {
-  const sceneText = L(scene.text);
+  const sceneText = (scene.narration && typeof scene.narration === "object") ? getNarration(scene, "intro", adventureState) : L(scene.text);
   let st = adventureState.memoryState;
   if (!st) {
     const icons = scene.icons || ['🌙', '⭐', '🌲', '🐿'];
@@ -11956,7 +12053,7 @@ function flipMemoryCard(idx) {
 // scene shape: { type:'statcheck', title, text, options:[{stat, threshold, label, success, failure}] }
 // Success if party total in that stat >= threshold. No randomness.
 function renderStatCheckScene(a, scene, c) {
-  const sceneText = L(scene.text);
+  const sceneText = (scene.narration && typeof scene.narration === "object") ? getNarration(scene, "intro", adventureState) : L(scene.text);
   const st = adventureState.statCheckState || (adventureState.statCheckState = { chosen: -1, succeeded: null, done: false });
   const heroes = adventureState.party.map(pid => kidById(pid)).filter(Boolean);
   const done = st.done;
@@ -12052,7 +12149,7 @@ function pickStatCheck(idx) {
 // Each task is cycled onto a party member. Each rolls 1d20 + stat vs DC.
 // Majority successes = overall success.
 function renderSplitScene(a, scene, c) {
-  const sceneText = L(scene.text);
+  const sceneText = (scene.narration && typeof scene.narration === "object") ? getNarration(scene, "intro", adventureState) : L(scene.text);
   const heroes = adventureState.party.map(pid => kidById(pid)).filter(Boolean);
   let st = adventureState.splitState;
   if (!st) {
