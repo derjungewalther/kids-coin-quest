@@ -444,6 +444,44 @@
     font-size: 22px;
   }
   .sequence-slot.filled { border-style: solid; border-color: var(--gold-dark); background: rgba(244,211,94,0.12); }
+  /* Sequence phase banner — clear, prominent state cue so kids know
+     whether to watch or tap. */
+  .seq-phase {
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    padding: 10px 14px;
+    margin: 10px auto;
+    max-width: 360px;
+    border-radius: 8px;
+    border: 2px solid var(--gold-dark);
+  }
+  .seq-phase-watch {
+    background: linear-gradient(180deg, rgba(244,211,94,0.18), rgba(139,105,20,0.25));
+    color: var(--gold-bright);
+    animation: seqWatchPulse 1.4s ease-in-out infinite;
+  }
+  .seq-phase-input {
+    background: linear-gradient(180deg, #7dd3a4, #2d6a4f);
+    color: #fff;
+    border-color: #1a3d2a;
+    box-shadow: 0 0 16px rgba(125,211,164,0.4);
+  }
+  @keyframes seqWatchPulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50%     { transform: scale(1.03); opacity: 0.85; }
+  }
+  .sequence-tile.choice {
+    cursor: pointer;
+    box-shadow: 0 0 0 0 rgba(244,211,94,0.5);
+    animation: seqTileBeckon 1.6s ease-in-out infinite;
+  }
+  @keyframes seqTileBeckon {
+    0%,100% { box-shadow: 0 0 0 0 rgba(244,211,94,0.5); }
+    50%     { box-shadow: 0 0 0 6px rgba(244,211,94,0); }
+  }
 
   /* Memory scene */
   .memory-grid {
@@ -4196,6 +4234,19 @@ async function playPrerenderedAudio(path) {
   try { await a.play(); return true; }
   catch (e) { return false; }
 }
+
+// Narrates a piece of scene text exactly once per "scene context" (a scene
+// + its sub-state, e.g. puzzle question vs. result). Subsequent calls with
+// the same key are no-ops, so clicks inside a mini-game don't restart the
+// audio mid-sentence. The key is reset on scene change (nextScene) and on
+// option-pick transitions, so genuinely new content still gets read.
+let _narrationLastKey = null;
+function narrateOnce(key, text) {
+  if (_narrationLastKey === key) return;
+  _narrationLastKey = key;
+  narrate(text);
+}
+function resetNarrationKey() { _narrationLastKey = null; }
 
 function narrate(text) {
   if (!state.settings.narratorOn) return;
@@ -8798,6 +8849,7 @@ function restartAdventure() {
   adventureState.lastRoll = null;
   adventureState.lootDropCount = 0;
   adventureState.mode = 'intro';
+  resetNarrationKey();
   stopNarration();
   persistAdventure();
   renderAdventure();
@@ -8878,6 +8930,7 @@ function renderAdventureIntro() {
 
 function beginScenes() {
   adventureState.mode = 'scene';
+  resetNarrationKey();
   playFanfare();
   renderAdventure();
 }
@@ -8936,7 +8989,7 @@ function renderAdventureScene() {
       </div>`;
     persistAdventure();
     lastNarratedText = sceneText;
-    narrate(sceneText);
+    narrateOnce('choice:' + adventureState.sceneIdx, sceneText);
     return;
   }
 
@@ -9038,6 +9091,7 @@ function renderAdventureScene() {
 }
 function chosenOptionBack() {
   adventureState.chosenOption = null;
+  resetNarrationKey();
   stopNarration();
   renderAdventure();
 }
@@ -9093,7 +9147,13 @@ function renderPuzzleScene(a, scene, c) {
     </div>`;
   persistAdventure();
   lastNarratedText = sceneText + ' ' + question;
-  if (!done) narrate(lastNarratedText);
+  // Narrate the prompt once per scene; result text takes its turn after solve.
+  if (!done) {
+    narrateOnce('puzzle:' + adventureState.sceneIdx, lastNarratedText);
+  } else {
+    const outcomeText = state_.solved ? L(scene.success) : L(scene.failure);
+    narrateOnce('puzzle:' + adventureState.sceneIdx + ':done', outcomeText);
+  }
   requestAnimationFrame(animateCourageDelta);
 }
 
@@ -9168,10 +9228,12 @@ function renderSequenceScene(a, scene, c) {
     ? `<div class="dice-result failure" style="margin-top:10px;">${t('failure_label')}</div>
        <div class="adventure-narrative" style="margin-top:6px;">${escapeHtmlMultiline(L(scene.failure))}</div>`
     : '';
+  // Phase banner: prominent so the kid knows what to do. Pulses while
+  // showing, glows while it's their turn.
   const phaseLine = st.phase === 'showing'
-    ? `<div style="text-align:center; font-family:'MedievalSharp',cursive; color: var(--gold-bright); font-size:14px; margin:6px 0;">${t('seq_watch')}</div>`
+    ? `<div class="seq-phase seq-phase-watch">${t('seq_watch')}</div>`
     : !done
-    ? `<div style="text-align:center; font-family:'MedievalSharp',cursive; color: var(--gold-bright); font-size:14px; margin:6px 0;">${t('seq_your_turn').replace('{n}', st.input.length + '/' + pattern.length)}</div>`
+    ? `<div class="seq-phase seq-phase-input">👇 ${t('seq_your_turn').replace('{n}', st.input.length + '/' + pattern.length)}</div>`
     : '';
   const isLast = adventureState.sceneIdx >= a.scenes.length - 1;
   const continueBtn = !done ? ''
@@ -9198,7 +9260,16 @@ function renderSequenceScene(a, scene, c) {
     </div>`;
   persistAdventure();
   lastNarratedText = sceneText;
-  if (st.phase === 'showing' && !done) narrate(sceneText);
+  // Narrate the scene text once on entry. Phase changes (showing → input →
+  // showing-after-miss) used to re-fire narration every time, restarting
+  // the audio mid-sentence with each tile click and making the game feel
+  // stalled.
+  if (!done) {
+    narrateOnce('sequence:' + adventureState.sceneIdx, sceneText);
+  } else {
+    const outcomeText = st.solved ? L(scene.success) : L(scene.failure);
+    narrateOnce('sequence:' + adventureState.sceneIdx + ':done', outcomeText);
+  }
   requestAnimationFrame(animateCourageDelta);
 }
 
@@ -9360,7 +9431,12 @@ function renderMemoryScene(a, scene, c) {
     </div>`;
   persistAdventure();
   lastNarratedText = sceneText;
-  if (!done) narrate(sceneText);
+  if (!done) {
+    narrateOnce('memory:' + adventureState.sceneIdx, sceneText);
+  } else {
+    const outcomeText = st.solved ? L(scene.success) : L(scene.failure);
+    narrateOnce('memory:' + adventureState.sceneIdx + ':done', outcomeText);
+  }
   requestAnimationFrame(animateCourageDelta);
 }
 
@@ -9485,7 +9561,12 @@ function renderStatCheckScene(a, scene, c) {
     </div>`;
   persistAdventure();
   lastNarratedText = sceneText;
-  if (!done) narrate(sceneText);
+  if (!done) {
+    narrateOnce('statcheck:' + adventureState.sceneIdx, sceneText);
+  } else if (chosenOpt) {
+    const outcomeText = st.succeeded ? L(chosenOpt.success) : L(chosenOpt.failure);
+    narrateOnce('statcheck:' + adventureState.sceneIdx + ':done', outcomeText);
+  }
   requestAnimationFrame(animateCourageDelta);
 }
 
@@ -9598,7 +9679,12 @@ function renderSplitScene(a, scene, c) {
     </div>`;
   persistAdventure();
   lastNarratedText = sceneText;
-  if (!done) narrate(sceneText);
+  if (!done) {
+    narrateOnce('split:' + adventureState.sceneIdx, sceneText);
+  } else {
+    const outcomeText = st.allSuccess ? L(scene.success) : L(scene.failure);
+    narrateOnce('split:' + adventureState.sceneIdx + ':done', outcomeText);
+  }
   requestAnimationFrame(animateCourageDelta);
 }
 
@@ -9777,6 +9863,8 @@ function nextScene() {
   adventureState.memoryState = null;
   adventureState.statCheckState = null;
   adventureState.splitState = null;
+  // New scene → allow narration to fire once for the new text.
+  resetNarrationKey();
   renderAdventure();
 }
 
