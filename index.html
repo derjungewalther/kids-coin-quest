@@ -494,20 +494,48 @@
   .memory-card {
     aspect-ratio: 1 / 1;
     min-height: 58px;
+    position: relative;
     display: flex; align-items: center; justify-content: center;
     font-size: 34px;
-    background: linear-gradient(180deg, var(--wood) 0%, var(--wood-dark) 100%);
+    /* Card-back: parchment scroll feel + gold ornament so cards read as
+       "tappable cards", not blank dark squares. The pseudo-element draws
+       the back; once flipped/matched it's hidden. */
+    background:
+      radial-gradient(circle at 30% 30%, rgba(244,211,94,0.12), transparent 60%),
+      linear-gradient(135deg, #5a3d20 0%, #3d2817 60%, #1f1208 100%);
     border: 3px solid var(--gold-dark);
     border-radius: 8px;
     cursor: pointer;
     color: var(--gold-bright);
-    box-shadow: 0 3px 0 var(--wood-darker), 0 5px 10px rgba(0,0,0,0.45);
-    transition: transform 0.15s, background 0.2s;
+    box-shadow: inset 0 0 0 2px rgba(244,211,94,0.18),
+                0 3px 0 var(--wood-darker),
+                0 5px 10px rgba(0,0,0,0.45);
+    transition: transform 0.15s, background 0.2s, box-shadow 0.15s;
     user-select: none;
+    overflow: hidden;
+  }
+  /* Card-back ornament — a question mark with a soft gold ring. */
+  .memory-card:not(.flipped):not(.matched)::before {
+    content: '?';
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: 30px;
+    color: rgba(244,211,94,0.8);
+    text-shadow: 0 1px 0 rgba(0,0,0,0.6);
+  }
+  .memory-card:not(.flipped):not(.matched)::after {
+    content: '';
+    position: absolute; inset: 6px;
+    border: 2px dashed rgba(244,211,94,0.35);
+    border-radius: 6px;
+    pointer-events: none;
   }
   .memory-card:hover:not(.matched):not(.flipped) {
     transform: translateY(-2px) scale(1.03);
-    background: linear-gradient(180deg, var(--wood-light, #7a5333) 0%, var(--wood) 100%);
+    box-shadow: inset 0 0 0 2px rgba(244,211,94,0.4),
+                0 4px 0 var(--wood-darker),
+                0 8px 16px rgba(0,0,0,0.55),
+                0 0 12px rgba(244,211,94,0.3);
   }
   .memory-card.flipped {
     background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-dark) 100%);
@@ -2063,16 +2091,23 @@
     text-transform: uppercase;
   }
 
-  /* Icon picker — grouped by suggested stat so parents scan faster */
+  /* Icon picker — grouped by suggested stat so parents scan faster.
+     The parent .emoji-picker is `display: flex; flex-wrap: wrap`, which
+     used to flow the group heads INLINE next to the icons, overlapping
+     the first icon of each group. Override the layout to a vertical
+     stack here so headers sit on their own row above the icons. */
+  .emoji-picker:has(> .icon-group-head),
+  #actEmojiPicker { display: block; }
   .icon-group-head {
+    display: block;
     font-family: 'Cinzel', serif;
     font-size: 11px;
     color: var(--gold-bright);
     letter-spacing: 1px;
     text-transform: uppercase;
-    margin: 8px 0 4px;
+    margin: 10px 0 4px;
   }
-  .icon-group-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .icon-group-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }
   .icon-group-row .emoji-btn { position: relative; }
 
   /* Pity indicator badge near the roll button */
@@ -3420,6 +3455,12 @@ const TRANSLATIONS = {
     tap_to_add: '+ Tap to add to party',
     in_party: '✓ In the party',
     pity_label: '+1 Pity',
+    earn_note_template: '{icon} {name} · +{n} {stat} {xp}',
+    xp_short: 'XP',
+    earn_toast: '{name} earned {coins} + {xp} {stat} XP',
+    level_up_toast: "⭐ {name}'s {stat} leveled up! Now +{n}",
+    treasure_word: 'treasure',
+    gift_word: 'gift',
     cadence_label: 'Cadence',
     cadence_once: '∞ Whenever (no limit)',
     cadence_daily: '🔄 Daily',
@@ -3769,6 +3810,12 @@ const TRANSLATIONS = {
     tap_to_add: '+ Zur Gruppe hinzufügen',
     in_party: '✓ In der Gruppe',
     pity_label: '+1 Trostbonus',
+    earn_note_template: '{icon} {name} · +{n} {stat}-{xp}',
+    xp_short: 'EP',
+    earn_toast: '{name} hat {coins} + {xp} {stat}-EP verdient',
+    level_up_toast: '⭐ {name} ist in {stat} aufgestiegen! Jetzt +{n}',
+    treasure_word: 'Schatz',
+    gift_word: 'Geschenk',
     cadence_label: 'Wiederholung',
     cadence_once: '∞ Beliebig (kein Limit)',
     cadence_daily: '🔄 Täglich',
@@ -5283,21 +5330,35 @@ function renderBakeryBg(variant) {
       </radialGradient>
     </defs>
     <rect width="600" height="300" fill="url(#bakery-wall)"/>
-    <!-- window -->
-    <rect x="60" y="40" width="140" height="100" rx="12" fill="url(#bakery-window)" stroke="#8b6914" stroke-width="3"/>
-    <line x1="130" y1="40" x2="130" y2="140" stroke="#8b6914" stroke-width="2"/>
-    <line x1="60" y1="90" x2="200" y2="90" stroke="#8b6914" stroke-width="2"/>
+    <!-- window: smaller pane + crossbars + sky tint, no longer a giant
+         glowing yellow rectangle that read as "missing sprite". -->
+    <rect x="70" y="48" width="110" height="74" rx="6" fill="#cfe0e8"/>
+    <rect x="70" y="48" width="110" height="74" rx="6" fill="url(#bakery-window)" opacity="0.45"/>
+    <line x1="125" y1="48" x2="125" y2="122" stroke="#8b6914" stroke-width="1.5"/>
+    <line x1="70"  y1="85" x2="180" y2="85" stroke="#8b6914" stroke-width="1.5"/>
+    <rect x="65" y="44" width="120" height="84" rx="8" fill="none" stroke="#8b6914" stroke-width="3"/>
+    <!-- 3 little hills outside the window -->
+    <path d="M70 110 Q90 95 110 110 Q130 92 150 110 Q165 100 180 110 L180 122 L70 122 Z"
+          fill="#7fb085" opacity="0.7"/>
     <!-- shelves with bread -->
     <rect x="400" y="50" width="160" height="8" fill="#7a4a26"/>
     <ellipse cx="430" cy="46" rx="14" ry="8" fill="#caa15c"/>
     <ellipse cx="465" cy="46" rx="12" ry="7" fill="#b07b3c"/>
     <ellipse cx="498" cy="46" rx="14" ry="8" fill="#caa15c"/>
     <ellipse cx="535" cy="46" rx="11" ry="7" fill="#b07b3c"/>
+    <!-- 8 spice jars on the second shelf — matches the memory mini-game's
+         8-card grid (4 pairs) so kids see the same number, not 4 vs 8. -->
     <rect x="400" y="100" width="160" height="8" fill="#7a4a26"/>
-    <ellipse cx="430" cy="96" rx="11" ry="6" fill="#e8b3a0"/>
-    <ellipse cx="465" cy="96" rx="11" ry="6" fill="#e8b3a0"/>
-    <ellipse cx="500" cy="96" rx="11" ry="6" fill="#caa15c"/>
-    <ellipse cx="535" cy="96" rx="11" ry="6" fill="#caa15c"/>
+    <g transform="translate(0,0)">
+      <ellipse cx="412" cy="96" rx="9" ry="6" fill="#e8b3a0"/>
+      <ellipse cx="432" cy="96" rx="9" ry="6" fill="#caa15c"/>
+      <ellipse cx="452" cy="96" rx="9" ry="6" fill="#b07b3c"/>
+      <ellipse cx="472" cy="96" rx="9" ry="6" fill="#7fb085"/>
+      <ellipse cx="492" cy="96" rx="9" ry="6" fill="#e8b3a0"/>
+      <ellipse cx="512" cy="96" rx="9" ry="6" fill="#caa15c"/>
+      <ellipse cx="532" cy="96" rx="9" ry="6" fill="#b07b3c"/>
+      <ellipse cx="552" cy="96" rx="9" ry="6" fill="#7fb085"/>
+    </g>
     <!-- striped awning -->
     <path d="M0 160 L600 160 L580 180 L20 180 Z" fill="#8b1a1a" opacity="0.55"/>
     <path d="M40 160 L40 180 M120 160 L120 180 M200 160 L200 180 M280 160 L280 180 M360 160 L360 180 M440 160 L440 180 M520 160 L520 180" stroke="#fff5c4" stroke-width="6" opacity="0.4"/>
@@ -5668,6 +5729,39 @@ function formatDecimalLocaleEditable(n) {
   const fixed = (Math.round(n * 100) / 100).toString();
   return fixed.replace('.', sep);
 }
+// Plain locale-aware decimal — no currency, used in toasts and log notes
+// where the surrounding sentence already provides the context.
+function fmtNumber(n) {
+  const lang = (state.settings && state.settings.lang) || 'en';
+  const sep = lang === 'de' ? ',' : '.';
+  if (n == null || isNaN(n)) return '';
+  return (Math.round(n * 100) / 100).toString().replace('.', sep);
+}
+// Single source of truth for date-time formatting. German UI gets the
+// 25.04.2026, 13:07 short form; English gets the local short form.
+function fmtDateTime(input) {
+  if (!input) return '';
+  const d = (input instanceof Date) ? input : new Date(input);
+  if (isNaN(d.getTime())) return '';
+  const lang = (state.settings && state.settings.lang) || 'en';
+  try {
+    return d.toLocaleString(lang === 'de' ? 'de-DE' : 'en-GB', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  } catch (e) { return d.toLocaleString(); }
+}
+function fmtDate(input) {
+  if (!input) return '';
+  const d = (input instanceof Date) ? input : new Date(input);
+  if (isNaN(d.getTime())) return '';
+  const lang = (state.settings && state.settings.lang) || 'en';
+  try {
+    return d.toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB', {
+      day: '2-digit', month: '2-digit', year: 'numeric'
+    });
+  } catch (e) { return d.toLocaleDateString(); }
+}
 
 function toast(msg, type = '') {
   const t = document.getElementById('toast');
@@ -5998,7 +6092,7 @@ function renderKids() {
         <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); deleteKid('${k.id}')">✕</button>
       </div>
       <div class="stats-grid">${statsHtml}</div>
-      <div class="kid-balance"><span class="cur">${state.settings.currency}</span>${(Math.round(k.balance*100)/100).toFixed(2)}</div>
+      <div class="kid-balance"><span class="cur">${state.settings.currency}</span>${fmtNumber(k.balance)}</div>
       <div class="kid-balance-label">${t('purse_label')}</div>
       ${goalHtml}
       <div class="pay-earned">
@@ -6079,7 +6173,16 @@ function earn(kidId, actId) {
   const newLevel = xpLevelBonus(k.xp[st]);
   const leveledUp = newLevel > prevLevel;
 
-  logTx(kidId, 'earn', a.amount, `${a.icon} ${L(a.name)} · +${a.amount} ${statLabel(st)} XP`, { xpStat: st, xpAmount: a.amount, activityId: a.id });
+  // Note is a localized template so the Chronicle reads "+0,5 Mut-EP" in DE
+  // and "+0.5 Brave XP" in EN — instead of the previous mixed-language mess.
+  const noteTemplate = t('earn_note_template'); // "{icon} {name} · +{n} {stat} {xp}"
+  const noteStr = noteTemplate
+    .replace('{icon}', a.icon)
+    .replace('{name}', L(a.name))
+    .replace('{n}', fmtNumber(a.amount))
+    .replace('{stat}', statLabel(st))
+    .replace('{xp}', t('xp_short'));
+  logTx(kidId, 'earn', a.amount, noteStr, { xpStat: st, xpAmount: a.amount, activityId: a.id });
   save();
   renderKids();
   playCoin();
@@ -6097,9 +6200,16 @@ function earn(kidId, actId) {
   });
   if (leveledUp) {
     playFanfare();
-    toast(`⭐ ${k.name}'s ${STAT_META[st].label} leveled up! Now +${newLevel}`, 'success');
+    toast(t('level_up_toast')
+      .replace('{name}', k.name)
+      .replace('{stat}', statLabel(st))
+      .replace('{n}', String(newLevel)), 'success');
   } else {
-    toast(`${k.name} earned ${fmt(a.amount)} + ${a.amount} ${STAT_META[st].label} XP`, 'success');
+    toast(t('earn_toast')
+      .replace('{name}', k.name)
+      .replace('{coins}', fmt(a.amount))
+      .replace('{xp}', fmtNumber(a.amount))
+      .replace('{stat}', statLabel(st)), 'success');
   }
   // Achievement checks fire after every earn — they're cheap and idempotent.
   checkAchievements(k, 'earn');
@@ -6826,7 +6936,7 @@ function renderHistory() {
           <span style="font-size:22px;">${typeEmoji}</span>
           <div>
             <div>${escapeHtml(t.note)} <span style="color:var(--ink-muted);">· ${kName}</span></div>
-            <div class="history-date">${new Date(t.at).toLocaleString()}</div>
+            <div class="history-date">${fmtDateTime(t.at)}</div>
           </div>
         </div>
         <div style="display:flex; align-items:center; gap:8px;">
@@ -8599,7 +8709,7 @@ function renderAdventureSelect() {
   if (hasSavedAdventure()) {
     const s = state.savedAdventure;
     const sadv = ADVENTURES.find(a => a.id === s.adventureId);
-    const savedAt = s.savedAt ? new Date(s.savedAt).toLocaleString() : '';
+    const savedAt = s.savedAt ? fmtDateTime(s.savedAt) : '';
     const partyNames = (s.party || []).map(pid => { const k = kidById(pid); return k ? k.name : null; }).filter(Boolean).join(', ');
     resumeHtml = `
       <div class="resume-banner">
@@ -10000,8 +10110,10 @@ function awardTreasure(tierMultiplier) {
       markLootDropped();
     }
     const note = paidAmount > 0
-      ? (item ? `🏆 ${L(adv.title)} treasure · ${item.icon} ${item.name}` : `🏆 ${L(adv.title)} treasure`)
-      : (item ? `🎁 ${L(adv.title)} gift · ${item.icon} ${item.name}` : `🎁 ${L(adv.title)} gift`);
+      ? (item ? `🏆 ${L(adv.title)} ${t('treasure_word')} · ${item.icon} ${item.name}`
+              : `🏆 ${L(adv.title)} ${t('treasure_word')}`)
+      : (item ? `🎁 ${L(adv.title)} ${t('gift_word')} · ${item.icon} ${item.name}`
+              : `🎁 ${L(adv.title)} ${t('gift_word')}`);
     logTx(h.id, 'earn', paidAmount, note, { adventurePaid: mayPayCoins, adventureRunId: runId, itemInstanceId: null });
     bumpStreak(h);
     checkGoalReached(h);
@@ -10862,7 +10974,7 @@ async function loadAdminList() {
     const totalCoin = (f.state && Array.isArray(f.state.kids))
       ? f.state.kids.reduce((s, k) => s + (Number(k.balance) || 0), 0).toFixed(2)
       : '0';
-    const last = f.updated_at ? new Date(f.updated_at).toLocaleString() : '—';
+    const last = f.updated_at ? fmtDateTime(f.updated_at) : '—';
     const adminMark = p.is_admin ? ' 🛡' : '';
     return `
       <div style="padding:10px 12px; border:1px solid var(--wood-dark); border-radius:6px; margin-bottom:8px; background: rgba(0,0,0,0.15);">
