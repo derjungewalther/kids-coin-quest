@@ -1162,23 +1162,10 @@
   }
   .nav-toggle:hover { background: rgba(244,211,94,0.08); }
 
-  /* Tablet (600–768px): keep the horizontal-scroll tabs (touch-friendly,
-     no menu overhead). Below 600 we'll switch to a real hamburger. */
-  @media (max-width: 768px) and (min-width: 601px) {
-    .tabs {
-      overflow-x: auto;
-      flex-wrap: nowrap;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-      mask-image: linear-gradient(90deg, #000 0, #000 90%, transparent 100%);
-    }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tabs .tab { flex: 0 0 auto; }
-  }
-
-  /* Phone (≤600px): collapse tabs into a dropdown panel anchored under
-     the header. All targets ≥44px to satisfy WCAG 2.5.5. */
-  @media (max-width: 600px) {
+  /* Phone + tablet portrait (≤768px): collapse tabs into a hamburger
+     dropdown panel anchored under the header. All tap targets ≥44px to
+     satisfy WCAG 2.5.5 / Apple HIG (R2-P1-07). */
+  @media (max-width: 768px) {
     .nav-toggle { display: inline-flex; }
     .tabs#primary-nav {
       display: none;
@@ -1191,6 +1178,7 @@
       background: linear-gradient(180deg, var(--wood-dark) 0%, #0d0703 100%);
       border: 2px solid var(--gold-dark);
       border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
     }
     .tabs#primary-nav.open { display: flex; }
     .tabs#primary-nav .tab {
@@ -1198,9 +1186,13 @@
       min-height: 44px;
       text-align: left;
       padding: 12px 16px;
-      font-size: 15px;
+      font-size: 16px;
     }
     .tab-divider { display: none; }
+    /* Header utility buttons: ensure 44×44 tap targets */
+    .music-btn { min-height: 44px; min-width: 44px; }
+    /* Hero card "✕ delete-hero" was ~24px. Bump to 44 on touch widths. */
+    .kid-head .btn-ghost { min-width: 44px; min-height: 44px; }
   }
 
   /* Slightly higher contrast on muted text so faint hints stay legible
@@ -1241,13 +1233,24 @@
     border: 1px solid var(--emerald);
     border-style: solid;
   }
+  /* Empty-state Sparziel button — bumped to high-contrast gold on dark
+     bg with a dashed gold border. Drops the faded italic that was hard
+     to read at first glance on parchment cards (R2-P1-06). */
   .goal-strip-empty {
     text-align: center;
-    color: var(--parchment-darker);
-    font-style: italic;
-    font-family: 'MedievalSharp', cursive;
+    color: var(--gold-bright);
+    font-family: 'Cinzel', serif;
     font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 11px 14px;
     border-style: dashed;
+    border-color: var(--gold);
+    background: rgba(244,211,94,0.08);
+  }
+  .goal-strip-empty:hover {
+    background: rgba(244,211,94,0.18);
+    color: #fff5c4;
   }
   .goal-strip-line {
     display: flex;
@@ -3208,7 +3211,7 @@
       <h2>🛡 <span data-i18n="admin_title">Global Admin</span></h2>
       <p style="color: var(--ink-muted); font-style: italic;" data-i18n="admin_desc">Read-only view of every family using this app.</p>
       <div style="margin: 10px 0;">
-        <button class="btn btn-ghost btn-sm" onclick="loadAdminList()" data-i18n="admin_refresh">↻ Refresh</button>
+        <button class="btn btn-ghost btn-sm" onclick="supaInvalidate('admin-all-families'); supaInvalidate('admin-all-profiles'); loadAdminList()" data-i18n="admin_refresh">↻ Refresh</button>
       </div>
       <div id="adminList"></div>
     </div>
@@ -6104,6 +6107,13 @@ function closeMobileNav() {
     if (e.target === tog || tog.contains(e.target)) return;
     if (nav.contains(e.target)) return;
     closeMobileNav();
+  });
+  // Escape closes and returns focus to the toggle (a11y requirement).
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!nav.classList.contains('open')) return;
+    closeMobileNav();
+    tog.focus();
   });
 })();
 
@@ -10786,6 +10796,24 @@ function playFanfare() {
 // =====================================================================
 
 let supaClient = null;
+
+// In-flight Supabase request dedupe. Multiple call sites legitimately
+// want the same data (e.g. profile + admin check + cloud-load all need
+// `profiles` and `families`). Without this they each fire their own
+// HTTP request even within the same bootstrap. dedupe(key, fn) returns
+// the same Promise to every caller within a 30s window. invalidate(key)
+// drops the cache so the next read refetches (call after writes).
+const _supaInflight = new Map();
+function supaDedupe(key, fn) {
+  if (_supaInflight.has(key)) return _supaInflight.get(key);
+  const p = Promise.resolve()
+    .then(fn)
+    .finally(() => setTimeout(() => _supaInflight.delete(key), 30_000));
+  _supaInflight.set(key, p);
+  return p;
+}
+function supaInvalidate(key) { _supaInflight.delete(key); }
+
 let supaSession = null;
 let supaProfile = null;       // { user_id, email, is_admin }
 let cloudFamilyId = null;
@@ -11110,22 +11138,29 @@ async function signOutAccount() {
 // ----- Profile + admin --------------------------------------------------
 async function loadOrCreateProfile() {
   if (!supaSession) return;
-  const { data, error } = await supaClient
-    .from('profiles')
-    .select('user_id, email, is_admin')
-    .eq('user_id', supaSession.user.id)
-    .maybeSingle();
-  if (!error && data) {
-    supaProfile = data;
+  // RPC instead of .from('profiles').eq('user_id', ...) so the user UUID
+  // isn't leaked into the request URL (R2-P2-09). Deduped per-bootstrap
+  // so multiple call sites that need the profile only fire one HTTP
+  // request together (R2-P2-08).
+  const { data, error } = await supaDedupe('my-profile', () =>
+    supaClient.rpc('get_my_profile')
+  );
+  const row = (Array.isArray(data) ? data[0] : data) || null;
+  if (!error && row) {
+    supaProfile = row;
     return;
   }
-  // Fallback: trigger may not be set up yet → upsert ourselves.
+  // Fallback: profile row missing — upsert ourselves. Upsert goes via
+  // POST with body, so no PII in URL either.
   const upsert = await supaClient
     .from('profiles')
     .upsert({ user_id: supaSession.user.id, email: supaSession.user.email }, { onConflict: 'user_id' })
     .select('user_id, email, is_admin')
     .single();
-  if (!upsert.error) supaProfile = upsert.data;
+  if (!upsert.error) {
+    supaProfile = upsert.data;
+    supaInvalidate('my-profile');
+  }
 }
 
 function isAdminUser() { return !!(supaProfile && supaProfile.is_admin); }
@@ -11134,29 +11169,31 @@ function isAdminUser() { return !!(supaProfile && supaProfile.is_admin); }
 async function cloudLoad() {
   if (!supaSession || !supaClient) return;
   try {
-    const { data, error } = await supaClient
-      .from('families')
-      .select('id, state, updated_at')
-      .eq('owner_user_id', supaSession.user.id)
-      .maybeSingle();
+    // RPC: list_my_families returns the caller's row(s) without leaking
+    // owner_user_id into the URL (R2-P2-09). Deduped per-bootstrap.
+    const { data, error } = await supaDedupe('my-families', () =>
+      supaClient.rpc('list_my_families')
+    );
     if (error) { cloudLastError = error.message; return; }
-    if (data && data.id) {
-      cloudFamilyId = data.id;
-      cloudLastRemoteUpdatedAt = data.updated_at;
-      const remoteState = data.state || {};
+    const row = Array.isArray(data) ? data[0] : data;
+    if (row && row.id) {
+      cloudFamilyId = row.id;
+      cloudLastRemoteUpdatedAt = row.updated_at;
+      const remoteState = row.state || {};
       const remoteHasData = (remoteState.kids && remoteState.kids.length > 0) ||
                             (remoteState.transactions && remoteState.transactions.length > 0);
       if (remoteHasData) {
-        // Cloud wins — this is the multi-device case.
+        // Cloud wins — multi-device case.
         state = mergeLoadedState(remoteState);
-        save(); // write cache + schedule any no-op sync
+        save();
         rerenderAll();
       } else {
-        // Empty cloud row → push what we have locally as the starting point.
         scheduleCloudSync();
       }
     } else {
-      // No row yet → create one with current local state.
+      // No row yet → create one with current local state. Insert is a
+      // POST with body, so no PII appears in the URL even though we're
+      // not using an RPC for the create path.
       await supaClient.from('families').insert({
         owner_user_id: supaSession.user.id,
         name: supaSession.user.email,
@@ -11166,6 +11203,7 @@ async function cloudLoad() {
           cloudFamilyId = r.data.id;
           cloudLastRemoteUpdatedAt = r.data.updated_at;
           cloudLastSyncedAt = Date.now();
+          supaInvalidate('my-families');
         }
       });
     }
@@ -11232,6 +11270,11 @@ async function cloudSync() {
     cloudLastRemoteUpdatedAt = data && data.updated_at;
     cloudLastSyncedAt = Date.now();
     cloudLastError = null;
+    // Bust the cached read so a follow-up cloudLoad picks up the fresh
+    // server-side state instead of returning the dedupe Promise from
+    // before this write.
+    supaInvalidate('my-families');
+    supaInvalidate('admin-all-families');
   } catch (e) {
     cloudLastError = String(e && e.message || e);
   } finally {
@@ -11332,10 +11375,12 @@ async function loadAdminList() {
   const box = document.getElementById('adminList');
   if (!box || !supaClient || !isAdminUser()) return;
   box.innerHTML = `<div style="color: var(--ink-muted); font-style: italic;">…</div>`;
-  // Families + profile join (both reads allowed by admin RLS policies).
+  // Admin RPCs check is_admin server-side and don't put any user UUID in
+  // the URL. Deduped so the global admin tab can refresh without firing
+  // four queries at the server (R2-P2-08 + R2-P2-09).
   const [famR, profR] = await Promise.all([
-    supaClient.from('families').select('id, owner_user_id, name, state, updated_at').order('updated_at', { ascending: false }),
-    supaClient.from('profiles').select('user_id, email, is_admin')
+    supaDedupe('admin-all-families', () => supaClient.rpc('admin_list_all_families')),
+    supaDedupe('admin-all-profiles', () => supaClient.rpc('admin_list_all_profiles'))
   ]);
   if (famR.error) { box.innerHTML = `<div style="color:#ff8080;">${escapeHtml(famR.error.message)}</div>`; return; }
   const profiles = {};
