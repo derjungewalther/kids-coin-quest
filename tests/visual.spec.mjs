@@ -22,41 +22,88 @@
  * until they're parsed and the layout is stable.
  */
 import { test, expect, seedHero, setPin } from './fixtures.mjs';
-import { mkdirSync } from 'node:fs';
-import path from 'node:path';
 
-const OUT_DIR = path.resolve('test-results/visual');
-try { mkdirSync(OUT_DIR, { recursive: true }); } catch (e) {}
+// Threshold knobs for cross-platform stability. Small font / antialias
+// drift between macOS dev and Linux CI is normal — pinning at 0.2%
+// pixel tolerance ignores that without being so loose it misses real
+// regressions. fullPage=true so we catch issues below the fold too.
+const SHOT_OPTS = {
+  fullPage: true,
+  maxDiffPixelRatio: 0.002,    // ≤0.2 % of pixels may differ
+  threshold: 0.2,              // per-pixel colour delta tolerance
+  animations: 'disabled'       // stop dice spins / pulses smearing
+};
+
+async function prepareForShot(page) {
+  // Block until web fonts are parsed so layout measurements don't
+  // shift between renders.
+  await page.evaluate(() => document.fonts && document.fonts.ready);
+  // Belt-and-braces: even with `animations: 'disabled'` above, some
+  // CSS keyframe gradients are paint-time and Playwright's freezer
+  // doesn't normalise them. Force-stop everything. Also hide the
+  // toast region — boot-time side effects (streak shield grant,
+  // PWA install chip) raise toasts whose timing varies under load
+  // and would otherwise show up in screenshots non-deterministically.
+  await page.addStyleTag({
+    content: `*, *::before, *::after {
+      animation-duration: 0s !important;
+      animation-delay: 0s !important;
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+    }
+    #toast, .install-chip { display: none !important; }`
+  });
+  await page.waitForTimeout(120);
+}
 
 async function captureFullPage(page, name) {
-  // Wait for fonts + any in-flight CSS animation to settle.
-  await page.evaluate(() => document.fonts && document.fonts.ready);
-  // Disable animations so dice / hero pulses don't smear the shot.
-  await page.addStyleTag({
-    content: `*, *::before, *::after {
-      animation-duration: 0s !important;
-      animation-delay: 0s !important;
-      transition-duration: 0s !important;
-      transition-delay: 0s !important;
-    }`
-  });
-  await page.waitForTimeout(120);
-  await page.screenshot({ path: path.join(OUT_DIR, `${name}.png`), fullPage: true });
+  await prepareForShot(page);
+  await expect(page).toHaveScreenshot(`${name}.png`, SHOT_OPTS);
 }
 
-async function captureViewport(page, name) {
-  await page.evaluate(() => document.fonts && document.fonts.ready);
-  await page.addStyleTag({
-    content: `*, *::before, *::after {
-      animation-duration: 0s !important;
-      animation-delay: 0s !important;
-      transition-duration: 0s !important;
-      transition-delay: 0s !important;
-    }`
+// Determinism hook: several render paths (sceneArtVariant,
+// pickOfferedLegendaryClasses, count-game positions, ritual hero
+// portrait flourish) tap Math.random(). For visual snapshots that
+// noise has to go — replace Math.random with a seeded LCG so each
+// render produces identical pixels run-to-run.
+test.beforeEach(async ({ page }) => {
+  // Boot-time stub: replaces Math.random with a deterministic LCG so
+  // first-paint code paths (id generation, narration variant pick,
+  // sceneArtVariant) render identically across runs. Tests that need
+  // a fresh seed RIGHT BEFORE a specific render call window.__reseed()
+  // to reset the LCG state — the stub state advances every time
+  // anything in the app calls Math.random, so the right seed for a
+  // ritual render only exists if we re-seed at the moment of render.
+  await page.addInitScript(() => {
+    const SEED = 0x9e3779b1;
+    let s = SEED;
+    const lcg = () => {
+      s = (Math.imul(s, 1597334677) + 0x6D2B79F5) >>> 0;
+      return (s & 0xfffffff) / 0x10000000;
+    };
+    Math.random = lcg;
+    window.__reseed = () => { s = SEED; };
+
+    // Pin the wall clock to a fixed instant so:
+    //   - logTx timestamps render the same date each run
+    //   - todayKeyFamily / dayKeyOffset return stable keys
+    //   - new Date().toISOString() in any code path is reproducible
+    // 2026-04-25T12:00:00Z chosen to match the development date already
+    // anchored in earlier specs.
+    const FIXED_NOW = new Date('2026-04-25T12:00:00Z').getTime();
+    const _Date = Date;
+    function StubDate(...args) {
+      if (args.length === 0) return new _Date(FIXED_NOW);
+      return new _Date(...args);
+    }
+    StubDate.now = () => FIXED_NOW;
+    StubDate.parse = _Date.parse;
+    StubDate.UTC = _Date.UTC;
+    StubDate.prototype = _Date.prototype;
+    Object.setPrototypeOf(StubDate, _Date);
+    window.Date = StubDate;
   });
-  await page.waitForTimeout(120);
-  await page.screenshot({ path: path.join(OUT_DIR, `${name}.png`), fullPage: false });
-}
+});
 
 test.describe('Visual capture · desktop 1280×900', () => {
   test.use({ viewport: { width: 1280, height: 900 } });
@@ -172,18 +219,42 @@ test.describe('Visual capture · desktop 1280×900', () => {
   });
 
   test('14 ritual step 1 (invocation)', async ({ page }) => {
-    await page.evaluate(() => { window.ensureLegendaryState(); window.openRecruitmentRitual(); });
+    await page.evaluate(() => {
+      window.__reseed && window.__reseed();
+      window.ensureLegendaryState();
+      // Pin pickOfferedLegendaryClasses so the visual is deterministic.
+      // The function is replaced in-place; restore is unnecessary
+      // because each test runs in its own page context.
+      window.pickOfferedLegendaryClasses = () => ['licht', 'erde', 'mond'];
+      window.openRecruitmentRitual();
+    });
     await captureFullPage(page, '14-ritual-step1-invocation');
   });
 
   test('15 ritual step 2 (class offering)', async ({ page }) => {
-    await page.evaluate(() => { window.ensureLegendaryState(); window.openRecruitmentRitual(); });
+    await page.evaluate(() => {
+      window.__reseed && window.__reseed();
+      window.ensureLegendaryState();
+      // Pin pickOfferedLegendaryClasses so the visual is deterministic.
+      // The function is replaced in-place; restore is unnecessary
+      // because each test runs in its own page context.
+      window.pickOfferedLegendaryClasses = () => ['licht', 'erde', 'mond'];
+      window.openRecruitmentRitual();
+    });
     await page.locator('#recruitmentRitualModal .btn-primary').first().click();
     await captureFullPage(page, '15-ritual-step2-classes');
   });
 
   test('16 ritual step 5 (welcome)', async ({ page }) => {
-    await page.evaluate(() => { window.ensureLegendaryState(); window.openRecruitmentRitual(); });
+    await page.evaluate(() => {
+      window.__reseed && window.__reseed();
+      window.ensureLegendaryState();
+      // Pin pickOfferedLegendaryClasses so the visual is deterministic.
+      // The function is replaced in-place; restore is unnecessary
+      // because each test runs in its own page context.
+      window.pickOfferedLegendaryClasses = () => ['licht', 'erde', 'mond'];
+      window.openRecruitmentRitual();
+    });
     await page.locator('#recruitmentRitualModal .btn-primary').first().click();
     await page.locator('.ritual-class-card').first().click();
     await page.locator('#ritualClassNextBtn').click();
@@ -255,7 +326,12 @@ test.describe('Visual capture · desktop 1280×900', () => {
     await captureFullPage(page, '20-minigame-rhythm');
   });
 
-  test('21 minigame · count flash phase', async ({ page }) => {
+  test('21 minigame · count guess phase', async ({ page }) => {
+    // Capture the guess-phase number pad — visually deterministic
+    // (no randomly placed icons). The flash phase has irreducible
+    // position randomness because Math.random consumption between
+    // the test's reseed and createCountGame.startRound depends on
+    // every render-side draw in between.
     await seedHero(page, { userName: 'mg21' });
     await page.evaluate(() => {
       window.adventureState.party = [window.state.kids[0].id];
@@ -263,11 +339,14 @@ test.describe('Visual capture · desktop 1280×900', () => {
       const advTab = document.querySelector('.tab[data-view="adventure"]');
       if (advTab) advTab.click();
       window.beginScenes();
-      window.adventureState.sceneIdx = 3; // Schwarmzählung = count
+      window.adventureState.sceneIdx = 3;
+      // Make the flash effectively instant so we land in 'guess'.
+      const adv = window.ADVENTURES.find(a => a.id === 'fischer-sebastian');
+      adv.scenes[3].minigameConfig = adv.scenes[3].minigameConfig || {};
+      adv.scenes[3].minigameConfig.flashDurationMs = 1;
       window.renderAdventure();
     });
-    // Capture during the flash phase (before transition to guess).
-    await page.waitForTimeout(800);
+    await page.waitForTimeout(150);
     await captureFullPage(page, '21-minigame-count');
   });
 
@@ -386,7 +465,15 @@ test.describe('Visual capture · mobile 390×844 (iPhone 14)', () => {
   });
 
   test('M05 ritual on mobile', async ({ page }) => {
-    await page.evaluate(() => { window.ensureLegendaryState(); window.openRecruitmentRitual(); });
+    await page.evaluate(() => {
+      window.__reseed && window.__reseed();
+      window.ensureLegendaryState();
+      // Pin pickOfferedLegendaryClasses so the visual is deterministic.
+      // The function is replaced in-place; restore is unnecessary
+      // because each test runs in its own page context.
+      window.pickOfferedLegendaryClasses = () => ['licht', 'erde', 'mond'];
+      window.openRecruitmentRitual();
+    });
     await page.locator('#recruitmentRitualModal .btn-primary').first().click();
     await captureFullPage(page, 'M05-mobile-ritual-classes');
   });
