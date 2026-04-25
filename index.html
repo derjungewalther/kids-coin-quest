@@ -1121,6 +1121,88 @@
     box-shadow: 0 0 0 2px rgba(45,106,79,0.35);
   }
 
+  /* Cosmetic gallery in hero sheet */
+  .cosmetic-slot-section { margin: 8px 0; }
+  .cosmetic-slot-head {
+    font-family: 'Cinzel', serif; color: var(--ink-muted);
+    font-size: 11px; letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  .cosmetic-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 8px;
+  }
+  .cosmetic-tile {
+    text-align: center;
+    background: rgba(255,245,196,0.4);
+    border: 2px solid var(--gold-dark);
+    border-radius: 8px;
+    padding: 8px 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .cosmetic-tile:hover { transform: translateY(-1px); background: rgba(244,211,94,0.45); }
+  .cosmetic-tile.equipped {
+    background: linear-gradient(180deg, rgba(125,211,164,0.3), rgba(45,106,79,0.25));
+    border-color: var(--emerald);
+  }
+  .cosmetic-icon { font-size: 26px; line-height: 1; }
+  .cosmetic-name {
+    font-family: 'Lora', serif; font-size: 11px;
+    color: var(--wood-dark); margin-top: 4px;
+    line-height: 1.2;
+  }
+  .cosmetic-equipped {
+    font-size: 10px; color: var(--emerald); font-weight: 700;
+    margin-top: 4px;
+  }
+
+  /* Legendary hero badge + recruit button */
+  .legendary-badge {
+    display: inline-block;
+    margin-left: 6px;
+    background: linear-gradient(180deg, #f4d35e, #b8860b);
+    color: var(--wood-dark);
+    border: 1.5px solid #6b4f15;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    box-shadow: 0 0 8px rgba(244,211,94,0.5);
+    vertical-align: middle;
+  }
+  .btn-recruit-legendary {
+    margin-left: 8px;
+    background: linear-gradient(180deg, #f4d35e 0%, #c69314 100%);
+    color: var(--wood-dark);
+    border: 2px solid #6b4f15;
+    border-radius: 6px;
+    padding: 12px 18px;
+    font-family: 'Cinzel', serif;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 0 14px rgba(244,211,94,0.55), 0 3px 0 #6b4f15;
+    transition: transform 0.1s, box-shadow 0.15s;
+  }
+  .btn-recruit-legendary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 22px rgba(244,211,94,0.75), 0 4px 0 #6b4f15;
+  }
+  .legendary-slot-pill {
+    display: inline-block;
+    background: rgba(244,211,94,0.15);
+    border: 1px solid var(--gold-dark);
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 11px;
+    color: var(--gold-bright);
+    margin-left: 8px;
+    font-family: 'Lora', serif;
+  }
+
   /* Family streak badge in the top bar — flame + day count, clickable
      for the detail modal. Cold variant when streak is 0. */
   .streak-badge {
@@ -3145,7 +3227,13 @@
     <div class="section">
       <h2 data-i18n="fellowship">🛡 The Fellowship</h2>
       <div class="ornament">❦ ❦ ❦</div>
-      <button class="btn btn-primary" onclick="openAddKidModal()" data-i18n="recruit_hero">⚔ Recruit New Hero</button>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="openAddKidModal()" data-i18n="recruit_hero">⚔ Recruit New Hero</button>
+        <button class="btn-recruit-legendary" id="recruitLegendaryBtn" onclick="openAddKidModal(true)" style="display:none;">
+          ⭐ <span data-i18n="recruit_legendary_btn">Recruit Legendary Hero</span>
+        </button>
+        <span class="legendary-slot-pill" id="legendarySlotPill" style="display:none;"></span>
+      </div>
     </div>
     <div class="kids-grid" id="kidsGrid"></div>
   </div>
@@ -3944,6 +4032,17 @@ const TRANSLATIONS = {
     streak_claim_btn: '✨ Tap to claim',
     streak_history_title: 'Family Streak',
     close_btn: 'Close',
+    recruit_legendary_btn: 'Recruit Legendary Hero',
+    legendary_badge_label: 'Legendary',
+    legendary_slot_label: 'Legendary slots',
+    cosmetics_title: 'Cosmetics',
+    cosmetics_desc: 'Earned from streak rewards. Tap to equip.',
+    cosmetics_empty: 'No cosmetics yet — keep your family streak alive to earn one every 7 days!',
+    cosmetic_slot_hat: 'Hat',
+    cosmetic_slot_cape: 'Cape',
+    cosmetic_slot_accessory: 'Accessory',
+    cosmetic_slot_pet: 'Pet',
+    cosmetic_equipped: 'Equipped',
     achievement_unlocked: 'Achievement',
     achievements_title: 'Achievements',
     achievements_desc: 'Trophies your hero has earned along the way.',
@@ -4327,6 +4426,17 @@ const TRANSLATIONS = {
     streak_claim_btn: '✨ Tippe zum Sammeln',
     streak_history_title: 'Familien-Strähne',
     close_btn: 'Schließen',
+    recruit_legendary_btn: 'Legendären Helden anwerben',
+    legendary_badge_label: 'Legendär',
+    legendary_slot_label: 'Legendäre Plätze',
+    cosmetics_title: 'Schmuck',
+    cosmetics_desc: 'Aus Strähnen-Belohnungen verdient. Antippen zum Anlegen.',
+    cosmetics_empty: 'Noch kein Schmuck — halte die Familien-Strähne lebendig, alle 7 Tage gibt es ein neues Stück!',
+    cosmetic_slot_hat: 'Kopfschmuck',
+    cosmetic_slot_cape: 'Umhang',
+    cosmetic_slot_accessory: 'Beiwerk',
+    cosmetic_slot_pet: 'Begleiter',
+    cosmetic_equipped: 'Angelegt',
     achievement_unlocked: 'Erfolg',
     achievements_title: 'Erfolge',
     achievements_desc: 'Trophäen, die dein Held gesammelt hat.',
@@ -5803,7 +5913,67 @@ function renderCharacterSVG(kid, compact, pos) {
     ${acc ? `<text x="35" y="98" text-anchor="middle" font-size="11"
                   dominant-baseline="middle" stroke="#3d2817" stroke-width="0.3"
                   paint-order="stroke">${acc.icon}</text>` : ''}
+    ${renderHeroCosmeticOverlays(kid)}
   </svg>`;
+}
+
+// Cosmetics from the family-streak rewards live on kid.cosmetics =
+// { hat?, cape?, pet?, accessory? } where each value is a cosmetic id
+// from COSMETIC_POOL. Rendered as small emoji overlays on top of the
+// portrait so even if the hero already has equipment, the cosmetic
+// reads as a "won this from the streak" decoration.
+function renderHeroCosmeticOverlays(kid) {
+  if (!kid.cosmetics) return '';
+  const lookup = (id) => COSMETIC_POOL.find(c => c.id === id);
+  const out = [];
+  // Hat cosmetic: floats just above the head (stacked above any equipment hat).
+  if (kid.cosmetics.hat) {
+    const c = lookup(kid.cosmetics.hat);
+    if (c) out.push(`<text x="64" y="6" text-anchor="middle" font-size="18"
+                          dominant-baseline="middle">${c.icon}</text>`);
+  }
+  // Cape: behind the body, lower-left edge of robe.
+  if (kid.cosmetics.cape) {
+    const c = lookup(kid.cosmetics.cape);
+    if (c) out.push(`<text x="22" y="98" text-anchor="middle" font-size="22"
+                          dominant-baseline="middle" opacity="0.95">${c.icon}</text>`);
+  }
+  // Accessory: floating right of the face, like an earring or monocle.
+  if (kid.cosmetics.accessory) {
+    const c = lookup(kid.cosmetics.accessory);
+    if (c) out.push(`<text x="76" y="44" text-anchor="middle" font-size="14"
+                          dominant-baseline="middle">${c.icon}</text>`);
+  }
+  // Pet: at the hero's feet, left side.
+  if (kid.cosmetics.pet) {
+    const c = lookup(kid.cosmetics.pet);
+    if (c) out.push(`<text x="20" y="118" text-anchor="middle" font-size="20"
+                          dominant-baseline="middle">${c.icon}</text>`);
+  }
+  return out.join('');
+}
+
+// Apply / remove a cosmetic on a hero. Cosmetics belong to the family
+// inventory; assigning the same item to multiple kids is allowed (kids
+// share their loot). Removing simply clears the slot.
+function applyCosmeticToKid(kidId, slot, cosmeticId) {
+  const k = kidById(kidId);
+  if (!k) return;
+  if (!k.cosmetics) k.cosmetics = {};
+  k.cosmetics[slot] = cosmeticId;
+  save();
+  renderKids();
+  if (typeof renderHeroSheet === 'function' && openSheetKidId === kidId) renderHeroSheet();
+  playChime();
+}
+function removeCosmeticFromKid(kidId, slot) {
+  const k = kidById(kidId);
+  if (!k || !k.cosmetics) return;
+  delete k.cosmetics[slot];
+  save();
+  renderKids();
+  if (typeof renderHeroSheet === 'function' && openSheetKidId === kidId) renderHeroSheet();
+  playChime();
 }
 
 // Class-specific shape on top of the head — hat, helm, halo, ears, cap.
@@ -6004,6 +6174,10 @@ function save() {
   // Refresh the family-streak badge in case anything that triggered a
   // save also moved the streak count (mark-active, claim, etc.).
   if (typeof updateFamilyStreakBadge === 'function') updateFamilyStreakBadge();
+  // Same idea for the "Recruit Legendary Hero" affordance — claiming a
+  // 30-day reward bumps state.legendaryRecruitsAvailable and we want the
+  // button to reveal itself without waiting for a re-render of Heroes.
+  if (typeof updateLegendaryRecruitButton === 'function') updateLegendaryRecruitButton();
 }
 function load() {
   const raw = localStorage.getItem('piggyBankState');
@@ -6055,6 +6229,9 @@ function load() {
           // unmapped slots (amulet/offHand/pants/shoes) remain in inventory (unequipped)
         });
         k.equipment = newEq;
+        // Family-streak cosmetic slots (decorative, no stat impact).
+        if (!k.cosmetics) k.cosmetics = {};
+        if (typeof k.legendary !== 'boolean') k.legendary = false;
         // Migrate inventory items (IDs)
         k.inventory = (k.inventory || []).map(inst => {
           const mappedId = ITEM_MIGRATION[inst.itemId] || inst.itemId;
@@ -6312,7 +6489,11 @@ document.querySelectorAll('.modal-backdrop').forEach(m => {
 });
 
 // --- KIDS ---
-function openAddKidModal() {
+let pendingLegendaryRecruit = false;
+function openAddKidModal(isLegendary) {
+  // Legendary path: only allowed if a slot is available. Otherwise the
+  // button shouldn't be visible — but guard anyway.
+  pendingLegendaryRecruit = !!isLegendary && (state.legendaryRecruitsAvailable || 0) > 0;
   document.getElementById('newKidName').value = '';
   document.getElementById('newKidUserName').value = '';
   document.getElementById('newKidStart').value = '0';
@@ -6368,30 +6549,61 @@ function addKid() {
   if (!/^[a-zA-Z0-9_]{2,20}$/.test(userName)) { toast('Username: 2–20 letters, numbers, or underscores', 'error'); return; }
   if (usernameTaken(userName)) { toast('That username is already claimed', 'error'); return; }
   if (start < 0) { toast('Starting gold cannot be negative', 'error'); return; }
+  // Legendary recruit: consume one of the awarded slots and stamp the hero
+  // with a +1 bonus across all base stats. We re-validate the slot count
+  // here (not just the flag) so a stale flag from a closed modal can't
+  // mint a free legendary.
+  const isLegendary = pendingLegendaryRecruit && (state.legendaryRecruitsAvailable || 0) > 0;
+  const baseStats = makeStats(selectedClass);
+  if (isLegendary) {
+    for (const sk of Object.keys(baseStats)) baseStats[sk] = (baseStats[sk] || 0) + 1;
+  }
   const kid = {
     id: id(),
     userName,
     name,
     avatar: selectedAvatar,
     class: selectedClass,
-    stats: makeStats(selectedClass),
+    stats: baseStats,
     balance: start,
     totalEarned: start,
     totalPaidOut: 0,
     portrait: null,
     inventory: [],
     equipment: { hat: null, armor: null, weapon: null, accessory: null },
+    cosmetics: {},
+    legendary: isLegendary,
     features: generateFeatures(Date.now() + ':' + userName),
     xp: { brave: 0, clever: 0, kind: 0 }
   };
   state.kids.push(kid);
+  if (isLegendary) {
+    state.legendaryRecruitsAvailable = Math.max(0, (state.legendaryRecruitsAvailable || 0) - 1);
+  }
+  pendingLegendaryRecruit = false;
   if (start > 0) logTx(kid.id, 'earn', start, 'Royal endowment', { event: 'royal_endowment', payload: {} });
   save();
   renderKids();
   renderHistoryFilter();
+  if (typeof updateLegendaryRecruitButton === 'function') updateLegendaryRecruitButton();
   closeModal('addKidModal');
   playFanfare();
-  toast(`${name} (@${userName}) joins the fellowship! ⚔`, 'success');
+  const heraldry = isLegendary ? '⭐ ' : '';
+  toast(`${heraldry}${name} (@${userName}) joins the fellowship! ⚔`, 'success');
+}
+
+// Toggle the "Recruit Legendary Hero" affordance based on how many
+// legendary slots the family has banked. Called from save() and on boot
+// so the button materialises the moment a 30-day reward is claimed.
+function updateLegendaryRecruitButton() {
+  const btn = document.getElementById('recruitLegendaryBtn');
+  const pill = document.getElementById('legendarySlotPill');
+  const slots = state && state.legendaryRecruitsAvailable ? state.legendaryRecruitsAvailable : 0;
+  if (btn) btn.style.display = slots > 0 ? '' : 'none';
+  if (pill) {
+    pill.style.display = slots > 0 ? '' : 'none';
+    pill.textContent = `×${slots}`;
+  }
 }
 
 let pendingDeleteKidId = null;
@@ -6503,7 +6715,7 @@ function renderKids() {
         <div class="kid-head-click" onclick="openHeroSheet('${k.id}')" title="View character sheet">
           <div class="avatar">${avatarInner}</div>
           <div style="flex:1; min-width:0;">
-            <h3 class="kid-name">${escapeHtml(k.name)} <span class="level-badge">Lv ${heroLevel(k)}</span> ${streakHtml}</h3>
+            <h3 class="kid-name">${escapeHtml(k.name)} <span class="level-badge">Lv ${heroLevel(k)}</span> ${k.legendary ? `<span class="legendary-badge" title="${escapeHtml(t('legendary_badge_label'))}">⭐ ${t('legendary_badge_label')}</span>` : ''} ${streakHtml}</h3>
             ${(!hasPinSet() || pinVerified) ? `<div class="kid-user">@${escapeHtml(k.userName || 'hero')}</div>` : ''}
             <div class="kid-class">${cls.icon} ${className(cls)} · ${rankName(k)}</div>
           </div>
@@ -8149,7 +8361,63 @@ function renderHeroSheet() {
         }).join('')}
       </div>
     </div>
+
+    ${renderCosmeticGalleryForHero(k)}
   `;
+}
+
+// Cosmetics gallery in the hero sheet — shows the family's owned items
+// grouped by slot. Tapping a tile assigns/unassigns the cosmetic on
+// THIS hero. Unowned items aren't shown (rewards-driven progression).
+function renderCosmeticGalleryForHero(k) {
+  const inv = state.cosmeticInventory || [];
+  if (!inv.length) {
+    return `
+      <div class="inventory-section">
+        <h4>💫 ${escapeHtml(t('cosmetics_title'))}</h4>
+        <div style="font-size: 12px; color: var(--ink-muted); font-style: italic;">
+          ${escapeHtml(t('cosmetics_empty'))}
+        </div>
+      </div>`;
+  }
+  const lang = (state.settings && state.settings.lang) || 'en';
+  const slots = ['hat', 'cape', 'accessory', 'pet'];
+  const slotLabels = {
+    hat: t('cosmetic_slot_hat'), cape: t('cosmetic_slot_cape'),
+    accessory: t('cosmetic_slot_accessory'), pet: t('cosmetic_slot_pet')
+  };
+  const cosmetics = (k.cosmetics) || {};
+  const sections = slots.map(slot => {
+    const items = inv.filter(c => c.slot === slot);
+    if (!items.length) return '';
+    const tiles = items.map(c => {
+      const def = COSMETIC_POOL.find(x => x.id === c.id) || c;
+      const equipped = cosmetics[slot] === c.id;
+      const name = (def.name && (def.name[lang] || def.name.en)) || c.id;
+      const onclick = equipped
+        ? `removeCosmeticFromKid('${k.id}','${slot}')`
+        : `applyCosmeticToKid('${k.id}','${slot}','${c.id}')`;
+      return `
+        <div class="cosmetic-tile${equipped ? ' equipped' : ''}" onclick="${onclick}" title="${escapeHtml(name)}">
+          <div class="cosmetic-icon">${def.icon || '✨'}</div>
+          <div class="cosmetic-name">${escapeHtml(name)}</div>
+          ${equipped ? `<div class="cosmetic-equipped">✓ ${escapeHtml(t('cosmetic_equipped'))}</div>` : ''}
+        </div>`;
+    }).join('');
+    return `
+      <div class="cosmetic-slot-section">
+        <div class="cosmetic-slot-head">${escapeHtml(slotLabels[slot])}</div>
+        <div class="cosmetic-tiles">${tiles}</div>
+      </div>`;
+  }).filter(Boolean).join('');
+  return `
+    <div class="inventory-section">
+      <h4>💫 ${escapeHtml(t('cosmetics_title'))}</h4>
+      <div style="font-size: 12px; color: var(--ink-muted); font-style: italic; margin-bottom: 8px;">
+        ${escapeHtml(t('cosmetics_desc'))}
+      </div>
+      ${sections}
+    </div>`;
 }
 
 function triggerPortraitUpload() {
@@ -11978,7 +12246,7 @@ applyLandingVisibility();  // decide before other renders which shell is visible
 updateI18n();
 // Show any pending reward that survived a previous session, after the
 // landing/intro UI has settled.
-setTimeout(() => { try { updateFamilyStreakBadge(); maybeShowNextReward(); } catch (e) {} }, 1500);
+setTimeout(() => { try { updateFamilyStreakBadge(); updateLegendaryRecruitButton(); maybeShowNextReward(); } catch (e) {} }, 1500);
 renderSettings();
 renderAvatarPicker();
 renderIconPicker();
