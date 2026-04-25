@@ -9204,11 +9204,18 @@ function renderSequenceScene(a, scene, c) {
     const len = scene.length || 4;
     const pattern = [];
     for (let i = 0; i < len; i++) pattern.push(Math.floor(Math.random() * tiles.length));
-    adventureState.sequenceState = { tiles, pattern, input: [], phase: 'showing', attempts: 0, solved: false, failed: false };
+    adventureState.sequenceState = { tiles, pattern, input: [], phase: 'showing', attempts: 0, solved: false, failed: false, _flashing: false };
     // Flash the pattern, then switch to input phase.
     requestAnimationFrame(() => playSequencePattern());
   }
   const st = adventureState.sequenceState;
+  // Re-trigger the flash on later renders that put us back into 'showing'
+  // (the "Show again" button or a wrong-tile retry). Without this guard
+  // the phase banner would say "Watch the pattern" but no tiles flash and
+  // the game looks stuck. _flashing prevents stacking timers.
+  if (st.phase === 'showing' && !st.solved && !st.failed && !st._flashing) {
+    requestAnimationFrame(() => playSequencePattern());
+  }
   const done = st.solved || st.failed;
   const tiles = st.tiles;
   const pattern = st.pattern;
@@ -9275,12 +9282,14 @@ function renderSequenceScene(a, scene, c) {
 
 function playSequencePattern() {
   const st = adventureState.sequenceState;
-  if (!st || st.phase !== 'showing') return;
+  if (!st || st.phase !== 'showing' || st._flashing) return;
+  st._flashing = true;
   const pattern = st.pattern;
   let i = 0;
   const flashNext = () => {
     if (!adventureState.sequenceState || adventureState.sequenceState !== st) return;
     if (i >= pattern.length) {
+      st._flashing = false;
       st.phase = 'input';
       renderAdventure();
       return;
