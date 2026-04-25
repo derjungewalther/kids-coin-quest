@@ -1028,6 +1028,14 @@
   .music-btn.toggle-off { opacity: 0.55; }
   .music-btn.toggle-on  { opacity: 1; box-shadow: 0 0 8px rgba(244,211,94,0.35); }
 
+  /* Account button: when signed-in, give it a subtle green ring so the
+     email-prefix label clearly reads as "you are logged in" rather than
+     just text. Click routes through to Council → Account → Sign out. */
+  .account-btn-signed-in {
+    border-color: var(--emerald) !important;
+    box-shadow: 0 0 0 2px rgba(45,106,79,0.35);
+  }
+
   /* Quest "Done!" complete button — wider with explicit text + checkmark
      so kids tell it apart from the small ✕ delete-hero button. */
   .quest-done-btn {
@@ -2518,7 +2526,7 @@
     <button class="music-btn" id="langBtn" onclick="toggleLang()">🌐 DE</button>
     <button class="music-btn" id="narratorBtn" onclick="toggleNarrator()">🔇 <span data-i18n="narrator">Narrator</span></button>
     <button class="music-btn" id="musicBtn" onclick="toggleMusic()">🔇 <span data-i18n="music">Music</span></button>
-    <button class="music-btn" id="accountBtn" onclick="onAccountBtnClick()" style="display:none;">👤 <span id="accountBtnLabel" data-i18n="sign_in">Sign in</span></button>
+    <button class="music-btn" id="accountBtn" onclick="onAccountBtnClick()" style="display:none;">👤 <span id="accountBtnLabel">Sign in</span></button>
     <div class="tabs">
       <button class="tab active" data-view="kids" data-i18n="tab_heroes">Heroes</button>
       <button class="tab" data-view="activities" data-i18n="tab_quests">Quests</button>
@@ -4107,6 +4115,11 @@ function updateI18n() {
   if (langBtn) langBtn.innerHTML = '🌐 ' + (lang === 'en' ? 'DE' : 'EN');
   const landingLangLabel = document.getElementById('landingLangLabel');
   if (landingLangLabel) landingLangLabel.textContent = lang === 'en' ? 'DE' : 'EN';
+  // Account button label is session-dependent (email prefix vs. "Sign in")
+  // and not catalogue-driven, so re-derive it after every i18n pass —
+  // otherwise the language toggle would clobber the email prefix back to
+  // the static "Sign in" string for signed-in users.
+  if (typeof updateAccountBtnLabel === 'function') updateAccountBtnLabel();
 }
 function toggleLang() {
   state.settings.lang = state.settings.lang === 'de' ? 'en' : 'de';
@@ -10414,11 +10427,18 @@ function updateAccountBtnLabel() {
   if (!btn || !label) return;
   if (supaSession) {
     const email = (supaSession.user && supaSession.user.email) || '';
+    // Show the email-prefix so it's unmistakable that the user is signed in
+    // (previously the label flipped back to "Sign in" on every updateI18n
+    // because the span had data-i18n="sign_in" attached). Click still
+    // routes through onAccountBtnClick → Council → Account where Sign-out
+    // lives.
     label.textContent = email.split('@')[0] || t('signed_in_as');
     btn.title = t('signed_in_as') + ' ' + email;
+    btn.classList.add('account-btn-signed-in');
   } else {
     label.textContent = t('sign_in');
     btn.title = '';
+    btn.classList.remove('account-btn-signed-in');
   }
 }
 
