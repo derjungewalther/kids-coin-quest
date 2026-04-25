@@ -2703,50 +2703,9 @@
           </label>
         </div>
       </div>
-      <div class="settings-row">
-        <div style="flex:1;">
-          <div class="label-title">🗣 English Narrator Voice</div>
-          <div class="label-sub">Best voices bubble to the top — pick Samantha for premium quality</div>
-        </div>
-        <div class="control">
-          <select id="setVoiceEn" style="min-width: 200px;" aria-label="English voice"></select>
-          <button class="btn btn-ghost btn-sm" onclick="testVoice('en')" aria-label="Test English voice">▶</button>
-        </div>
-      </div>
-      <div class="settings-row">
-        <div style="flex:1;">
-          <div class="label-title">🗣 German Narrator Voice</div>
-          <div class="label-sub">Install Anna Premium on macOS for best results</div>
-        </div>
-        <div class="control">
-          <select id="setVoiceDe" style="min-width: 200px;" aria-label="German voice"></select>
-          <button class="btn btn-ghost btn-sm" onclick="testVoice('de')" aria-label="Test German voice">▶</button>
-        </div>
-      </div>
-      <div class="settings-row">
-        <div style="flex:1;">
-          <div class="label-title">Narrator Speed</div>
-          <div class="label-sub">How fast the narrator reads</div>
-        </div>
-        <div class="control" style="display:flex; gap:6px; align-items:center;">
-          <input type="range" id="setNarratorRate" min="0.7" max="1.3" step="0.05" style="width: 140px;" aria-label="Narrator speed"/>
-          <span id="setNarratorRateValue" style="min-width: 36px; font-family: 'Cinzel', serif;">1.00×</span>
-        </div>
-      </div>
-      <div class="settings-row">
-        <div style="flex:1;">
-          <div class="label-title">Narrator Pitch</div>
-          <div class="label-sub">Higher pitch = friendlier, lower = more dramatic</div>
-        </div>
-        <div class="control" style="display:flex; gap:6px; align-items:center;">
-          <input type="range" id="setNarratorPitch" min="0.7" max="1.3" step="0.05" style="width: 140px;" aria-label="Narrator pitch"/>
-          <span id="setNarratorPitchValue" style="min-width: 36px; font-family: 'Cinzel', serif;">1.00</span>
-        </div>
-      </div>
       <div style="margin-top: 16px;">
         <button class="btn btn-primary" onclick="saveSettings()">💾 Decree Settings</button>
         <button class="btn btn-accent" onclick="applyInterestNow()">🏦 Bestow Interest Now</button>
-        <button class="btn btn-ghost" onclick="diagnoseVoices()" aria-label="Diagnose voices">🔬 Diagnose Voices</button>
       </div>
     </div>
     <div class="section">
@@ -3755,16 +3714,6 @@ function updateNarratorBtn() {
   if (!btn) return;
   btn.innerHTML = (state.settings.narratorOn ? '🗣 ' : '🔇 ') + '<span data-i18n="narrator">' + t('narrator') + '</span>';
 }
-if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-  window.speechSynthesis.onvoiceschanged = () => {
-    // Voices became available — refresh pickers if the Council is open
-    try {
-      if (document.getElementById('setVoiceEn')) populateVoiceDropdown('en');
-      if (document.getElementById('setVoiceDe')) populateVoiceDropdown('de');
-    } catch (e) { /* ignore if populateVoiceDropdown not yet defined */ }
-  };
-}
-
 const AVATARS = ['⚔️','🏹','🧙‍♂️','🧝‍♀️','🛡️','👑','🗡️','🪄','🐉','🦄','🐺','🦅','🦁','🐲','🧚','🧛','🧞','🧟','⚡','🌟'];
 const ICONS = ['⚔️','🛡️','🏹','🗡️','🪄','🧪','📜','🗝️','💎','🏰','🐉','🐺','🧹','🛏️','📚','🦷','🚿','🐕','🗑️','🌱'];
 
@@ -5578,28 +5527,6 @@ function renderHistory() {
 }
 
 // --- SETTINGS ---
-function populateVoiceDropdown(lang) {
-  const selId = lang === 'de' ? 'setVoiceDe' : 'setVoiceEn';
-  const sel = document.getElementById(selId);
-  if (!sel) return;
-  const ranked = availableVoicesForLang(lang);
-  if (ranked.length === 0) {
-    sel.innerHTML = '<option value="">(No voices found)</option>';
-    return;
-  }
-  const current = lang === 'de' ? state.settings.voiceDe : state.settings.voiceEn;
-  const best = ranked[0];
-  const autoLabel = best ? ` (best: ${best.name})` : '';
-  const opts = [`<option value="">🪄 Auto-pick${autoLabel}</option>`];
-  ranked.forEach(v => {
-    const sc = scoreVoice(v, lang);
-    const badge = sc >= 10 ? '⭐ ' : sc >= 5 ? '✨ ' : '';
-    const sel = (current === v.name) ? ' selected' : '';
-    opts.push(`<option value="${escapeHtml(v.name)}"${sel}>${badge}${escapeHtml(v.name)} — ${escapeHtml(v.lang)}</option>`);
-  });
-  sel.innerHTML = opts.join('');
-}
-
 function renderSettings() {
   document.getElementById('setCurrency').value = state.settings.currency;
   document.getElementById('setInterestRate').value = state.settings.interestRate;
@@ -5612,23 +5539,6 @@ function renderSettings() {
   if (iTried) iTried.checked = state.settings.iTriedBonus !== false;
   const paidPw = document.getElementById('setPaidPerWeek');
   if (paidPw) paidPw.value = state.settings.paidAdventuresPerWeek != null ? state.settings.paidAdventuresPerWeek : 1;
-  // Voice pickers
-  populateVoiceDropdown('en');
-  populateVoiceDropdown('de');
-  const rate = document.getElementById('setNarratorRate');
-  const rateV = document.getElementById('setNarratorRateValue');
-  if (rate) {
-    rate.value = state.settings.narratorRate != null ? state.settings.narratorRate : 1.0;
-    if (rateV) rateV.textContent = Number(rate.value).toFixed(2) + '×';
-    rate.oninput = () => { rateV.textContent = Number(rate.value).toFixed(2) + '×'; };
-  }
-  const pitch = document.getElementById('setNarratorPitch');
-  const pitchV = document.getElementById('setNarratorPitchValue');
-  if (pitch) {
-    pitch.value = state.settings.narratorPitch != null ? state.settings.narratorPitch : 1.0;
-    if (pitchV) pitchV.textContent = Number(pitch.value).toFixed(2);
-    pitch.oninput = () => { pitchV.textContent = Number(pitch.value).toFixed(2); };
-  }
 }
 
 function saveSettings() {
@@ -5646,59 +5556,9 @@ function saveSettings() {
     const n = parseInt(paidPw.value, 10);
     state.settings.paidAdventuresPerWeek = isNaN(n) ? 1 : Math.max(0, Math.min(99, n));
   }
-  const ve = document.getElementById('setVoiceEn');
-  const vd = document.getElementById('setVoiceDe');
-  if (ve) state.settings.voiceEn = ve.value || null;
-  if (vd) state.settings.voiceDe = vd.value || null;
-  const rate = document.getElementById('setNarratorRate');
-  const pitch = document.getElementById('setNarratorPitch');
-  if (rate) state.settings.narratorRate = parseFloat(rate.value) || 1.0;
-  if (pitch) state.settings.narratorPitch = parseFloat(pitch.value) || 1.0;
   save();
   renderKids();
   toast('Council decree recorded!', 'success');
-}
-
-function diagnoseVoices() {
-  const all = window.speechSynthesis.getVoices();
-  const ua = navigator.userAgent;
-  const browser = /Chrome\/(?!.*Edge)/.test(ua) ? 'Chrome' : /Edg\//.test(ua) ? 'Edge' : /Safari\//.test(ua) ? 'Safari' : 'Other';
-  const warnChrome = browser !== 'Safari' && /Mac/.test(ua) ? '\n\n⚠ On macOS you should use Safari — Chrome/Edge hide premium system voices!' : '';
-  const en = availableVoicesForLang('en').slice(0, 8).map(v => `  ${v.name} (${v.lang})${v.localService ? ' [local]' : ''} — score ${scoreVoice(v, 'en')}`).join('\n');
-  const de = availableVoicesForLang('de').slice(0, 8).map(v => `  ${v.name} (${v.lang})${v.localService ? ' [local]' : ''} — score ${scoreVoice(v, 'de')}`).join('\n');
-  const hasPremium = all.some(v => /premium|enhanced|neural|natural/i.test(v.name));
-  const premiumNote = hasPremium ? '✓ Premium/Enhanced voices detected' : '⚠ NO premium voices found — install them in macOS Settings → Accessibility → Spoken Content → System Voice → Manage Voices';
-  alert(`Voice Diagnostics\n\nBrowser: ${browser}\nTotal voices: ${all.length}\n${premiumNote}${warnChrome}\n\nTop EN voices:\n${en || '  (none)'}\n\nTop DE voices:\n${de || '  (none)'}`);
-}
-
-function testVoice(lang) {
-  // Use the currently selected value in the dropdown (not yet saved)
-  const selId = lang === 'de' ? 'setVoiceDe' : 'setVoiceEn';
-  const sel = document.getElementById(selId);
-  const prevVoicePref = lang === 'de' ? state.settings.voiceDe : state.settings.voiceEn;
-  const prevLang = state.settings.lang;
-  const prevOn = state.settings.narratorOn;
-  const rate = document.getElementById('setNarratorRate');
-  const pitch = document.getElementById('setNarratorPitch');
-  const prevRate = state.settings.narratorRate;
-  const prevPitch = state.settings.narratorPitch;
-  // Temporarily apply for the test
-  if (sel) { if (lang === 'de') state.settings.voiceDe = sel.value || null; else state.settings.voiceEn = sel.value || null; }
-  if (rate) state.settings.narratorRate = parseFloat(rate.value) || 1.0;
-  if (pitch) state.settings.narratorPitch = parseFloat(pitch.value) || 1.0;
-  state.settings.lang = lang;
-  state.settings.narratorOn = true;
-  narrate(lang === 'de'
-    ? 'Hallo! Ich bin dein Erzähler. Auf zum Abenteuer!'
-    : 'Hello! I am your narrator. Let the adventure begin!');
-  // Restore (voice prefs restored only if user hadn't saved yet — but test shouldn't mutate)
-  setTimeout(() => {
-    state.settings.lang = prevLang;
-    state.settings.narratorOn = prevOn;
-    if (lang === 'de') state.settings.voiceDe = prevVoicePref; else state.settings.voiceEn = prevVoicePref;
-    state.settings.narratorRate = prevRate;
-    state.settings.narratorPitch = prevPitch;
-  }, 50);
 }
 
 function applyInterestNow() {
