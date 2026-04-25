@@ -414,6 +414,516 @@ test.describe('Visual capture · desktop 1280×900', () => {
     await page.evaluate(() => { window.state.settings.lang = 'de'; window.updateI18n(); window.renderKids(); });
     await captureFullPage(page, '28-de-heroes');
   });
+
+  // =====================================================================
+  // TIER 1 — modals + states with zero coverage
+  // =====================================================================
+
+  test('29 modal · allowance', async ({ page }) => {
+    await seedHero(page, { name: 'AllowKid', userName: 'allow' });
+    await page.evaluate(() => window.openAllowanceModal(window.state.kids[0].id));
+    await captureFullPage(page, '29-modal-allowance');
+  });
+
+  test('30 modal · sign-in', async ({ page }) => {
+    await page.evaluate(() => window.openSignInModal && window.openSignInModal());
+    await captureFullPage(page, '30-modal-signin');
+  });
+
+  test('31 modal · custom adventure (template loaded)', async ({ page }) => {
+    await page.evaluate(() => {
+      window.pinVerified = true;
+      window.openCustomAdventureModal();
+      if (typeof window.loadCustomAdventureTemplate === 'function') {
+        window.loadCustomAdventureTemplate();
+      }
+    });
+    await captureFullPage(page, '31-modal-custom-adv-template');
+  });
+
+  test('32 modal · custom adventure (parse error)', async ({ page }) => {
+    await page.evaluate(() => {
+      window.pinVerified = true;
+      window.openCustomAdventureModal();
+      const ta = document.getElementById('customAdvJson');
+      if (ta) ta.value = '{ this is not valid json';
+      window.saveCustomAdventureFromModal && window.saveCustomAdventureFromModal();
+    });
+    await captureFullPage(page, '32-modal-custom-adv-error');
+  });
+
+  test('33 modal · Erdheld pre-adventure prompt', async ({ page }) => {
+    await seedHero(page, { name: 'ErdeKid', userName: 'erdekid' });
+    await page.evaluate(() => {
+      window.state.kids.push({
+        id: 'lh-erde-vis', userName: 'lhev', name: 'Toras',
+        class: 'legendary', stats: { brave: 0, clever: 0, kind: 0 },
+        legendary: { class: 'erde', abilityCharges: { perAdventure: 1, currentAdventure: 1 }, bondLevel: 0 }
+      });
+      window.adventureState.party = [window.state.kids[0].id];
+      window.adventureState.legendaryId = 'lh-erde-vis';
+      window.chooseAdventure('fischer-sebastian');
+    });
+    await captureFullPage(page, '33-modal-erde-prompt');
+  });
+
+  test('34 modal · delete hero (BANISH)', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'Banished', userName: 'banishtest' });
+    await page.evaluate((id) => {
+      window.pinVerified = true;
+      window.deleteKid(id);
+    }, kidId);
+    await captureFullPage(page, '34-modal-delete-hero');
+  });
+
+  test('35 modal · rename hero', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'OldName', userName: 'oldname' });
+    await page.evaluate((id) => {
+      window.pinVerified = true;
+      if (typeof window.openRenameHero === 'function') window.openRenameHero(id);
+    }, kidId);
+    await captureFullPage(page, '35-modal-rename-hero');
+  });
+
+  test('36 modal · PIN entry', async ({ page }) => {
+    await setPin(page, '4242');
+    await page.evaluate(() => {
+      window.pinVerified = false;
+      // requirePin opens the entry modal when a PIN is set.
+      window.requirePin && window.requirePin(() => {}, 'pin_required');
+    });
+    await captureFullPage(page, '36-modal-pin-entry');
+  });
+
+  test('37 reward · tier 7 cosmetic', async ({ page }) => {
+    await page.evaluate(() => {
+      window.ensureFamilyStreakState();
+      window.state.streak.pendingRewards.push({
+        tier: 'tier7', day: window.todayKeyFamily(), ts: Date.now(),
+        contents: { type: 'cosmetic', cosmeticId: 'crown_gold' }
+      });
+      window.maybeShowNextReward();
+    });
+    await captureFullPage(page, '37-reward-tier7');
+  });
+
+  test('38 reward · tier 30 ritual entry', async ({ page }) => {
+    await page.evaluate(() => {
+      window.ensureFamilyStreakState();
+      window.ensureLegendaryState();
+      window.state.streak.pendingRewards.push({
+        tier: 'tier30', day: window.todayKeyFamily(), ts: Date.now(),
+        contents: { type: 'legendary_recruitment_ritual' }
+      });
+      window.maybeShowNextReward();
+    });
+    await captureFullPage(page, '38-reward-tier30-ritual');
+  });
+
+  test('39 reward · tier 30 cosmetic fallback', async ({ page }) => {
+    await page.evaluate(() => {
+      window.ensureFamilyStreakState();
+      window.state.streak.pendingRewards.push({
+        tier: 'tier30', day: window.todayKeyFamily(), ts: Date.now(),
+        contents: { type: 'legendary_cosmetic', cosmeticId: 'halo_gold' }
+      });
+      window.maybeShowNextReward();
+    });
+    await captureFullPage(page, '39-reward-tier30-cosmetic');
+  });
+
+  // ---- Adventure end screens ------------------------------------------------
+
+  async function setupAdventureEnd(page, hp) {
+    const kidId = await seedHero(page, { name: 'Endkid', userName: 'endkid', balance: 5, totalEarned: 5 });
+    await page.evaluate(({ id, hp }) => {
+      window.adventureState.party = [id];
+      window.adventureState.adventureId = 'fischer-sebastian';
+      window.adventureState.sceneIdx = 7;
+      window.adventureState.maxHp = 6;
+      window.adventureState.hp = hp;
+      window.adventureState.log = Array.from({ length: 8 }, (_, i) => ({
+        sceneTitle: 'Scene ' + (i+1), heroId: id, success: i < hp,
+        type: 'minigame', score: i < hp ? 1 : 0, errors: 0, durationMs: 1000
+      }));
+      window.adventureState.treasureRewards = null;
+      const advTab = document.querySelector('.tab[data-view="adventure"]');
+      if (advTab) advTab.click();
+      window.endAdventure(hp >= 4);
+    }, { id: kidId, hp });
+  }
+
+  test('40 adventure end · triumph 5⭐', async ({ page }) => {
+    await setupAdventureEnd(page, 5);
+    await captureFullPage(page, '40-end-triumph');
+  });
+
+  test('41 adventure end · brave 3⭐', async ({ page }) => {
+    await setupAdventureEnd(page, 3);
+    await captureFullPage(page, '41-end-brave');
+  });
+
+  test('42 adventure end · close call 1⭐', async ({ page }) => {
+    await setupAdventureEnd(page, 1);
+    await captureFullPage(page, '42-end-close');
+  });
+
+  test('43 adventure end · defeat 0⭐', async ({ page }) => {
+    await setupAdventureEnd(page, 0);
+    await captureFullPage(page, '43-end-defeat');
+  });
+
+  // ---- Settings (post-PIN) -------------------------------------------------
+
+  test('44 settings · post-unlock panel', async ({ page }) => {
+    await seedHero(page, { name: 'SetK', userName: 'setk' });
+    await setPin(page, '1234');
+    await page.evaluate(() => {
+      window.pinVerified = true;
+      const tab = document.querySelector('.tab[data-view="settings"]');
+      if (tab) tab.click();
+    });
+    await captureFullPage(page, '44-settings-unlocked');
+  });
+
+  test('45 settings · interest + allowance config visible', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'IntK', userName: 'intk', balance: 50 });
+    await page.evaluate((id) => {
+      window.pinVerified = true;
+      window.state.settings.interestRate = 5;
+      window.state.settings.interestFreq = 'monthly';
+      const k = window.kidById(id);
+      k.allowance = { amount: 3, dayOfWeek: 0, lastPaidAt: null };
+      window.save();
+      const tab = document.querySelector('.tab[data-view="settings"]');
+      if (tab) tab.click();
+    }, kidId);
+    await captureFullPage(page, '45-settings-interest-allowance');
+  });
+
+  test('46 eltern dashboard · streak heatmap', async ({ page }) => {
+    await seedHero(page, { name: 'EltK1', userName: 'elt1', balance: 12, totalEarned: 30 });
+    await seedHero(page, { name: 'EltK2', userName: 'elt2', balance: 7,  totalEarned: 20 });
+    await setPin(page, '1234');
+    await page.evaluate(() => {
+      window.pinVerified = true;
+      window.ensureFamilyStreakState();
+      // Seed a chunky heatmap: 14 active days, one shielded day, 3 misses.
+      const today = window.todayKeyFamily();
+      const active = [];
+      for (let i = 0; i < 14; i++) active.push(window.dayKeyOffset(today, -i));
+      window.state.streak.activeDays = active;
+      window.state.streak.freezesUsed = [window.dayKeyOffset(today, -7)];
+      window.state.streak.longest = 14;
+      window.save();
+      const tab = document.querySelector('.tab[data-view="settings"]');
+      if (tab) tab.click();
+    });
+    await captureFullPage(page, '46-eltern-heatmap');
+  });
+
+  // =====================================================================
+  // TIER 2 — each non-Fischer adventure + minigame outcome banners
+  // =====================================================================
+
+  for (const advId of ['bakery', 'grove', 'crypt', 'dragon', 'tower']) {
+    test(`50 adventure · ${advId} first scene`, async ({ page }) => {
+      await seedHero(page, { name: 'A', userName: 'a' + advId, xp: { brave: 9999, clever: 9999, kind: 9999 } });
+      await page.evaluate((id) => {
+        window.adventureState.party = [window.state.kids[0].id];
+        window.chooseAdventure(id);
+        const advTab = document.querySelector('.tab[data-view="adventure"]');
+        if (advTab) advTab.click();
+        window.beginScenes();
+        window.renderAdventure();
+      }, advId);
+      await captureFullPage(page, `50-adv-${advId}-scene1`);
+    });
+  }
+
+  test('55 minigame outcome · memory success banner', async ({ page }) => {
+    await seedHero(page, { userName: 'mout1' });
+    await page.evaluate(() => {
+      window.adventureState.party = [window.state.kids[0].id];
+      window.chooseAdventure('fischer-sebastian');
+      const advTab = document.querySelector('.tab[data-view="adventure"]');
+      if (advTab) advTab.click();
+      window.beginScenes();
+      const adv = window.ADVENTURES.find(a => a.id === 'fischer-sebastian');
+      window.finishMinigameOutcome({ success: true, score: 1, errors: 0, durationMs: 100 }, adv.scenes[0]);
+    });
+    // finishMinigameOutcome shows the success banner for ~800ms.
+    await page.waitForTimeout(300);
+    await captureFullPage(page, '55-minigame-memory-success');
+  });
+
+  test('56 minigame outcome · memory failure banner', async ({ page }) => {
+    await seedHero(page, { userName: 'mout2' });
+    await page.evaluate(() => {
+      window.adventureState.party = [window.state.kids[0].id];
+      window.chooseAdventure('fischer-sebastian');
+      const advTab = document.querySelector('.tab[data-view="adventure"]');
+      if (advTab) advTab.click();
+      window.beginScenes();
+      const adv = window.ADVENTURES.find(a => a.id === 'fischer-sebastian');
+      window.finishMinigameOutcome({ success: false, score: 0.2, errors: 3, durationMs: 100 }, adv.scenes[0]);
+    });
+    await page.waitForTimeout(300);
+    await captureFullPage(page, '56-minigame-memory-failure');
+  });
+
+  test('57 sort game · one item picked', async ({ page }) => {
+    await seedHero(page, { userName: 'mout3' });
+    await page.evaluate(() => {
+      window.adventureState.party = [window.state.kids[0].id];
+      window.chooseAdventure('fischer-sebastian');
+      const advTab = document.querySelector('.tab[data-view="adventure"]');
+      if (advTab) advTab.click();
+      window.beginScenes();
+      window.adventureState.sceneIdx = 1;
+      window.renderAdventure();
+      window.__sortPickItem && window.__sortPickItem(0);
+    });
+    await captureFullPage(page, '57-minigame-sort-picked');
+  });
+
+  test('58 spot game · one diff found', async ({ page }) => {
+    await seedHero(page, { userName: 'mout5' });
+    await page.evaluate(() => {
+      window.adventureState.party = [window.state.kids[0].id];
+      window.chooseAdventure('fischer-sebastian');
+      const advTab = document.querySelector('.tab[data-view="adventure"]');
+      if (advTab) advTab.click();
+      window.beginScenes();
+      window.adventureState.sceneIdx = 6;
+      window.renderAdventure();
+      // Synthetically tap one of the right-panel diffs.
+      const right = document.querySelector('.spot-panel.right');
+      if (right) {
+        const r = right.getBoundingClientRect();
+        const ev = new MouseEvent('click', { bubbles: true,
+          clientX: r.left + 0.25 * r.width, clientY: r.top + 0.50 * r.height });
+        window.__mgSpotTap && window.__mgSpotTap(ev, right);
+      }
+    });
+    await page.waitForTimeout(300);
+    await captureFullPage(page, '58-minigame-spot-found');
+  });
+
+  // =====================================================================
+  // TIER 3 — hero sheet variations
+  // =====================================================================
+
+  test('60 hero sheet · with inventory', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'Inv', userName: 'inv', class: 'warrior' });
+    await page.evaluate((id) => {
+      const k = window.kidById(id);
+      // Drop a few items into the inventory.
+      const items = (window.ITEMS || []).slice(0, 4);
+      items.forEach(it => window.giveItemToKid(id, it));
+      // Equip the first item if its slot exists.
+      const first = items[0];
+      if (first && first.slot) {
+        const inst = (k.inventory || []).find(i => i.itemId === first.id);
+        if (inst) k.equipment[first.slot] = inst.id;
+      }
+      window.save();
+      window.openHeroSheet(id);
+    }, kidId);
+    await captureFullPage(page, '60-hero-sheet-inventory');
+  });
+
+  test('61 hero sheet · achievements unlocked grid', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'Ach', userName: 'achkid', balance: 200, totalEarned: 250 });
+    await page.evaluate((id) => {
+      const k = window.kidById(id);
+      k.xp = { brave: 30, clever: 30, kind: 30 };
+      k.achievements = ['first_quest','level_5','coins_50','goal_reached'];
+      k.goal = { name: 'Bike', target: 100, achievedAt: new Date().toISOString() };
+      window.save();
+      window.openHeroSheet(id);
+    }, kidId);
+    await captureFullPage(page, '61-hero-sheet-achievements');
+  });
+
+  test('62 hero sheet · legendary mentor variant', async ({ page }) => {
+    await page.evaluate(() => {
+      window.state.kids.push({
+        id: 'lh-sheet', userName: 'lhsheet', name: 'Selene',
+        class: 'legendary', stats: { brave: 0, clever: 0, kind: 0 },
+        balance: null, totalEarned: null, totalPaidOut: null,
+        cosmetics: { hat: 'mask_silver' }, inventory: [], equipment: {},
+        legendary: { class: 'mond', recruitedAt: new Date().toISOString(),
+          recruitedAfterStreak: 30, abilityCharges: { perAdventure: 1, currentAdventure: 1 },
+          timesUsed: 2, bondLevel: 9 }
+      });
+      window.state.cosmeticInventory = [{ id: 'mask_silver', slot: 'hat', icon: '🎭', legendary: true }];
+      window.save();
+      window.openHeroSheet('lh-sheet');
+    });
+    await captureFullPage(page, '62-hero-sheet-legendary');
+  });
+
+  for (const cls of ['warrior', 'healer', 'elf', 'bard']) {
+    test(`63 hero sheet · ${cls} class`, async ({ page }) => {
+      const kidId = await seedHero(page, { name: cls + 'Kid', userName: cls + 'kid', class: cls, balance: 12, totalEarned: 18 });
+      await page.evaluate((id) => {
+        const k = window.kidById(id);
+        k.xp = { brave: 8, clever: 8, kind: 8 };
+        window.save();
+        window.openHeroSheet(id);
+      }, kidId);
+      await captureFullPage(page, `63-hero-sheet-${cls}`);
+    });
+  }
+
+  // =====================================================================
+  // TIER 4 — i18n DE breadth
+  // =====================================================================
+
+  async function switchToDE(page) {
+    await page.evaluate(() => { window.state.settings.lang = 'de'; window.updateI18n(); });
+  }
+
+  test('70 DE · quest board', async ({ page }) => {
+    await switchToDE(page);
+    await page.locator('.tab[data-view="activities"]').click();
+    await captureFullPage(page, '70-de-quest-board');
+  });
+
+  test('71 DE · chronicle', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'Tester', userName: 'tester' });
+    await page.evaluate((id) => {
+      window.logTx(id, 'earn', 3, '📜 Bett machen', { event: 'quest', payload: { questIcon: '📜', questName: 'Bett machen', xp: 1, stat: 'brave' } });
+      window.logTx(id, 'payout', -2, 'Eis', { event: 'withdrawal', payload: { reason: 'Eis' } });
+      window.logTx(id, 'earn', 5, '🏛 Wöchentliches Taschengeld', { event: 'allowance', payload: {} });
+    }, kidId);
+    await switchToDE(page);
+    await page.locator('.tab[data-view="history"]').click();
+    await captureFullPage(page, '71-de-chronicle');
+  });
+
+  test('72 DE · adventure picker', async ({ page }) => {
+    await seedHero(page, { name: 'Pip', userName: 'pip' });
+    await switchToDE(page);
+    await page.locator('.tab[data-view="adventure"]').click();
+    await page.locator('.adventure-hero-card').first().click();
+    await captureFullPage(page, '72-de-adventure-picker');
+  });
+
+  test('73 DE · recruit modal', async ({ page }) => {
+    await switchToDE(page);
+    await page.getByRole('button', { name: /Held|Anwerben|Recruit/ }).first().click();
+    await captureFullPage(page, '73-de-modal-recruit');
+  });
+
+  test('74 DE · goal modal', async ({ page }) => {
+    await seedHero(page, { name: 'GZK', userName: 'gzk' });
+    await switchToDE(page);
+    await page.locator('.goal-strip-empty').click();
+    await captureFullPage(page, '74-de-modal-goal');
+  });
+
+  test('75 DE · ritual classes', async ({ page }) => {
+    await switchToDE(page);
+    await page.evaluate(() => {
+      window.__reseed && window.__reseed();
+      window.ensureLegendaryState();
+      window.pickOfferedLegendaryClasses = () => ['licht', 'erde', 'mond'];
+      window.openRecruitmentRitual();
+    });
+    await page.locator('#recruitmentRitualModal .btn-primary').first().click();
+    await captureFullPage(page, '75-de-ritual-classes');
+  });
+
+  // =====================================================================
+  // TIER 5 — edge cases
+  // =====================================================================
+
+  test('80 edge · long hero name truncation', async ({ page }) => {
+    await seedHero(page, { name: 'Aurelius Ferdinand the Brave Magnificent Third', userName: 'longname' });
+    await page.evaluate(() => window.renderKids());
+    await captureFullPage(page, '80-edge-long-name');
+  });
+
+  test('81 edge · 5+ heroes in grid', async ({ page }) => {
+    for (let i = 0; i < 6; i++) {
+      await seedHero(page, { name: 'H' + (i+1), userName: 'h' + (i+1), balance: i + 1 });
+    }
+    await page.evaluate(() => window.renderKids());
+    await captureFullPage(page, '81-edge-many-heroes');
+  });
+
+  test('82 edge · 4-slot adventure party (3 kids + legendary)', async ({ page }) => {
+    await seedHero(page, { name: 'Aria', userName: 'aria4' });
+    await seedHero(page, { name: 'Boris', userName: 'boris4' });
+    await seedHero(page, { name: 'Cleo', userName: 'cleo4' });
+    await page.evaluate(() => {
+      window.state.kids.push({
+        id: 'lh-4slot', userName: 'lh4', name: 'Mira',
+        class: 'legendary', stats: {brave:0,clever:0,kind:0},
+        legendary: { class: 'licht', abilityCharges: { perAdventure: 1, currentAdventure: 1 }, bondLevel: 0 }
+      });
+      window.adventureState.party = window.state.kids.filter(k => !window.isLegendaryHero(k)).map(k => k.id);
+      window.adventureState.legendaryId = 'lh-4slot';
+      window.save();
+      const tab = document.querySelector('.tab[data-view="adventure"]');
+      if (tab) tab.click();
+    });
+    await captureFullPage(page, '82-edge-4slot-party');
+  });
+
+  test('83 edge · unicode emoji name', async ({ page }) => {
+    await seedHero(page, { name: '🦄 Sparkle 🌈', userName: 'unicornkid' });
+    await page.evaluate(() => window.renderKids());
+    await captureFullPage(page, '83-edge-unicode-name');
+  });
+
+  test('84 edge · streak badge 99 days', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'StreakK', userName: 'streakk' });
+    await page.evaluate((id) => {
+      const k = window.kidById(id);
+      k.streak = { days: 99, lastEarn: new Date().toISOString() };
+      window.save();
+      window.renderKids();
+    }, kidId);
+    await captureFullPage(page, '84-edge-streak-99');
+  });
+
+  test('85 edge · large balance with thousand separator', async ({ page }) => {
+    await seedHero(page, { name: 'Rich', userName: 'rich', balance: 12345.67, totalEarned: 99999.99 });
+    await page.evaluate(() => { window.state.settings.lang = 'de'; window.updateI18n(); window.renderKids(); });
+    await captureFullPage(page, '85-edge-big-balance-de');
+  });
+
+  test('86 edge · empty chronicle (no transactions)', async ({ page }) => {
+    await seedHero(page, { name: 'Empty', userName: 'emptyk' });
+    await page.locator('.tab[data-view="history"]').click();
+    await captureFullPage(page, '86-edge-empty-chronicle');
+  });
+
+  test('87 edge · 4-mentor cap state on heroes view', async ({ page }) => {
+    await seedHero(page, { name: 'Aria', userName: 'aria-cap' });
+    await page.evaluate(() => {
+      const classes = ['licht', 'sturm', 'mond', 'erde'];
+      const names = ['Mira', 'Boras', 'Selene', 'Toras'];
+      classes.forEach((cls, i) => {
+        window.state.kids.push({
+          id: 'lh-cap-' + cls, userName: 'lhcap' + cls, name: names[i],
+          class: 'legendary', stats: {brave:0,clever:0,kind:0},
+          cosmetics: {},
+          legendary: { class: cls, recruitedAt: new Date().toISOString(),
+            recruitedAfterStreak: 30, abilityCharges: { perAdventure: 1, currentAdventure: 1 },
+            timesUsed: 0, bondLevel: i + 1 }
+        });
+      });
+      window.ensureLegendaryState();
+      window.state.legendary.heroesRecruited = 4;
+      window.save();
+      window.renderKids();
+    });
+    await captureFullPage(page, '87-edge-4-mentors');
+  });
 });
 
 test.describe('Visual capture · mobile 390×844 (iPhone 14)', () => {
@@ -476,5 +986,124 @@ test.describe('Visual capture · mobile 390×844 (iPhone 14)', () => {
     });
     await page.locator('#recruitmentRitualModal .btn-primary').first().click();
     await captureFullPage(page, 'M05-mobile-ritual-classes');
+  });
+
+  test('M06 mobile · chronicle', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'MH', userName: 'mh' });
+    await page.evaluate((id) => {
+      window.logTx(id, 'earn', 3, '📜 Brush teeth', { event: 'quest', payload: { questIcon: '📜', questName: 'Brush teeth', xp: 1, stat: 'brave' } });
+      window.logTx(id, 'payout', -2, 'Treat', { event: 'withdrawal', payload: { reason: 'Treat' } });
+      window.logTx(id, 'earn', 5, '🏛 Allowance', { event: 'allowance', payload: {} });
+      // Tabs are hidden inside the hamburger on mobile — call switchTab
+      // directly to land on the Chronicle view without animating.
+      window.switchTab('history');
+    }, kidId);
+    await captureFullPage(page, 'M06-mobile-chronicle');
+  });
+
+  test('M07 mobile · reward modal', async ({ page }) => {
+    await page.evaluate(() => {
+      window.ensureFamilyStreakState();
+      window.state.streak.pendingRewards.push({
+        tier: 'tier3', day: window.todayKeyFamily(), ts: Date.now(),
+        contents: { type: 'lucky_charm', qty: 1 }
+      });
+      window.maybeShowNextReward();
+    });
+    await captureFullPage(page, 'M07-mobile-reward');
+  });
+
+  test('M08 mobile · hero sheet', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'Sage', userName: 'sage', class: 'magician', balance: 7, totalEarned: 11 });
+    await page.evaluate((id) => {
+      const k = window.kidById(id);
+      k.xp = { brave: 5, clever: 12, kind: 3 };
+      k.achievements = ['first_quest'];
+      window.save();
+      window.openHeroSheet(id);
+    }, kidId);
+    await captureFullPage(page, 'M08-mobile-hero-sheet');
+  });
+
+  test('M09 mobile · settings PIN setup', async ({ page }) => {
+    // Settings is PIN-gated and requirePin opens the setup modal when
+    // no PIN is set. Trigger that path directly.
+    await page.evaluate(() => window.requirePin && window.requirePin(() => {}, 'pin_council_reason'));
+    await captureFullPage(page, 'M09-mobile-settings-pin');
+  });
+
+  test('M10 mobile · adventure picker', async ({ page }) => {
+    await seedHero(page, { name: 'Mob', userName: 'mob10' });
+    await page.evaluate(() => {
+      window.switchTab('adventure');
+      window.adventureState.party = [window.state.kids[0].id];
+      window.renderAdventure();
+    });
+    await captureFullPage(page, 'M10-mobile-adventure-picker');
+  });
+});
+
+// =====================================================================
+// TIER 4 — tablet (iPad portrait + landscape)
+// =====================================================================
+
+test.describe('Visual capture · iPad portrait 768×1024', () => {
+  test.use({ viewport: { width: 768, height: 1024 } });
+
+  test('T01 tablet portrait · heroes', async ({ page }) => {
+    await seedHero(page, { name: 'Aria',  userName: 'tara',  class: 'warrior',  balance: 15 });
+    await seedHero(page, { name: 'Boris', userName: 'tbor',  class: 'magician', balance: 4  });
+    await page.evaluate(() => window.renderKids());
+    await captureFullPage(page, 'T01-tablet-p-heroes');
+  });
+
+  test('T02 tablet portrait · adventure picker', async ({ page }) => {
+    await seedHero(page, { name: 'PartyT', userName: 'tpt' });
+    await page.evaluate(() => {
+      window.switchTab('adventure');
+      window.adventureState.party = [window.state.kids[0].id];
+      window.renderAdventure();
+    });
+    await captureFullPage(page, 'T02-tablet-p-adventure-picker');
+  });
+
+  test('T03 tablet portrait · minigame · sort', async ({ page }) => {
+    await seedHero(page, { userName: 'tsort' });
+    await page.evaluate(() => {
+      window.adventureState.party = [window.state.kids[0].id];
+      window.chooseAdventure('fischer-sebastian');
+      const advTab = document.querySelector('.tab[data-view="adventure"]');
+      if (advTab) advTab.click();
+      window.beginScenes();
+      window.adventureState.sceneIdx = 1;
+      window.renderAdventure();
+    });
+    await captureFullPage(page, 'T03-tablet-p-sort');
+  });
+});
+
+test.describe('Visual capture · iPad landscape 1024×768', () => {
+  test.use({ viewport: { width: 1024, height: 768 } });
+
+  test('T04 tablet landscape · heroes', async ({ page }) => {
+    await seedHero(page, { name: 'A', userName: 'tla', class: 'warrior',  balance: 15 });
+    await seedHero(page, { name: 'B', userName: 'tlb', class: 'magician', balance: 4  });
+    await seedHero(page, { name: 'C', userName: 'tlc', class: 'healer',   balance: 9  });
+    await page.evaluate(() => window.renderKids());
+    await captureFullPage(page, 'T04-tablet-l-heroes');
+  });
+
+  test('T05 tablet landscape · minigame · maze', async ({ page }) => {
+    await seedHero(page, { userName: 'tlmaze' });
+    await page.evaluate(() => {
+      window.adventureState.party = [window.state.kids[0].id];
+      window.chooseAdventure('fischer-sebastian');
+      const advTab = document.querySelector('.tab[data-view="adventure"]');
+      if (advTab) advTab.click();
+      window.beginScenes();
+      window.adventureState.sceneIdx = 4;
+      window.renderAdventure();
+    });
+    await captureFullPage(page, 'T05-tablet-l-maze');
   });
 });
