@@ -6500,32 +6500,6 @@ function checkAchievements(k, _ev) {
   }
 }
 
-// =====================================================================
-// RECURRING QUESTS — informational schedule on activities. Values:
-//   null      → one-off / no schedule (still selectable any time)
-//   'daily'   → meant to be done every day
-//   'weekly:0'..'weekly:6' → specific weekday (0=Sun..6=Sat)
-// The kid still has to click Done; recurrence is a hint to the parent
-// + a small badge in the dropdown so the kid knows it's a daily.
-// =====================================================================
-function recurrenceLabel(rec) {
-  if (!rec) return '';
-  if (rec === 'daily') return t('recurrence_daily');
-  if (typeof rec === 'string' && rec.startsWith('weekly:')) {
-    const idx = parseInt(rec.slice(7), 10);
-    const days = (state.settings.lang === 'de'
-      ? ['So','Mo','Di','Mi','Do','Fr','Sa']
-      : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']);
-    return `${t('recurrence_weekly')} · ${days[idx] || ''}`.trim();
-  }
-  return '';
-}
-function recurrenceBadgeHtml(rec) {
-  const label = recurrenceLabel(rec);
-  if (!label) return '';
-  return `<span class="recurrence-badge">📅 ${escapeHtml(label)}</span>`;
-}
-
 // --- PAYOUT ---
 function openPayout(kidId) {
   const k = kidById(kidId);
