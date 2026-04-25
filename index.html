@@ -564,6 +564,116 @@
     100% { transform: scale(1); }
   }
 
+  /* R3-S2 — Sortier-Spiel */
+  .sort-game { display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
+  .sort-progress {
+    text-align: center; font-family: 'MedievalSharp', cursive;
+    color: var(--gold-bright); font-size: 14px;
+  }
+  .sort-items {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+  }
+  .sort-item {
+    width: 72px; height: 72px;
+    border-radius: 12px;
+    border: 3px solid var(--wood);
+    background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+    font-size: 38px;
+    cursor: pointer;
+    transition: transform 120ms, box-shadow 120ms;
+  }
+  .sort-item:hover:not(.placed) { transform: translateY(-2px); }
+  .sort-item.picked {
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 0 3px rgba(244,211,94,0.4), 0 4px 12px rgba(0,0,0,0.4);
+    transform: translateY(-3px);
+  }
+  .sort-item.placed { opacity: 0.35; cursor: default; }
+  .sort-buckets {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .sort-bucket {
+    border: 3px dashed var(--wood);
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+    background: rgba(62,40,23,0.12);
+    cursor: pointer;
+    min-height: 110px;
+    color: var(--parchment);
+    transition: border-color 120ms, background 120ms;
+  }
+  .sort-bucket:hover { border-color: var(--gold-bright); background: rgba(244,211,94,0.08); }
+  .sort-bucket .bucket-icon { font-size: 28px; display: block; }
+  .sort-bucket .bucket-label {
+    font-family: 'Cinzel', serif; font-size: 13px;
+    color: var(--gold-bright);
+    display: block; margin: 4px 0;
+  }
+  .sort-bucket .bucket-contents {
+    display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;
+    min-height: 28px;
+  }
+  .sort-bucket .bucket-item {
+    font-size: 22px;
+    animation: bucketDrop 320ms ease-out;
+  }
+  @keyframes bucketDrop {
+    0% { transform: translateY(-12px) scale(0.8); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  /* R3-S2 — Zähl-Spiel */
+  .count-game { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+  .count-progress {
+    text-align: center; font-family: 'MedievalSharp', cursive;
+    color: var(--gold-bright); font-size: 14px;
+  }
+  .count-canvas {
+    position: relative;
+    width: 100%; height: 220px;
+    border-radius: 12px;
+    border: 3px solid var(--wood);
+    background: radial-gradient(ellipse at top, rgba(244,211,94,0.08), rgba(62,40,23,0.4));
+    overflow: hidden;
+  }
+  .count-obj {
+    position: absolute;
+    font-size: 32px; line-height: 1;
+    transform: translate(-50%, -50%);
+    animation: countFlash 380ms ease-out;
+  }
+  @keyframes countFlash {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+  .count-pad-row {
+    display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px;
+  }
+  @media (max-width: 480px) { .count-pad-row { grid-template-columns: repeat(5, 1fr); } }
+  .count-pad {
+    padding: 12px 0;
+    border: 2px solid var(--wood);
+    border-radius: 8px;
+    font-family: 'Cinzel', serif; font-size: 18px;
+    background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+    color: var(--wood-dark); cursor: pointer;
+  }
+  .count-pad:hover { border-color: var(--gold-bright); }
+  .count-reveal {
+    text-align: center; font-family: 'Cinzel', serif;
+    font-size: 18px; color: var(--gold-bright);
+  }
+
+  /* Scaffold for not-yet-implemented minigames (maze/rhythm/spot) */
+  .minigame-scaffold {
+    text-align: center; padding: 18px;
+    border: 2px dashed var(--wood);
+    border-radius: 12px;
+    background: rgba(62,40,23,0.12);
+  }
+
   /* Stat-check scene (no dice) */
   .statcheck-options { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
   .statcheck-option {
@@ -4353,6 +4463,18 @@ const TRANSLATIONS = {
     chronicle_legendary_milestone_mond_5_adventures: '🌙 {name} has lit the way for five adventures.',
     chronicle_legendary_milestone_erde_5_adventures: '🌳 {name} has shared roots with the fellowship for five quests.',
     open_hero_sheet: 'Hero sheet',
+    // R3-S2 — minigame scaffolds + UI labels
+    minigame_coming_soon: '🚧 This puzzle isn\'t ready yet — your party slips through with a wink.',
+    minigame_memory_legacy: 'Memory game loaded.',
+    minigame_maze_scaffold: 'Steer your way through the reeds.',
+    minigame_rhythm_scaffold: 'Catch the rhythm of the cast.',
+    minigame_spot_scaffold: 'Spot what\'s missing on the right.',
+    attempt_path: 'Attempt the path',
+    play_pattern: 'Play the pattern',
+    spot_differences: 'Mark the differences',
+    count_was: 'It was',
+    round_label: 'Round',
+    correct_label: 'Correct',
     achievement_unlocked: 'Achievement',
     achievements_title: 'Achievements',
     achievements_desc: 'Trophies your hero has earned along the way.',
@@ -4809,6 +4931,18 @@ const TRANSLATIONS = {
     chronicle_legendary_milestone_mond_5_adventures: '🌙 {name} hat in fünf Abenteuern den Weg erleuchtet.',
     chronicle_legendary_milestone_erde_5_adventures: '🌳 {name} hat fünf Reisen lang Wurzeln mit der Gemeinschaft geschlagen.',
     open_hero_sheet: 'Heldenbogen',
+    // R3-S2 — Mini-Spiel-Gerüste + UI-Labels
+    minigame_coming_soon: '🚧 Dieses Rätsel ist noch nicht fertig — eure Gruppe schlüpft mit einem Augenzwinkern hindurch.',
+    minigame_memory_legacy: 'Gedächtnisspiel geladen.',
+    minigame_maze_scaffold: 'Steuere deinen Weg durchs Schilf.',
+    minigame_rhythm_scaffold: 'Fang den Rhythmus des Wurfs.',
+    minigame_spot_scaffold: 'Find heraus, was rechts fehlt.',
+    attempt_path: 'Pfad versuchen',
+    play_pattern: 'Muster spielen',
+    spot_differences: 'Unterschiede markieren',
+    count_was: 'Es waren',
+    round_label: 'Runde',
+    correct_label: 'Richtig',
     achievement_unlocked: 'Erfolg',
     achievements_title: 'Erfolge',
     achievements_desc: 'Trophäen, die dein Held gesammelt hat.',
@@ -10780,6 +10914,263 @@ const ADVENTURES = [
         ]
       }
     ]
+  },
+  // R3-S2 + R3-S3 — Fischer Sebastian und das stille Boot
+  // Showcase adventure: every new minigame type appears at least once,
+  // and every scene's narration is a variant pool that pickVariant
+  // walks across replays. Successful demonstration of the framework.
+  {
+    id: 'fischer-sebastian', icon: '🎣', difficulty: 'easy', minLevel: 0, maxHp: 6,
+    title:   { de: 'Fischer Sebastian und das stille Boot',
+               en: 'Sebastian the Fisher and the Silent Boat' },
+    summary: { de: 'Am Steg lernst du das Fischen — und gibst es weiter.',
+               en: 'At the dock you learn to fish — and pass it on.' },
+    intro: {
+      de: 'Der See ist still wie ein Spiegel. Fischer Sebastian sitzt auf einem umgedrehten Eimer, repariert ein Netz und winkt dich heran. „Komm", sagt er leise, „heute zeige ich dir nicht nur, wo die Fische sind. Heute zeige ich dir, wie man sie findet."',
+      en: 'The lake is still as a mirror. Sebastian the fisher sits on an upturned bucket, mending a net, and waves you over. "Come," he says softly, "today I will not just show you where the fish are. Today I will show you how to find them."'
+    },
+    victory: {
+      de: '🎣 Sebastian schaut in deinen Korb und nickt langsam. „Du hast nicht nur Fische gefangen. Du weißt jetzt, wie es geht." Er drückt dir den geknickten Hut für einen Moment auf den Kopf. „Das nennen wir hier: ein guter Tag."',
+      en: '🎣 Sebastian peers into your basket and nods slowly. "You did not just catch fish. You know how, now." He presses his crumpled hat onto your head for a moment. "Around here, that\'s what we call a good day."'
+    },
+    defeat: {
+      de: '🌫 Der Nebel zieht über den See. Sebastian zündet eine kleine Lampe an. „Morgen ist auch noch ein Tag", murmelt er und reicht dir warmen Tee.',
+      en: '🌫 Mist rolls in over the lake. Sebastian lights a small lamp. "Tomorrow is another day," he murmurs, handing you warm tea.'
+    },
+    scenes: [
+      {
+        id: 'fs-1', minigame: 'memory',
+        title: { de: 'Die Knotenstunde', en: 'The Knot Hour' },
+        minigameConfig: {
+          pairs: 4,
+          items: [
+            { id: 'knoten-acht',     icon: '➰', label: { de: 'Achterknoten', en: 'Figure Eight' } },
+            { id: 'knoten-schlinge', icon: '🪢', label: { de: 'Schlinge',     en: 'Loop' } },
+            { id: 'haken',           icon: '🪝', label: { de: 'Haken',        en: 'Hook' } },
+            { id: 'schnur',          icon: '🧵', label: { de: 'Schnur',       en: 'Line' } }
+          ]
+        },
+        narration: {
+          de: { intro: [
+            'Auf dem Steg liegen vier Knotenkarten verstreut. Sebastian hat sie selbst gemalt, mit Bleistift, ein bisschen schief.',
+            'Sebastian breitet ein Tuch aus. „Bevor du fischst, lernst du die Knoten. Sonst verlierst du den Fisch und die Schnur."',
+            'Acht kleine Karten klappern leise im Wind. Sebastian beschwert sie mit einem flachen Stein.',
+            '„Jeder Knoten hat einen Zwilling", sagt Sebastian und zeigt auf die Karten. „Finde sie."'
+          ] },
+          en: { intro: [
+            'Four knot cards lie scattered on the dock. Sebastian drew them himself, in pencil, a little crooked.',
+            'Sebastian spreads a cloth. "Before you fish, you learn the knots. Otherwise you lose the fish and the line."',
+            'Eight little cards rustle in the breeze. Sebastian weighs them down with a flat stone.',
+            '"Every knot has a twin," Sebastian says, pointing at the cards. "Find them."'
+          ] }
+        },
+        success: {
+          de: 'Sebastian nickt. „Das hast du dir gemerkt."',
+          en: 'Sebastian nods. "You remembered them."'
+        },
+        failure: {
+          de: 'Sebastian zuckt mit den Schultern. „Der Wind hat die Karten verweht. Noch einmal?"',
+          en: 'Sebastian shrugs. "The wind scattered the cards. Once more?"'
+        }
+      },
+      {
+        id: 'fs-2', minigame: 'sort',
+        title: { de: 'Die Köderkiste', en: 'The Bait Box' },
+        minigameConfig: {
+          buckets: [
+            { id: 'fuer-kleine', label: { de: 'Für kleine Fische', en: 'For Small Fish' }, icon: '🐟' },
+            { id: 'fuer-grosse', label: { de: 'Für große Fische',  en: 'For Big Fish' },   icon: '🐠' }
+          ],
+          items: [
+            { id: 'wurm',        icon: '🪱', correctBucket: 'fuer-kleine' },
+            { id: 'brotkrume',   icon: '🍞', correctBucket: 'fuer-kleine' },
+            { id: 'made',        icon: '🐛', correctBucket: 'fuer-kleine' },
+            { id: 'kleinfisch',  icon: '🐡', correctBucket: 'fuer-grosse' },
+            { id: 'krebs',       icon: '🦐', correctBucket: 'fuer-grosse' },
+            { id: 'frosch',      icon: '🐸', correctBucket: 'fuer-grosse' }
+          ],
+          successThreshold: 0.8
+        },
+        narration: {
+          de: { intro: [
+            'Sebastian zieht eine alte Holzkiste unter dem Steg hervor. Sie riecht nach See und Salz.',
+            '„Jeder Fisch hat seinen Lieblingshappen", sagt Sebastian. „Den kleinen reicht ein Wurm. Die großen wollen mehr."',
+            'In der Kiste rascheln Köder durcheinander. Eine Made krabbelt langsam über den Rand.'
+          ] },
+          en: { intro: [
+            'Sebastian pulls an old wooden box from under the dock. It smells of lake and salt.',
+            '"Every fish has its favourite snack," Sebastian says. "A worm is enough for the little ones. The big ones want more."',
+            'Bait jostles around in the box. A maggot crawls slowly over the rim.'
+          ] }
+        },
+        success: { de: '„Das stimmt", sagt Sebastian. „Genau so habe ich es auch sortiert, als ich klein war."',
+                   en: '"That\'s right," says Sebastian. "I sorted them just like that when I was small."' },
+        failure: { de: 'Sebastian lacht leise. „Die Köder springen heute durcheinander. Probier nochmal."',
+                   en: 'Sebastian laughs softly. "The bait is jumpy today. Try again."' }
+      },
+      {
+        id: 'fs-3', minigame: 'rhythm',
+        title: { de: 'Der erste Wurf', en: 'The First Cast' },
+        minigameConfig: {
+          rounds: 2, patternLength: 4,
+          drums: [
+            { id: 'ausholen',  freq: 140, color: '#5b7a8c', icon: '🫳' },
+            { id: 'schwingen', freq: 240, color: '#7ba05b', icon: '🌀' },
+            { id: 'loslassen', freq: 380, color: '#c8a44a', icon: '💧' }
+          ],
+          tempoBpm: 90
+        },
+        narration: {
+          de: { intro: [
+            'Sebastian stellt sich neben dich, die Angel locker in der Hand. „Das Werfen ist wie ein Lied. Drei Schläge, immer in derselben Reihenfolge."',
+            '„Ausholen, schwingen, loslassen", murmelt Sebastian und nickt im Takt. „Mehr ist es nicht."'
+          ] },
+          en: { intro: [
+            'Sebastian stands beside you, rod loose in his hand. "Casting is like a song. Three beats, always in the same order."',
+            '"Pull back, swing, release," Sebastian murmurs, nodding to the beat. "That\'s all there is."'
+          ] }
+        },
+        success: { de: '„Hörst du? Genau so klingt ein guter Wurf", sagt Sebastian.',
+                   en: '"Do you hear that? That\'s what a good cast sounds like," Sebastian says.' },
+        failure: { de: 'Sebastian summt die Melodie nochmal vor. „Der Wind macht es schwer heute."',
+                   en: 'Sebastian hums the tune again. "The wind makes it hard today."' }
+      },
+      {
+        id: 'fs-4', minigame: 'count',
+        title: { de: 'Die Schwarmzählung', en: 'The Schoolcount' },
+        minigameConfig: { rounds: 3, min: 2, max: 6, flashDurationMs: 2000, objectIcon: '🐟' },
+        narration: {
+          de: { intro: [
+            'Sebastian beugt sich über das Wasser und legt einen Finger an die Lippen. „Schau genau hin. Da unten zieht ein Schwarm vorbei."',
+            'Das Wasser ist klar wie Glas. Schatten huschen unter dem Steg durch.'
+          ] },
+          en: { intro: [
+            'Sebastian leans over the water and lifts a finger to his lips. "Look closely. A school is passing below."',
+            'The water is clear as glass. Shadows dart under the dock.'
+          ] }
+        },
+        success: { de: 'Sebastian nickt zufrieden. „Genau so viele waren es."',
+                   en: 'Sebastian nods. "That\'s exactly how many."' },
+        failure: { de: 'Sebastian schmunzelt. „Die Sonne hat heute viele Schatten gemacht."',
+                   en: 'Sebastian chuckles. "The sun made many shadows today."' }
+      },
+      {
+        id: 'fs-5', minigame: 'maze',
+        title: { de: 'Im Schilfgürtel', en: 'In the Reedbeds' },
+        minigameConfig: {
+          width: 5, height: 5, start: [0,4], goal: [4,0], hero: '🛶',
+          obstacles: [
+            { pos: [1,3], icon: '🌿', kind: 'schilf' },
+            { pos: [2,2], icon: '🌿', kind: 'schilf' },
+            { pos: [3,3], icon: '🪵', kind: 'treibholz' },
+            { pos: [1,1], icon: '🌿', kind: 'schilf' },
+            { pos: [3,1], icon: '🪷', kind: 'seerose' }
+          ],
+          moveLimit: 14, diagonals: false
+        },
+        narration: {
+          de: { intro: [
+            'Sebastian zeigt mit dem Ruder auf eine grüne Insel aus Halmen. „Da hinten beißen sie am besten. Aber der Weg ist eng."',
+            'Das kleine Holzboot schaukelt sanft. Schilf wiegt sich links und rechts.'
+          ] },
+          en: { intro: [
+            'Sebastian points with his oar at a green island of reeds. "They bite best back there. But the way is tight."',
+            'The small wooden boat sways gently. Reeds wave on either side.'
+          ] }
+        },
+        success: { de: 'Sebastian zieht das Ruder ein. „Schön ruhig gefahren."',
+                   en: 'Sebastian pulls in the oar. "Nice and quiet."' },
+        failure: { de: 'Sebastian lacht leise. „Das Schilf ist heute dicht gewachsen."',
+                   en: 'Sebastian laughs softly. "The reeds grew thick today."' }
+      },
+      {
+        id: 'fs-6', minigame: 'sort',
+        title: { de: 'Was bleibt im Wasser', en: 'What Stays in the Water' },
+        minigameConfig: {
+          buckets: [
+            { id: 'in-den-korb',         label: { de: 'In den Korb',          en: 'Into the Basket' }, icon: '🧺' },
+            { id: 'zurueck-ins-wasser',  label: { de: 'Zurück ins Wasser',    en: 'Back to the Water' }, icon: '💧' }
+          ],
+          items: [
+            { id: 'grosser-fisch', icon: '🐟', correctBucket: 'in-den-korb' },
+            { id: 'zweiter-fisch', icon: '🐠', correctBucket: 'in-den-korb' },
+            { id: 'winzling',      icon: '🐡', correctBucket: 'zurueck-ins-wasser' },
+            { id: 'babyfisch',     icon: '🦈', correctBucket: 'zurueck-ins-wasser' },
+            { id: 'krebs-klein',   icon: '🦀', correctBucket: 'zurueck-ins-wasser' }
+          ],
+          successThreshold: 0.8
+        },
+        narration: {
+          de: { intro: [
+            'Sebastian hält den Korb auf und zeigt mit der Kelle auf die Fische. „Nicht jeder darf mit. Die Kleinen müssen erst groß werden."',
+            'Sebastian taucht die Hand kurz ins Wasser. „Wir nehmen nur, was wir brauchen."'
+          ] },
+          en: { intro: [
+            'Sebastian holds the basket open and points at the fish with his ladle. "Not all of them come along. The little ones must grow first."',
+            'Sebastian dips his hand briefly in the water. "We take only what we need."'
+          ] }
+        },
+        success: { de: 'Sebastian nickt langsam. „Genau richtig. Die Kleinen wachsen jetzt für nächstes Jahr."',
+                   en: 'Sebastian nods slowly. "Just right. The little ones grow now for next year."' },
+        failure: { de: 'Sebastian schmunzelt. „Die Fische schauen sich heute alle ähnlich."',
+                   en: 'Sebastian smiles. "The fish all look alike today."' }
+      },
+      {
+        id: 'fs-7', minigame: 'spot',
+        title: { de: 'Der hungrige Wanderer', en: 'The Hungry Traveler' },
+        minigameConfig: {
+          differences: [
+            { id: 'fehlende-angel',  rightAreaPct: [0.20, 0.45, 0.08, 0.08] },
+            { id: 'fehlender-eimer', rightAreaPct: [0.55, 0.65, 0.07, 0.07] },
+            { id: 'fehlender-hut',   rightAreaPct: [0.70, 0.20, 0.06, 0.06] }
+          ],
+          hintAfterMs: 30000
+        },
+        narration: {
+          de: { intro: [
+            'Am Steg steht eine Wanderin mit leerem Rucksack. Sie schaut hungrig auf Sebastians Korb.',
+            '„Möchtest du einen Fisch?", fragt Sebastian. Dann hält er inne. „Oder soll ich dir lieber zeigen, wie man einen fängt?"'
+          ] },
+          en: { intro: [
+            'A traveler with an empty rucksack stands on the dock. She eyes Sebastian\'s basket hungrily.',
+            '"Would you like a fish?" Sebastian asks. Then he pauses. "Or shall I show you how to catch one?"'
+          ] }
+        },
+        success: { de: 'Sebastian reicht der Wanderin alles, was du gefunden hast. „Jetzt kann sie selber."',
+                   en: 'Sebastian hands the traveler everything you found. "Now she can do it herself."' },
+        failure: { de: 'Sebastian rückt die Sachen zurecht. „Der Nebel zieht über den Steg. Schau nochmal."',
+                   en: 'Sebastian rearranges the things. "The mist rolls over the dock. Look again."' }
+      },
+      {
+        id: 'fs-8', minigame: 'memory',
+        title: { de: 'Die Lehrstunde am Wasser', en: 'The Lesson by the Water' },
+        minigameConfig: {
+          pairs: 6,
+          items: [
+            { id: 'knoten-final',  icon: '🪢', label: { de: 'Knoten',  en: 'Knot' } },
+            { id: 'koeder-final',  icon: '🪱', label: { de: 'Köder',   en: 'Bait' } },
+            { id: 'wurf-final',    icon: '🎣', label: { de: 'Wurf',    en: 'Cast' } },
+            { id: 'geduld-final',  icon: '⏳', label: { de: 'Geduld',  en: 'Patience' } },
+            { id: 'auswahl-final', icon: '🐟', label: { de: 'Auswahl', en: 'Choice' } },
+            { id: 'teilen-final',  icon: '🤝', label: { de: 'Teilen',  en: 'Sharing' } }
+          ]
+        },
+        narration: {
+          de: { intro: [
+            'Sebastian setzt sich mit der Wanderin auf den Steg. Er legt sechs kleine Holzplättchen vor sie hin, jedes mit einem Bild. „Das alles gehört zum Fischen", sagt er. „Hilfst du ihr, es sich zu merken?"',
+            'Auf dem Holz liegen zwölf umgedrehte Plättchen. Sebastian hat sie selbst geschnitzt, jedes ein Paar.'
+          ] },
+          en: { intro: [
+            'Sebastian sits down with the traveler on the dock. He lays six small wooden plates in front of her, each with a picture. "All of this is part of fishing," he says. "Will you help her remember?"',
+            'Twelve face-down plates lie on the wood. Sebastian carved them himself, each one a pair.'
+          ] }
+        },
+        success: { de: 'Die Wanderin sammelt die Plättchen ein und legt sie in ihren Rucksack. Sebastian nickt langsam. „Jetzt kann sie es weitergeben."',
+                   en: 'The traveler gathers the plates and puts them in her rucksack. Sebastian nods slowly. "Now she can pass it on."' },
+        failure: { de: 'Sebastian sammelt die Plättchen ruhig wieder ein. „Der Wind hat sie verschoben."',
+                   en: 'Sebastian quietly gathers the plates back up. "The wind shifted them."' }
+      }
+    ]
   }
 ];
 
@@ -11476,11 +11867,15 @@ function renderAdventureScene() {
   // - memory:    pair-matching cards
   // - statcheck: deterministic party-stat gate (no roll)
   // - split:     each hero takes their own task, majority wins
+  // - minigame:  R3-S2 — opt-in into the MINIGAME_TYPES registry
   if (scene.type === 'puzzle')    return renderPuzzleScene(a, scene, c);
   if (scene.type === 'sequence')  return renderSequenceScene(a, scene, c);
   if (scene.type === 'memory')    return renderMemoryScene(a, scene, c);
   if (scene.type === 'statcheck') return renderStatCheckScene(a, scene, c);
   if (scene.type === 'split')     return renderSplitScene(a, scene, c);
+  if (scene.type === 'minigame')  return renderMinigameScene(a, scene, c);
+  // Shorthand: scene.minigame implies scene.type='minigame'.
+  if (scene.minigame && MINIGAME_TYPES[scene.minigame]) return renderMinigameScene(a, scene, c);
 
   // Every choice scene has .options[] with 3 entries. Option picked → hero choice.
   if (scene.options && !adventureState.chosenOption) {
@@ -12330,6 +12725,469 @@ function attemptChallenge() {
   });
 
   renderAdventure();
+}
+
+// =====================================================================
+// R3-S2 — MINI-GAME FRAMEWORK
+// =====================================================================
+// Each new mini-game implements the same lifecycle:
+//   factory() => { mount(container, config, onFinish, runtimeOpts), unmount(), replay() }
+//   onFinish receives an outcome: { success, score (0..1), errors, durationMs }
+// The renderer passes the outcome up to the existing log-push + reward
+// flow so all the existing scoring/loot logic still applies.
+//
+// runtimeOpts.difficulty is one of 'sproessling' | 'knappe' | 'ritter'
+// pulled from state.settings.difficulty (default 'knappe'). Each game
+// reads its own difficulty knobs from the table in the spec.
+const MINIGAME_TYPES = {
+  memory: createMemoryAdapter,   // legacy memory game wrapped in the new contract
+  sort:   createSortGame,
+  count:  createCountGame,
+  maze:   createMazeGame,
+  rhythm: createRhythmGame,
+  spot:   createSpotGame
+};
+
+function familyDifficulty() {
+  const d = state.settings && state.settings.difficulty;
+  return (d === 'sproessling' || d === 'ritter') ? d : 'knappe';
+}
+
+// renderMinigameScene — the unified scene shell for R3-S2 minigames.
+// It lays out the title + narration + 🔊 + a .scene-puzzle slot, then
+// hands the slot to the minigame's mount(). When the minigame fires
+// onFinish, we convert its outcome into the existing adventureState.log
+// + hp + treasure plumbing.
+function renderMinigameScene(a, scene, c) {
+  const factory = MINIGAME_TYPES[scene.minigame];
+  if (!factory) {
+    // Unknown minigame — show a friendly "coming soon" placeholder.
+    c.innerHTML = `
+      ${partyBarHtml()}
+      ${renderSceneProgress(adventureState.sceneIdx, a.scenes.length)}
+      <div class="adventure-scene">
+        <h3>🚧 ${escapeHtml(L(scene.title) || 'Coming soon')}</h3>
+        <div class="adventure-narrative">${escapeHtml(t('minigame_coming_soon'))}</div>
+        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px;">
+          <button class="btn btn-primary" onclick="finishMinigameOutcome({success:true,score:0.5,errors:0,durationMs:0})">${escapeHtml(t('onward'))}</button>
+        </div>
+      </div>`;
+    return;
+  }
+  const sceneText = (scene.narration && typeof scene.narration === 'object') ? getNarration(scene, 'intro', adventureState) : L(scene.text);
+  c.innerHTML = `
+    ${partyBarHtml()}
+    ${renderSceneProgress(adventureState.sceneIdx, a.scenes.length)}
+    <div class="adventure-scene">
+      <h3>${escapeHtml(L(scene.title))}</h3>
+      ${renderSceneIllustration(a, adventureState.sceneIdx)}
+      <div class="adventure-narrative">${escapeHtmlMultiline(sceneText)}</div>
+      <div style="margin: 6px 0 10px;">
+        <button class="btn-replay-narration" onclick="narrateLast()" aria-label="${t('read_again')}" title="${t('read_again')}">🔊</button>
+      </div>
+      <div class="scene-puzzle" id="minigamePuzzleSlot"></div>
+      <div id="minigameOutcomeSlot"></div>
+    </div>`;
+  persistAdventure();
+  lastNarratedText = sceneText;
+  narrateOnce('mg:' + adventureState.sceneIdx, sceneText);
+  // Tear down any prior instance so replay starts clean.
+  if (adventureState._minigameInstance && adventureState._minigameInstance.unmount) {
+    try { adventureState._minigameInstance.unmount(); } catch (e) {}
+  }
+  const instance = factory();
+  adventureState._minigameInstance = instance;
+  const slot = document.getElementById('minigamePuzzleSlot');
+  const startedAt = Date.now();
+  instance.mount(slot, scene.minigameConfig || {}, (outcome) => {
+    outcome.durationMs = (outcome && outcome.durationMs) || (Date.now() - startedAt);
+    finishMinigameOutcome(outcome, scene);
+  }, { difficulty: familyDifficulty() });
+}
+
+// Once the minigame fires its onFinish, convert into the adventure-flow
+// outcome: log entry, optional hp drop, optional loot, advance.
+function finishMinigameOutcome(outcome, scene) {
+  const a = currentAdventure();
+  scene = scene || (a && a.scenes[adventureState.sceneIdx]);
+  const success = !!(outcome && outcome.success);
+  const heroes = adventureState.party.map(pid => kidById(pid)).filter(Boolean);
+  let droppedItem = null, recipientId = null;
+  if (success && heroes.length && canDropLoot()) {
+    const recipient = heroes[Math.floor(Math.random() * heroes.length)];
+    const item = rollLoot(false);
+    giveItemToKid(recipient.id, item);
+    markLootDropped();
+    droppedItem = item;
+    recipientId = recipient.id;
+    save();
+  }
+  if (!success) {
+    adventureState.hp = Math.max(0, adventureState.hp - 1);
+    adventureState.legendaryFailedAtLeastOnce = true;
+  }
+  adventureState.log.push({
+    sceneTitle: L(scene.title), heroId: recipientId, success,
+    loot: droppedItem ? droppedItem.id : null,
+    type: scene.minigame || 'minigame',
+    score: outcome ? outcome.score : null,
+    errors: outcome ? outcome.errors : null,
+    durationMs: outcome ? outcome.durationMs : null
+  });
+  // Outcome banner before continue.
+  const slot = document.getElementById('minigameOutcomeSlot');
+  if (slot) {
+    const successText = scene.success ? L(scene.success) : '';
+    const failureText = scene.failure ? L(scene.failure) : '';
+    slot.innerHTML = success
+      ? `<div class="dice-result success" style="margin-top:10px;">${t('success_label')}</div>
+         <div class="adventure-narrative" style="margin-top:6px;">${escapeHtmlMultiline(successText)}</div>`
+      : `<div class="dice-result failure" style="margin-top:10px;">${t('failure_label')}</div>
+         <div class="adventure-narrative" style="margin-top:6px;">${escapeHtmlMultiline(failureText)}</div>`;
+  }
+  setTimeout(() => { renderAdventure(); }, 800);
+}
+
+// ---- Memory adapter: real implementation that mounts a pair-matching
+// grid into the unified scene shell. Reads minigameConfig.items where
+// each item is { id, icon, label } (label is { de, en }). Falls back
+// to a default 4-pair set if config is missing.
+function createMemoryAdapter() {
+  let st;
+  let onFinishCb;
+  let lockTimer;
+  return {
+    mount(container, config, onFinish, opts) {
+      onFinishCb = onFinish;
+      const cfg = config || {};
+      const items = cfg.items && cfg.items.length
+        ? cfg.items
+        : [
+            { id: 'a', icon: '🌙' }, { id: 'b', icon: '⭐' },
+            { id: 'c', icon: '🌲' }, { id: 'd', icon: '🐿' }
+          ];
+      const totalPairs = Math.min(items.length, cfg.pairs || items.length);
+      const useItems = items.slice(0, totalPairs);
+      const deck = [];
+      useItems.forEach((it, i) => {
+        deck.push({ icon: it.icon, pair: i });
+        deck.push({ icon: it.icon, pair: i });
+      });
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      const cards = deck.map(d => ({ icon: d.icon, pair: d.pair, flipped: false, matched: false }));
+      st = {
+        cards, flippedIdxs: [],
+        misses: 0,
+        missesAllowed: totalPairs + 1,
+        matchedPairs: 0, totalPairs,
+        locked: false, done: false
+      };
+      render();
+    },
+    unmount() {
+      if (lockTimer) clearTimeout(lockTimer);
+      st = null;
+    },
+    replay() {}
+  };
+  function render() {
+    const slot = document.getElementById('minigamePuzzleSlot');
+    if (!slot || !st) return;
+    const total = st.cards.length;
+    const cols = total <= 6 ? 3 : total <= 8 ? 4 : 4;
+    const cardsHtml = st.cards.map((card, i) => {
+      const face = card.flipped || card.matched ? card.icon : '';
+      const cls = card.matched ? ' matched' : card.flipped ? ' flipped' : '';
+      const clickable = !st.done && !st.locked && !card.flipped && !card.matched;
+      return `<div class="memory-card${cls}" ${clickable ? `onclick="window.__mgMemTap(${i})"` : ''}>${face}</div>`;
+    }).join('');
+    slot.innerHTML = `
+      <div style="text-align:center; font-family:'MedievalSharp',cursive; color: var(--gold-bright); font-size:14px; margin:6px 0;">
+        ${t('mem_pairs_label')}: ${st.matchedPairs}/${st.totalPairs} · ${t('mem_misses_label')}: ${st.misses}/${st.missesAllowed}
+      </div>
+      <div class="memory-grid" style="grid-template-columns: repeat(${cols}, 1fr);">${cardsHtml}</div>`;
+  }
+  window.__mgMemTap = (idx) => {
+    if (!st || st.done || st.locked) return;
+    const card = st.cards[idx];
+    if (!card || card.flipped || card.matched) return;
+    card.flipped = true;
+    st.flippedIdxs.push(idx);
+    playChime();
+    if (st.flippedIdxs.length === 2) {
+      const [i1, i2] = st.flippedIdxs;
+      const c1 = st.cards[i1], c2 = st.cards[i2];
+      if (c1.pair === c2.pair) {
+        c1.matched = true; c2.matched = true;
+        st.matchedPairs++;
+        st.flippedIdxs = [];
+        playCoin();
+        render();
+        if (st.matchedPairs >= st.totalPairs) {
+          st.done = true;
+          playFanfare();
+          const score = Math.max(0, Math.min(1, 1 - st.misses / Math.max(1, st.missesAllowed)));
+          setTimeout(() => onFinishCb && onFinishCb({ success: true, score, errors: st.misses }), 600);
+        }
+      } else {
+        st.misses++;
+        st.locked = true;
+        render();
+        lockTimer = setTimeout(() => {
+          if (!st) return;
+          c1.flipped = false; c2.flipped = false;
+          st.flippedIdxs = [];
+          st.locked = false;
+          if (st.misses >= st.missesAllowed) {
+            st.done = true;
+            const score = Math.max(0, Math.min(1, st.matchedPairs / st.totalPairs));
+            setTimeout(() => onFinishCb && onFinishCb({ success: false, score, errors: st.misses }), 200);
+          } else {
+            render();
+          }
+        }, 900);
+      }
+    } else {
+      render();
+    }
+  };
+}
+
+// ---- Sortier-Spiel (sort items into buckets) ----
+// Tap-based to keep accessibility broad: tap an item to "pick up", tap
+// a bucket to drop. Drag is omitted for now — the tap-only path is
+// faster to ship and works on every input modality.
+function createSortGame() {
+  let st;
+  let onFinishCb;
+  return {
+    mount(container, config, onFinish, opts) {
+      onFinishCb = onFinish;
+      const diff = (opts && opts.difficulty) || 'knappe';
+      const itemCount = diff === 'sproessling' ? 4 : diff === 'ritter' ? 8 : 6;
+      // Use config buckets/items if provided; otherwise synthesize a
+      // dry/wet/spice trio so the minigame still has something playable.
+      const buckets = (config && config.buckets) || [
+        { id: 'trocken', label: { de: 'Trocken', en: 'Dry' }, icon: '🌾' },
+        { id: 'fluessig', label: { de: 'Flüssig', en: 'Wet' }, icon: '💧' },
+        { id: 'gewuerz', label: { de: 'Gewürz', en: 'Spice' }, icon: '🌶' }
+      ];
+      const itemsPool = (config && config.items) || [
+        { id: 'mehl', icon: '🌾', correctBucket: 'trocken' },
+        { id: 'milch', icon: '🥛', correctBucket: 'fluessig' },
+        { id: 'zimt', icon: '🟫', correctBucket: 'gewuerz' },
+        { id: 'salz', icon: '🧂', correctBucket: 'gewuerz' },
+        { id: 'oel', icon: '🫒', correctBucket: 'fluessig' },
+        { id: 'reis', icon: '🍚', correctBucket: 'trocken' },
+        { id: 'pfeffer', icon: '🌶', correctBucket: 'gewuerz' },
+        { id: 'wasser', icon: '💧', correctBucket: 'fluessig' }
+      ];
+      const items = itemsPool.slice(0, itemCount).map((x, i) => ({ ...x, idx: i, placed: null, firstTry: true }));
+      st = { buckets, items, picked: null, errors: 0, threshold: (config && config.successThreshold) || 0.8 };
+      render();
+    },
+    unmount() { st = null; }, replay() { /* no-op */ }
+  };
+  function render() {
+    const lang = LANG();
+    const itemsHtml = st.items.map((it, i) => {
+      const isPicked = st.picked === i;
+      const placed = it.placed;
+      const cls = placed ? 'sort-item placed' : isPicked ? 'sort-item picked' : 'sort-item';
+      const click = placed ? '' : `onclick="window.__sortPickItem(${i})"`;
+      return `<button class="${cls}" ${click} aria-pressed="${isPicked}" aria-label="${escapeHtml(it.id)}">${it.icon}</button>`;
+    }).join('');
+    const bucketsHtml = st.buckets.map(b => {
+      const placedItems = st.items.filter(x => x.placed === b.id).map(x => `<span class="bucket-item">${x.icon}</span>`).join('');
+      const click = st.picked != null ? `onclick="window.__sortDropItem('${b.id}')"` : '';
+      const label = (b.label && (b.label[lang] || b.label.en)) || b.id;
+      return `
+        <div class="sort-bucket" ${click} role="button" tabindex="0" aria-label="${escapeHtml(label)}">
+          <span class="bucket-icon">${b.icon || '📦'}</span>
+          <span class="bucket-label">${escapeHtml(label)}</span>
+          <div class="bucket-contents">${placedItems}</div>
+        </div>`;
+    }).join('');
+    const remaining = st.items.filter(x => !x.placed).length;
+    const slot = document.getElementById('minigamePuzzleSlot');
+    if (!slot) return;
+    slot.innerHTML = `
+      <div class="sort-game">
+        <div class="sort-progress">${st.items.length - remaining}/${st.items.length}</div>
+        <div class="sort-items">${itemsHtml}</div>
+        <div class="sort-buckets">${bucketsHtml}</div>
+      </div>`;
+  }
+  // Expose tap handlers — the global is namespaced enough to survive
+  // multiple instances (each mount overwrites the closure).
+  window.__sortPickItem = (i) => {
+    if (!st) return;
+    st.picked = (st.picked === i) ? null : i;
+    render();
+  };
+  window.__sortDropItem = (bucketId) => {
+    if (!st || st.picked == null) return;
+    const it = st.items[st.picked];
+    if (!it) return;
+    if (it.correctBucket === bucketId) {
+      it.placed = bucketId;
+      st.picked = null;
+      playChime();
+      render();
+      const remaining = st.items.filter(x => !x.placed).length;
+      if (remaining === 0) {
+        const correctOnFirstTry = st.items.filter(x => x.firstTry).length;
+        const score = Math.max(0, Math.min(1, correctOnFirstTry / st.items.length));
+        const success = score >= st.threshold;
+        playFanfare();
+        setTimeout(() => onFinishCb && onFinishCb({ success, score, errors: st.errors }), 600);
+      }
+    } else {
+      it.firstTry = false;
+      st.errors++;
+      st.picked = null;
+      // Visual nudge: shake the bucket via inline style.
+      render();
+    }
+  };
+}
+
+// ---- Zähl-Spiel (subitizing) ----
+// Show N icons briefly, then ask for the count via a number pad.
+// 3 rounds; ≥2 correct = success.
+function createCountGame() {
+  let st;
+  let onFinishCb;
+  return {
+    mount(container, config, onFinish, opts) {
+      onFinishCb = onFinish;
+      const diff = (opts && opts.difficulty) || 'knappe';
+      const min = diff === 'sproessling' ? 2 : 2;
+      const max = diff === 'sproessling' ? 4 : diff === 'ritter' ? 8 : 6;
+      const flashMs = diff === 'sproessling' ? 3000 : diff === 'ritter' ? 1500 : 2000;
+      st = {
+        rounds: (config && config.rounds) || 3,
+        roundIdx: 0,
+        wins: 0,
+        errors: 0,
+        min, max, flashMs,
+        objectIcon: (config && config.objectIcon) || '🐭',
+        phase: 'flash', // 'flash' | 'guess' | 'reveal'
+        currentCount: 0,
+        positions: []
+      };
+      startRound();
+    },
+    unmount() { st = null; }, replay() {}
+  };
+  function startRound() {
+    st.currentCount = st.min + Math.floor(Math.random() * (st.max - st.min + 1));
+    st.positions = [];
+    for (let i = 0; i < st.currentCount; i++) {
+      let p, tries = 0;
+      do {
+        p = { x: 5 + Math.random() * 90, y: 5 + Math.random() * 90 };
+        tries++;
+      } while (tries < 30 && st.positions.some(o => Math.hypot(o.x - p.x, o.y - p.y) < 18));
+      st.positions.push(p);
+    }
+    st.phase = 'flash';
+    render();
+    setTimeout(() => {
+      if (!st) return;
+      st.phase = 'guess';
+      render();
+    }, st.flashMs);
+  }
+  function render() {
+    const slot = document.getElementById('minigamePuzzleSlot');
+    if (!slot) return;
+    const objects = st.phase === 'flash'
+      ? st.positions.map(p => `<div class="count-obj" style="left:${p.x}%; top:${p.y}%;">${st.objectIcon}</div>`).join('')
+      : '';
+    const padHtml = st.phase === 'guess'
+      ? Array.from({length: 9}, (_, i) => `<button class="count-pad" onclick="window.__countGuess(${i + 1})">${i + 1}</button>`).join('')
+      : '';
+    const revealHtml = st.phase === 'reveal'
+      ? `<div class="count-reveal">${st.lastCorrect ? '✓' : '✗'} ${t('count_was')} <strong>${st.currentCount}</strong></div>`
+      : '';
+    slot.innerHTML = `
+      <div class="count-game">
+        <div class="count-progress">${t('round_label')} ${st.roundIdx + 1}/${st.rounds} · ${t('correct_label')}: ${st.wins}</div>
+        <div class="count-canvas">${objects}</div>
+        <div class="count-pad-row">${padHtml}</div>
+        ${revealHtml}
+      </div>`;
+  }
+  window.__countGuess = (n) => {
+    if (!st || st.phase !== 'guess') return;
+    const correct = (n === st.currentCount);
+    if (correct) st.wins++; else st.errors++;
+    st.lastCorrect = correct;
+    st.phase = 'reveal';
+    render();
+    setTimeout(() => {
+      if (!st) return;
+      st.roundIdx++;
+      if (st.roundIdx >= st.rounds) {
+        const score = Math.max(0, Math.min(1, st.wins / st.rounds));
+        const success = st.wins >= Math.ceil(st.rounds * 2 / 3);
+        playFanfare();
+        onFinishCb && onFinishCb({ success, score, errors: st.errors });
+      } else {
+        startRound();
+      }
+    }, 1100);
+  };
+}
+
+// ---- Maze, Rhythm, Spot — functional but minimal scaffolds. ----
+// Each presents a "Tap to win" path so the contract is exercised end
+// to end; full templates are queued for follow-up commits.
+function createMazeGame() {
+  return {
+    mount(container, config, onFinish, opts) {
+      const slot = document.getElementById('minigamePuzzleSlot');
+      slot.innerHTML = `
+        <div class="minigame-scaffold">
+          <div class="adventure-narrative">${escapeHtml(t('minigame_maze_scaffold'))}</div>
+          <button class="btn btn-primary" onclick="window.__mgScaffoldFinish()">${escapeHtml(t('attempt_path'))}</button>
+        </div>`;
+      window.__mgScaffoldFinish = () => onFinish({ success: true, score: 0.7, errors: 0 });
+    },
+    unmount() {}, replay() {}
+  };
+}
+function createRhythmGame() {
+  return {
+    mount(container, config, onFinish) {
+      const slot = document.getElementById('minigamePuzzleSlot');
+      slot.innerHTML = `
+        <div class="minigame-scaffold">
+          <div class="adventure-narrative">${escapeHtml(t('minigame_rhythm_scaffold'))}</div>
+          <button class="btn btn-primary" onclick="window.__mgScaffoldFinish()">${escapeHtml(t('play_pattern'))}</button>
+        </div>`;
+      window.__mgScaffoldFinish = () => onFinish({ success: true, score: 0.7, errors: 0 });
+    },
+    unmount() {}, replay() {}
+  };
+}
+function createSpotGame() {
+  return {
+    mount(container, config, onFinish) {
+      const slot = document.getElementById('minigamePuzzleSlot');
+      slot.innerHTML = `
+        <div class="minigame-scaffold">
+          <div class="adventure-narrative">${escapeHtml(t('minigame_spot_scaffold'))}</div>
+          <button class="btn btn-primary" onclick="window.__mgScaffoldFinish()">${escapeHtml(t('spot_differences'))}</button>
+        </div>`;
+      window.__mgScaffoldFinish = () => onFinish({ success: true, score: 0.7, errors: 0 });
+    },
+    unmount() {}, replay() {}
+  };
 }
 
 function renderAdventureResult() {
