@@ -751,9 +751,10 @@
   .quest-picker {
     display: flex; gap: 6px; align-items: stretch;
     margin-top: 6px;
+    flex-wrap: wrap;
   }
   .quest-picker select {
-    flex: 1 1 auto; min-width: 0;
+    flex: 1 1 180px; min-width: 0;
     padding: 8px 10px;
     border: 2px solid var(--wood);
     background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-dark) 100%);
@@ -763,12 +764,22 @@
     color: var(--wood);
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
     cursor: pointer;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
   .quest-picker select:focus {
     outline: none; border-color: var(--gold-dark);
     box-shadow: 0 0 6px rgba(212,175,55,0.4);
   }
   .quest-picker .btn { flex: 0 0 auto; padding: 8px 12px; font-size: 12px; }
+  /* On hero cards narrower than ~280px (mobile, narrow split-screen),
+     the select wraps to its own row and the Done button drops below
+     full-width — no more overlap of the reward text. */
+  @media (max-width: 480px) {
+    .quest-picker select { flex: 1 1 100%; }
+    .quest-picker .quest-done-btn { width: 100%; }
+  }
   .quest-preview {
     font-family: 'MedievalSharp', cursive;
     font-size: 11px;
@@ -1051,6 +1062,43 @@
     .pwa-install-chip { right: 8px; top: 8px; font-size: 11px; padding: 6px 4px 6px 12px; }
   }
 
+  /* Compact replay-narration speaker (P3-18). Was a wide "🔊 Noch
+     einmal" button under the puzzle that kids misread as "restart
+     puzzle". Now a small circular icon sitting next to the scene text. */
+  .btn-replay-narration {
+    background: rgba(244,211,94,0.08);
+    border: 1px solid var(--gold-dark);
+    color: var(--gold-bright);
+    font-size: 14px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: background 0.12s, transform 0.08s;
+    vertical-align: middle;
+  }
+  .btn-replay-narration:hover { background: rgba(244,211,94,0.22); }
+  .btn-replay-narration:active { transform: scale(0.92); }
+
+  /* Quest "Remove" button: subtle burgundy outline, not stark red.
+     Uses just an ✕ glyph + tooltip so the row stays compact. */
+  .btn-quest-remove {
+    background: transparent;
+    border: 1.5px solid var(--blood);
+    color: var(--blood);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    width: 32px; height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    line-height: 1;
+  }
+  .btn-quest-remove:hover { background: rgba(139,26,26,0.12); }
+  .btn-quest-remove:active { background: rgba(139,26,26,0.22); }
+
   /* Header toggle buttons — visibly dim when "off" so users don't
      mistake the muted icon for the action label. */
   .music-btn.toggle-off { opacity: 0.55; }
@@ -1090,10 +1138,24 @@
   .quest-picker { display: flex; gap: 8px; align-items: stretch; }
   .quest-picker select { flex: 1; min-width: 0; }
 
-  /* Mobile tab overflow — under 600px the 6 header tabs got clipped. Now
-     the tab strip scrolls horizontally with a subtle fade on the right
-     so users see there's more. */
-  @media (max-width: 600px) {
+  /* Hamburger menu — hidden on desktop, swaps in for the tab strip on
+     phones so the 6 tabs don't overflow or compress to <44px taps. */
+  .nav-toggle {
+    display: none;
+    align-items: center; justify-content: center;
+    min-width: 44px; min-height: 44px;
+    padding: 8px;
+    background: transparent;
+    border: 2px solid var(--gold-dark);
+    border-radius: 6px;
+    color: var(--gold-bright);
+    cursor: pointer;
+  }
+  .nav-toggle:hover { background: rgba(244,211,94,0.08); }
+
+  /* Tablet (600–768px): keep the horizontal-scroll tabs (touch-friendly,
+     no menu overhead). Below 600 we'll switch to a real hamburger. */
+  @media (max-width: 768px) and (min-width: 601px) {
     .tabs {
       overflow-x: auto;
       flex-wrap: nowrap;
@@ -1103,6 +1165,33 @@
     }
     .tabs::-webkit-scrollbar { display: none; }
     .tabs .tab { flex: 0 0 auto; }
+  }
+
+  /* Phone (≤600px): collapse tabs into a dropdown panel anchored under
+     the header. All targets ≥44px to satisfy WCAG 2.5.5. */
+  @media (max-width: 600px) {
+    .nav-toggle { display: inline-flex; }
+    .tabs#primary-nav {
+      display: none;
+      flex-basis: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 4px;
+      padding: 8px;
+      margin-top: 6px;
+      background: linear-gradient(180deg, var(--wood-dark) 0%, #0d0703 100%);
+      border: 2px solid var(--gold-dark);
+      border-radius: 6px;
+    }
+    .tabs#primary-nav.open { display: flex; }
+    .tabs#primary-nav .tab {
+      width: 100%;
+      min-height: 44px;
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 15px;
+    }
+    .tab-divider { display: none; }
   }
 
   /* Slightly higher contrast on muted text so faint hints stay legible
@@ -1172,6 +1261,15 @@
     opacity: 0.85;
     flex-shrink: 0;
   }
+  .goal-strip-edit {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--gold-bright);
+    opacity: 0.75;
+    margin-left: 6px;
+    line-height: 1;
+  }
+  .goal-strip:hover .goal-strip-edit { opacity: 1; }
   .goal-bar {
     height: 6px;
     background: rgba(0,0,0,0.4);
@@ -1564,11 +1662,14 @@
 
   .ornament {
     text-align: center;
-    color: var(--gold-dark);
-    font-size: 18px;
-    margin: 10px 0;
-    letter-spacing: 8px;
-    opacity: 0.7;
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    margin: 12px 0 14px;
+    letter-spacing: 1.5em;
+    padding-left: 1.5em; /* offset trailing letter-spacing for true centering */
+    opacity: 0.85;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
   }
 
   .stat-details {
@@ -2467,22 +2568,33 @@
     margin-top: 10px;
   }
   .pin-btn {
-    padding: 18px 0;
+    min-height: 56px;
+    padding: 14px 0;
     font-family: 'Cinzel', serif;
     font-size: 22px;
     font-weight: 700;
-    border: 3px solid var(--wood);
-    background: linear-gradient(180deg, #8b8b8b, #5a5a5a);
-    color: #fff;
-    border-radius: 6px;
+    border: 2px solid var(--gold-dark);
+    background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+    color: var(--wood-dark);
+    border-radius: 8px;
     cursor: pointer;
-    text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
-    box-shadow: inset 0 2px 0 rgba(255,255,255,0.25), 0 3px 0 #3a3a3a;
-    transition: all 0.08s;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 3px 0 var(--wood-dark), 0 5px 10px rgba(0,0,0,0.3);
+    transition: all 0.1s;
   }
-  .pin-btn:hover { filter: brightness(1.1); }
-  .pin-btn:active { transform: translateY(2px); box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 0 #3a3a3a; }
-  .pin-btn.pin-action { background: linear-gradient(180deg, #a83030, #6a1818); font-size: 18px; }
+  .pin-btn:hover {
+    background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 100%);
+    border-color: var(--wood-dark);
+  }
+  .pin-btn:active { transform: translateY(2px); box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 0 var(--wood-dark); }
+  .pin-btn.pin-action {
+    background: linear-gradient(180deg, #a85050 0%, var(--blood) 100%);
+    color: var(--parchment);
+    border-color: #5a0a0a;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+    font-size: 18px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 3px 0 #5a0a0a, 0 5px 10px rgba(0,0,0,0.3);
+  }
 
   /* Parent theme */
   .parent-theme { background: transparent; }
@@ -2562,7 +2674,16 @@
     <button class="music-btn" id="narratorBtn" onclick="toggleNarrator()">🔇 <span data-i18n="narrator">Narrator</span></button>
     <button class="music-btn" id="musicBtn" onclick="toggleMusic()">🔇 <span data-i18n="music">Music</span></button>
     <button class="music-btn" id="accountBtn" onclick="onAccountBtnClick()" style="display:none;">👤 <span id="accountBtnLabel">Sign in</span></button>
-    <div class="tabs">
+    <button class="nav-toggle" id="navToggle" type="button"
+            aria-controls="primary-nav" aria-expanded="false"
+            aria-label="Menu">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <rect y="4"  width="24" height="3" rx="1" fill="currentColor"/>
+        <rect y="10.5" width="24" height="3" rx="1" fill="currentColor"/>
+        <rect y="17" width="24" height="3" rx="1" fill="currentColor"/>
+      </svg>
+    </button>
+    <div class="tabs" id="primary-nav">
       <button class="tab active" data-view="kids" data-i18n="tab_heroes">Heroes</button>
       <button class="tab" data-view="activities" data-i18n="tab_quests">Quests</button>
       <button class="tab" data-view="adventure" data-i18n="tab_adventure">Adventure</button>
@@ -3420,6 +3541,18 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// =================== LOGGING / ERROR HANDLERS ===================
+// All KCQ-internal logs and errors are prefixed `[KCQ]` so they can be
+// filtered with `[KCQ]` in DevTools. Global handlers catch otherwise-
+// silent uncaught exceptions and unhandled Promise rejections (e.g. from
+// failed Supabase round-trips inside async event handlers).
+window.addEventListener('error', (e) => {
+  console.error('[KCQ] uncaught:', e.error || e.message, e.filename + ':' + e.lineno);
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('[KCQ] unhandled rejection:', e.reason);
+});
+
 // =================== LOCALIZATION ===================
 const TRANSLATIONS = {
   en: {
@@ -5879,6 +6012,9 @@ function switchTab(view) {
 document.querySelectorAll('.tab').forEach(btn => {
   btn.addEventListener('click', () => {
     const view = btn.dataset.view;
+    // Close the mobile hamburger menu after selection so the user
+    // doesn't have to dismiss it manually.
+    closeMobileNav();
     if (view === 'settings' || view === 'parents') {
       requirePin(() => switchTab(view), view === 'parents' ? 'pin_parents_reason' : 'pin_council_reason');
       return;
@@ -5886,6 +6022,31 @@ document.querySelectorAll('.tab').forEach(btn => {
     switchTab(view);
   });
 });
+
+// Hamburger menu toggle for mobile widths (≤600px).
+function closeMobileNav() {
+  const nav = document.getElementById('primary-nav');
+  const tog = document.getElementById('navToggle');
+  if (nav) nav.classList.remove('open');
+  if (tog) tog.setAttribute('aria-expanded', 'false');
+}
+(function initNavToggle() {
+  const tog = document.getElementById('navToggle');
+  const nav = document.getElementById('primary-nav');
+  if (!tog || !nav) return;
+  tog.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = nav.classList.toggle('open');
+    tog.setAttribute('aria-expanded', String(open));
+  });
+  // Click anywhere outside closes the menu.
+  document.addEventListener('click', (e) => {
+    if (!nav.classList.contains('open')) return;
+    if (e.target === tog || tog.contains(e.target)) return;
+    if (nav.contains(e.target)) return;
+    closeMobileNav();
+  });
+})();
 
 // --- MODALS ---
 function openModal(id) { document.getElementById(id).classList.add('open'); }
@@ -6056,17 +6217,23 @@ function renderKids() {
     const streakHtml = streakDays >= 2
       ? `<span class="streak-badge" title="${escapeHtml(t('streak_tooltip').replace('{n}', streakDays))}">🔥 ${streakDays}</span>`
       : '';
+    // Explicit nullish + positive-target check so a stray `{}` or
+    // legacy state with target=0 doesn't render the progress branch and
+    // leave just an empty bar (P1-07). Edit hint is always shown on the
+    // progress branch so the affordance never disappears after a chore.
     const goal = k.goal;
+    const hasGoal = goal != null && Number(goal.target) > 0;
     let goalHtml = '';
-    if (goal) {
+    if (hasGoal) {
       const pct = Math.min(100, Math.round((k.balance / goal.target) * 100));
       const reached = !!goal.achievedAt || k.balance >= goal.target;
       goalHtml = `
         <div class="goal-strip${reached ? ' reached' : ''}" onclick="event.stopPropagation(); openGoalModal('${k.id}')" title="${escapeHtml(t('edit_goal'))}">
           <div class="goal-strip-line">
-            <span class="goal-strip-emoji">${goal.emoji}</span>
-            <span class="goal-strip-name">${escapeHtml(goal.name)}</span>
+            <span class="goal-strip-emoji">${goal.emoji || '🎯'}</span>
+            <span class="goal-strip-name">${escapeHtml(goal.name || '')}</span>
             <span class="goal-strip-amount">${fmt(k.balance)} / ${fmt(goal.target)}</span>
+            <span class="goal-strip-edit" aria-label="${escapeHtml(t('edit_goal'))}">✎</span>
           </div>
           <div class="goal-bar"><div class="goal-bar-fill" style="width:${pct}%"></div></div>
         </div>`;
@@ -6083,7 +6250,7 @@ function renderKids() {
           <div class="avatar">${avatarInner}</div>
           <div style="flex:1; min-width:0;">
             <h3 class="kid-name">${escapeHtml(k.name)} <span class="level-badge">Lv ${heroLevel(k)}</span> ${streakHtml}</h3>
-            <div class="kid-user">@${escapeHtml(k.userName || 'hero')}</div>
+            ${(!hasPinSet() || pinVerified) ? `<div class="kid-user">@${escapeHtml(k.userName || 'hero')}</div>` : ''}
             <div class="kid-class">${cls.icon} ${className(cls)} · ${rankName(k)}</div>
           </div>
         </div>
@@ -6833,7 +7000,7 @@ function renderActivities() {
       <td><input type="text" inputmode="decimal" value="${amountStr}" onchange="updateActivity('${a.id}','amount',this.value)" style="max-width:100px;" /></td>
       <td><select onchange="updateActivity('${a.id}','statType',this.value)" style="max-width:140px;">${opts}</select></td>
       <td><select onchange="updateActivity('${a.id}','cadence',this.value)" style="max-width:170px;">${cadOpts}</select></td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')" data-i18n="remove">${escapeHtml(t('remove'))}</button></td>
+      <td><button class="btn-quest-remove" onclick="deleteActivity('${a.id}')" title="${escapeHtml(t('remove'))}" aria-label="${escapeHtml(t('remove'))}">✕</button></td>
     </tr>
   `;
   }).join('');
@@ -9050,7 +9217,7 @@ function renderAdventureIntro() {
       ${partyMention}
       <div class="adventure-narrative">${escapeHtmlMultiline(introText)}</div>
       <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-        <button class="btn btn-ghost btn-sm" onclick="narrateLast()" aria-label="${t('read_again')}">${t('read_again')}</button>
+        <button class="btn-replay-narration" onclick="narrateLast()" aria-label="${t('read_again')}" title="${t('read_again')}">🔊</button>
         <div style="display:flex; gap:8px;">
           <button class="btn btn-ghost" onclick="abandonAdventure()">${t('turn_back')}</button>
           <button class="btn btn-primary" onclick="beginScenes()">${t('begin')}</button>
@@ -9112,7 +9279,7 @@ function renderAdventureScene() {
         ${partyMention}
         <div class="adventure-narrative">${escapeHtmlMultiline(sceneText)}</div>
         <div style="margin: 6px 0 12px;">
-          <button class="btn btn-ghost btn-sm" onclick="narrateLast()" aria-label="${t('read_again')}">${t('read_again')}</button>
+          <button class="btn-replay-narration" onclick="narrateLast()" aria-label="${t('read_again')}" title="${t('read_again')}">🔊</button>
         </div>
         <div style="font-family:'Cinzel',serif; color: var(--gold-bright); font-size: 12px; letter-spacing: 1px; margin: 10px 0 6px; text-transform: uppercase;">${t('choose_approach')}</div>
         ${opts}
@@ -9271,7 +9438,7 @@ function renderPuzzleScene(a, scene, c) {
       ${renderSceneIllustration(a, adventureState.sceneIdx)}
       <div class="adventure-narrative">${escapeHtmlMultiline(sceneText)}</div>
       <div style="margin: 6px 0 10px;">
-        <button class="btn btn-ghost btn-sm" onclick="narrateLast()" aria-label="${t('read_again')}">${t('read_again')}</button>
+        <button class="btn-replay-narration" onclick="narrateLast()" aria-label="${t('read_again')}" title="${t('read_again')}">🔊</button>
       </div>
       <div style="font-family:'Cinzel',serif; color: var(--gold-bright); font-size: 15px; letter-spacing: 0.5px; text-align:center; margin: 10px 0;">${escapeHtml(question)}</div>
       <div class="puzzle-options">${optsHtml}</div>
@@ -9565,7 +9732,7 @@ function renderMemoryScene(a, scene, c) {
       ${renderSceneIllustration(a, adventureState.sceneIdx)}
       <div class="adventure-narrative">${escapeHtmlMultiline(sceneText)}</div>
       <div style="margin: 6px 0 10px;">
-        <button class="btn btn-ghost btn-sm" onclick="narrateLast()" aria-label="${t('read_again')}">${t('read_again')}</button>
+        <button class="btn-replay-narration" onclick="narrateLast()" aria-label="${t('read_again')}" title="${t('read_again')}">🔊</button>
       </div>
       ${statusLine}
       <div class="memory-grid" style="grid-template-columns: repeat(${cols}, 1fr);">${cardsHtml}</div>
@@ -9695,7 +9862,7 @@ function renderStatCheckScene(a, scene, c) {
       ${renderSceneIllustration(a, adventureState.sceneIdx)}
       <div class="adventure-narrative">${escapeHtmlMultiline(sceneText)}</div>
       <div style="margin: 6px 0 10px;">
-        <button class="btn btn-ghost btn-sm" onclick="narrateLast()" aria-label="${t('read_again')}">${t('read_again')}</button>
+        <button class="btn-replay-narration" onclick="narrateLast()" aria-label="${t('read_again')}" title="${t('read_again')}">🔊</button>
       </div>
       <div style="font-family:'Cinzel',serif; color: var(--gold-bright); font-size:12px; letter-spacing:1px; margin:10px 0 6px; text-transform:uppercase; text-align:center;">${t('statcheck_prompt')}</div>
       <div class="statcheck-options">${optsHtml}</div>
@@ -9812,7 +9979,7 @@ function renderSplitScene(a, scene, c) {
       ${renderSceneIllustration(a, adventureState.sceneIdx)}
       <div class="adventure-narrative">${escapeHtmlMultiline(sceneText)}</div>
       <div style="margin: 6px 0 10px;">
-        <button class="btn btn-ghost btn-sm" onclick="narrateLast()" aria-label="${t('read_again')}">${t('read_again')}</button>
+        <button class="btn-replay-narration" onclick="narrateLast()" aria-label="${t('read_again')}" title="${t('read_again')}">🔊</button>
       </div>
       <div style="font-family:'Cinzel',serif; color: var(--gold-bright); font-size:12px; letter-spacing:1px; margin:10px 0 6px; text-transform:uppercase; text-align:center;">${t('split_prompt')}</div>
       <div class="split-tasks">${assignmentsHtml}</div>
