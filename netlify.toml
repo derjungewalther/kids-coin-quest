@@ -1,8 +1,11 @@
 # Netlify deploy config — Kids Coin Quest
-# Everything is static; there is no build step. Publish the repo root.
+# Everything is static. The "build command" is just a one-liner that strips
+# the audio bundle out of the deploy: those ~130 MB of mp3s now come from
+# jsDelivr (free CDN over GitHub) so we don't burn Netlify free-tier
+# bandwidth on them. The files stay in git, just not in the Netlify deploy.
 [build]
   publish = "."
-  command = ""
+  command = "rm -rf audio/*.mp3 audio/manifest.json audio/texts.json || true"
 
 # Keep node_modules, tests, and Playwright artifacts out of the deploy bundle.
 [build.processing]

@@ -4196,9 +4196,16 @@ function pickBestVoice(lang) {
 }
 
 // Pre-rendered narration: generated once with OpenAI TTS (see scripts/),
-// hashed by (lang|text), served as audio/<id>.mp3. Loaded lazily from
-// audio/manifest.json on first narrate() call. Falls back to Web Speech
-// for any text that isn't pre-rendered (e.g. hero names the user typed).
+// hashed by (lang|text), served from a CDN. The audio bundle is ~130 MB
+// — keeping it on Netlify burned through the free-tier bandwidth in days.
+// jsDelivr serves any public GitHub repo for free, with global edge cache
+// and no quotas relevant to a project this size, so we point at it in
+// production. Local dev keeps relative paths so `npm run serve` works
+// offline. Filenames are content-hashed → safe to cache forever.
+const AUDIO_CDN_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:')
+  ? ''   // local dev / file:// — keep relative
+  : 'https://cdn.jsdelivr.net/gh/derjungewalther/kids-coin-quest@main/';
+
 let narratorManifest = null;      // { en: { id: path }, de: { id: path } }
 let narratorManifestPromise = null;
 let narratorAudio = null;         // <audio> element currently playing
@@ -4206,7 +4213,10 @@ let narratorAudio = null;         // <audio> element currently playing
 async function loadNarratorManifest() {
   if (narratorManifest) return narratorManifest;
   if (narratorManifestPromise) return narratorManifestPromise;
-  narratorManifestPromise = fetch('audio/manifest.json', { cache: 'default' })
+  // Manifest is small (~24 KB) and only needed once per session — fetching
+  // it from the same CDN as the audio keeps the dependency chain simple.
+  const manifestUrl = AUDIO_CDN_BASE + 'audio/manifest.json';
+  narratorManifestPromise = fetch(manifestUrl, { cache: 'default' })
     .then(r => r.ok ? r.json() : null)
     .catch(() => null)
     .then(m => { narratorManifest = m || { en: {}, de: {} }; return narratorManifest; });
@@ -4228,7 +4238,10 @@ function stopPrerenderedAudio() {
 
 async function playPrerenderedAudio(path) {
   stopPrerenderedAudio();
-  const a = new Audio(path);
+  // Path in the manifest is repo-relative ("audio/<id>.mp3"). On production
+  // we prefix it with the jsDelivr CDN so Netlify never serves the bytes.
+  const fullUrl = AUDIO_CDN_BASE + path;
+  const a = new Audio(fullUrl);
   a.preload = 'auto';
   narratorAudio = a;
   try { await a.play(); return true; }
