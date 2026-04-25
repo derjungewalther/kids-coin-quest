@@ -1315,6 +1315,234 @@
     margin: 8px 0 16px;
   }
 
+  /* R3-S4 — Heldenweihe (recruitment ritual) modal */
+  .ritual-modal {
+    max-width: 540px;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at top, rgba(244,211,94,0.12), transparent 60%), var(--parchment-bg, #2a1f12);
+  }
+  .ritual-stars {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.85), transparent 50%),
+      radial-gradient(1px 1px at 65% 18%, rgba(255,236,170,0.7), transparent 50%),
+      radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.55), transparent 50%),
+      radial-gradient(1px 1px at 35% 75%, rgba(255,236,170,0.6), transparent 50%),
+      radial-gradient(1px 1px at 10% 85%, rgba(255,255,255,0.7), transparent 50%);
+    opacity: 0.7;
+    animation: ritualStars 6s ease-in-out infinite alternate;
+  }
+  @keyframes ritualStars { from { opacity: 0.45; } to { opacity: 0.85; } }
+  @media (prefers-reduced-motion: reduce) { .ritual-stars { animation: none; } }
+  .ritual-body { position: relative; z-index: 1; }
+  .ritual-step-title {
+    font-family: 'Cinzel', serif; color: var(--gold-bright);
+    font-size: 22px; text-align: center; margin: 0 0 12px;
+  }
+  .ritual-line {
+    font-family: 'Lora', serif; color: var(--parchment);
+    font-size: 15px; line-height: 1.55;
+    margin: 0 0 10px; text-align: center;
+    opacity: 0; transform: translateY(6px);
+    animation: ritualLineIn 500ms ease-out forwards;
+  }
+  .ritual-line.l2 { animation-delay: 800ms; }
+  .ritual-line.l3 { animation-delay: 1600ms; }
+  @keyframes ritualLineIn { to { opacity: 1; transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) {
+    .ritual-line { opacity: 1; transform: none; animation: none; }
+  }
+  .ritual-class-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    margin: 12px 0;
+  }
+  @media (max-width: 480px) {
+    .ritual-class-grid { grid-template-columns: 1fr; }
+  }
+  .ritual-class-card {
+    border: 2px solid var(--parchment-darker);
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    background: rgba(62,40,23,0.18);
+    transition: transform 120ms, border-color 120ms, background 120ms;
+    color: var(--parchment);
+  }
+  .ritual-class-card:hover { transform: translateY(-2px); }
+  .ritual-class-card.selected {
+    border-color: var(--legendary-color, #f6c344);
+    background: rgba(244,211,94,0.12);
+    box-shadow: 0 0 0 3px rgba(244,211,94,0.25);
+  }
+  .ritual-class-emoji { font-size: 38px; line-height: 1; margin-bottom: 4px; }
+  .ritual-class-name {
+    font-family: 'Cinzel', serif; font-size: 14px;
+    color: var(--legendary-color, var(--gold-bright));
+    letter-spacing: 0.5px;
+  }
+  .ritual-class-tag {
+    font-size: 12px; color: var(--ink-muted);
+    margin-top: 4px; line-height: 1.35;
+  }
+  .ritual-name-chips {
+    display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+    margin: 10px 0;
+  }
+  .ritual-name-chip {
+    border: 1px solid var(--parchment-darker);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-family: 'Lora', serif; font-size: 13px;
+    background: rgba(62,40,23,0.15);
+    color: var(--parchment);
+    cursor: pointer;
+  }
+  .ritual-name-chip:hover { border-color: var(--gold-dark); }
+  .ritual-cosmetic-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    margin: 12px 0;
+  }
+  .ritual-cosmetic-card {
+    border: 2px solid var(--parchment-darker);
+    border-radius: 10px;
+    padding: 14px 8px;
+    text-align: center;
+    cursor: pointer;
+    background: rgba(62,40,23,0.18);
+    color: var(--parchment);
+  }
+  .ritual-cosmetic-card.selected {
+    border-color: var(--legendary-color, #f6c344);
+    background: rgba(244,211,94,0.12);
+  }
+  .ritual-cosmetic-icon { font-size: 34px; line-height: 1; margin-bottom: 4px; }
+  .ritual-cosmetic-name { font-size: 12px; line-height: 1.3; }
+  .ritual-actions {
+    display: flex; gap: 8px; justify-content: space-between;
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px dashed rgba(244,211,94,0.3);
+  }
+  .ritual-welcome-portrait {
+    text-align: center;
+    margin: 10px 0;
+  }
+  .ritual-welcome-portrait .avatar-svg-box {
+    width: 120px; height: 120px;
+    margin: 0 auto;
+    border: 3px solid var(--legendary-color, #f6c344);
+    box-shadow: 0 0 24px var(--legendary-color, #f6c344);
+  }
+  .ritual-welcome-portrait .legendary-emoji {
+    font-size: 92px;
+    filter: drop-shadow(0 0 16px var(--legendary-color, #f6c344));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ritual-welcome-portrait .avatar-svg-box { box-shadow: 0 0 0 1px var(--legendary-color, #f6c344); }
+    .ritual-welcome-portrait .legendary-emoji { filter: none; }
+  }
+  /* Legendary mentor card variant on the Helden tab — animated gradient
+     border keyed off --legendary-color set inline per-class. */
+  .kid-card[data-legendary="true"] {
+    position: relative;
+    background: linear-gradient(180deg, rgba(244,211,94,0.05) 0%, rgba(62,40,23,0.18) 100%);
+  }
+  .kid-card[data-legendary="true"]::before {
+    content: '';
+    position: absolute; inset: -2px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from 0deg,
+      var(--legendary-color, #c8a44a) 0%,
+      transparent 25%,
+      var(--legendary-color, #c8a44a) 50%,
+      transparent 75%,
+      var(--legendary-color, #c8a44a) 100%
+    );
+    z-index: -1;
+    animation: legendaryRotate 4s linear infinite;
+  }
+  @keyframes legendaryRotate { to { transform: rotate(1turn); } }
+  @media (prefers-reduced-motion: reduce) {
+    .kid-card[data-legendary="true"]::before { animation: none; }
+  }
+  .legendary-class-pill {
+    display: inline-block;
+    border: 1px solid var(--legendary-color, #c8a44a);
+    color: var(--legendary-color, #c8a44a);
+    padding: 2px 8px; border-radius: 999px;
+    font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 0.5px;
+    margin-left: 6px;
+  }
+  .legendary-bond-line {
+    margin: 10px 0 0;
+    font-size: 13px; color: var(--ink-muted);
+    text-align: center;
+  }
+  .legendary-support-line {
+    margin: 6px 0 4px;
+    font-size: 13px;
+    color: var(--legendary-color, var(--gold-bright));
+    text-align: center;
+    font-style: italic;
+  }
+  /* Ability button on adventure scenes */
+  .legendary-ability-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 2px solid var(--legendary-color, #c8a44a);
+    border-radius: 8px;
+    background: rgba(62,40,23,0.4);
+    color: var(--parchment);
+    padding: 6px 10px;
+    font-family: 'Cinzel', serif; font-size: 12px;
+    cursor: pointer;
+    transition: transform 120ms, box-shadow 120ms;
+  }
+  .legendary-ability-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 2px rgba(244,211,94,0.3);
+  }
+  .legendary-ability-btn:disabled {
+    opacity: 0.5; cursor: not-allowed; transform: none;
+  }
+  .legendary-ability-btn .ability-portrait { font-size: 16px; }
+  .legendary-ability-btn .ability-charge { font-size: 11px; opacity: 0.8; }
+  .ability-burst-overlay {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 96px;
+    z-index: 9999;
+    color: var(--legendary-color, #f6c344);
+    text-shadow: 0 0 30px var(--legendary-color, #f6c344);
+    animation: abilityBurst 900ms ease-out forwards;
+  }
+  @keyframes abilityBurst {
+    0%   { transform: scale(0.4); opacity: 0; }
+    35%  { transform: scale(1.4); opacity: 1; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ability-burst-overlay { animation: none; opacity: 0; }
+  }
+  .mond-solution-overlay {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(197,200,212,0.25), rgba(0,0,0,0.6));
+    color: var(--parchment);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    text-align: center; padding: 20px;
+    z-index: 9998;
+    font-family: 'Lora', serif;
+  }
+  .mond-solution-overlay h3 {
+    font-family: 'Cinzel', serif; font-size: 22px; margin: 0 0 8px;
+    color: #c5c8d4;
+  }
+
   /* Quest "Done!" complete button — wider with explicit text + checkmark
      so kids tell it apart from the small ✕ delete-hero button. */
   .quest-done-btn {
@@ -3722,6 +3950,26 @@
   </div>
 </div>
 
+<!-- R3-S4 — Heldenweihe (legendary recruitment ritual) -->
+<div class="modal-backdrop" id="recruitmentRitualModal">
+  <div class="modal ritual-modal">
+    <div class="ritual-stars" aria-hidden="true"></div>
+    <div id="ritualBody"></div>
+  </div>
+</div>
+
+<!-- R3-S4 — Erdheld:in pre-adventure prompt -->
+<div class="modal-backdrop" id="erdePromptModal">
+  <div class="modal">
+    <h3 id="erdePromptTitle">🌳 <span data-i18n="legendary_class_erde">Erdheld:in</span></h3>
+    <p id="erdePromptBody" style="margin: 12px 0 18px;"></p>
+    <div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap: wrap;">
+      <button class="btn btn-ghost" id="erdePromptSkip" data-i18n="legendary_erde_save">Save it this time</button>
+      <button class="btn btn-primary" id="erdePromptUse" data-i18n="legendary_erde_use">Yes, use it now</button>
+    </div>
+  </div>
+</div>
+
 <!-- Purge-all-records Modal (typed confirmation) -->
 <div class="modal-backdrop" id="purgeModal">
   <div class="modal">
@@ -4043,6 +4291,68 @@ const TRANSLATIONS = {
     cosmetic_slot_accessory: 'Accessory',
     cosmetic_slot_pet: 'Pet',
     cosmetic_equipped: 'Equipped',
+    // R3-S4 — Legendary heroes (mentor/companion system)
+    streak_tier30_body_ritual: 'A Hero Consecration awaits — three legends offer themselves to your fellowship.',
+    streak_tier30_body_cosmetic: 'A legendary cosmetic appears in your collection: {item}',
+    legendary_ritual_title: 'Hero Consecration',
+    legendary_ritual_skip: 'Skip',
+    legendary_ritual_next: 'Next',
+    back_btn: 'Back',
+    legendary_ritual_confirm: 'Recruit this hero',
+    legendary_ritual_to_chamber: 'To the Hero Hall',
+    legendary_ritual_inv1: 'You have played faithfully for 30 days. An old legend has felt it.',
+    legendary_ritual_inv2: 'From the mists of the past, three heroes who heard you have come.',
+    legendary_ritual_inv3: 'Choose one — the others will return to legend.',
+    legendary_ritual_class_title: 'Three legends step forward',
+    legendary_ritual_name_prompt: 'What is your hero called?',
+    legendary_ritual_name_invalid: 'Pick a unique name (1–20 letters)',
+    legendary_ritual_cosmetic_prompt: 'Pick a gift for your hero',
+    legendary_ritual_welcome_title: 'Welcome',
+    legendary_ritual_welcome: '{name} opens their eyes and looks around. "I came because you never gave up."',
+    legendary_ritual_resume: 'A hero awaits the consecration',
+    legendary_class_licht: 'Light Hero',
+    legendary_class_sturm: 'Storm Hero',
+    legendary_class_mond: 'Moon Hero',
+    legendary_class_erde: 'Earth Hero',
+    legendary_class_licht_tagline: 'Restores a morale star',
+    legendary_class_sturm_tagline: 'Helps when you are stuck',
+    legendary_class_mond_tagline: 'Shows the way when you cannot see it',
+    legendary_class_erde_tagline: "Doubles one adventure's treasure",
+    legendary_ability_licht_name: 'Lightspark',
+    legendary_ability_sturm_name: 'Stormstep',
+    legendary_ability_mond_name: 'Moonsight',
+    legendary_ability_erde_name: 'Rootblessing',
+    legendary_disabled_spent: 'Already used — comes back next adventure.',
+    legendary_disabled_morale_already_full: 'Your morale is already full.',
+    legendary_disabled_must_try_first: 'Try the scene first — then the storm can help.',
+    legendary_disabled_scene_already_resolved: 'Scene is already done.',
+    legendary_disabled_pre_adventure_only: 'Activated at adventure start.',
+    legendary_erde_prompt: "Should {name} weave nature's power? The treasure of this adventure will double.",
+    legendary_erde_use: 'Yes, use it now',
+    legendary_erde_save: 'Save it this time',
+    legendary_erde_blessed: '{name} kneels and weaves a blessing into the earth.',
+    legendary_card_subtitle: 'Supports your journey',
+    legendary_card_bond: 'Adventures together: {n}',
+    legendary_companion_row: 'Legendary Companion',
+    legendary_companion_desc: 'A mentor walks beside the kids. Optional — adventures play the same without one.',
+    legendary_undeletable: 'Legendary heroes cannot be removed',
+    legendary_cap_reached: 'Legendary roster is full',
+    legendary_effect_licht: '✨ {name} restores a morale star.',
+    legendary_effect_sturm: '🌪 {name} resolves the scene with a stormstep.',
+    legendary_mond_overlay_title: '🌙 Moonsight',
+    legendary_mond_hint_generic: 'The path forward shimmers softly.',
+    legendary_mond_hint_option: 'Try: {label}',
+    chronicle_legendary_recruited: '✨ {name} ({className}) was recruited after a {streak}-day streak.',
+    chronicle_legendary_ability_licht: '✨ Lightspark — {name} restored a morale star.',
+    chronicle_legendary_ability_sturm: '🌪 Stormstep — {name} pushed the party past a tough scene.',
+    chronicle_legendary_ability_mond: '🌙 Moonsight — {name} revealed the way.',
+    chronicle_legendary_ability_erde: '🌳 Rootblessing — {name} doubled the adventure treasure.',
+    chronicle_legendary_milestone_generic: '🤝 {name} has shared {n} adventures with the fellowship.',
+    chronicle_legendary_milestone_licht_5_adventures: '✨ {name} now knows the children’s voices. They helped today without being asked.',
+    chronicle_legendary_milestone_sturm_5_adventures: '🌪 {name} has weathered five storms with you.',
+    chronicle_legendary_milestone_mond_5_adventures: '🌙 {name} has lit the way for five adventures.',
+    chronicle_legendary_milestone_erde_5_adventures: '🌳 {name} has shared roots with the fellowship for five quests.',
+    open_hero_sheet: 'Hero sheet',
     achievement_unlocked: 'Achievement',
     achievements_title: 'Achievements',
     achievements_desc: 'Trophies your hero has earned along the way.',
@@ -4437,6 +4747,68 @@ const TRANSLATIONS = {
     cosmetic_slot_accessory: 'Beiwerk',
     cosmetic_slot_pet: 'Begleiter',
     cosmetic_equipped: 'Angelegt',
+    // R3-S4 — Legendäre Helden (Mentoren-System)
+    streak_tier30_body_ritual: 'Eine Heldenweihe wartet — drei Legenden bieten sich deiner Gemeinschaft an.',
+    streak_tier30_body_cosmetic: 'Ein legendäres Schmuckstück erscheint in deiner Sammlung: {item}',
+    legendary_ritual_title: 'Heldenweihe',
+    legendary_ritual_skip: 'Überspringen',
+    legendary_ritual_next: 'Weiter',
+    back_btn: 'Zurück',
+    legendary_ritual_confirm: 'Diesen Helden anwerben',
+    legendary_ritual_to_chamber: 'Zur Heldenkammer',
+    legendary_ritual_inv1: 'Du hast 30 Tage lang treu gespielt. Eine alte Legende hat das gespürt.',
+    legendary_ritual_inv2: 'Aus dem Nebel der Vergangenheit kommen drei Helden, die dich gehört haben.',
+    legendary_ritual_inv3: 'Wähle einen — die anderen kehren in die Legende zurück.',
+    legendary_ritual_class_title: 'Drei Legenden treten hervor',
+    legendary_ritual_name_prompt: 'Wie heißt dein Held?',
+    legendary_ritual_name_invalid: 'Wähle einen einzigartigen Namen (1–20 Zeichen)',
+    legendary_ritual_cosmetic_prompt: 'Wähle ein Geschenk für deinen Helden',
+    legendary_ritual_welcome_title: 'Willkommen',
+    legendary_ritual_welcome: '{name} öffnet die Augen und schaut sich um. „Ich bin gekommen, weil ihr nie aufgegeben habt."',
+    legendary_ritual_resume: 'Ein Held wartet auf seine Weihe',
+    legendary_class_licht: 'Lichtheld:in',
+    legendary_class_sturm: 'Sturmheld:in',
+    legendary_class_mond: 'Mondheld:in',
+    legendary_class_erde: 'Erdheld:in',
+    legendary_class_licht_tagline: 'Stellt einen Moralstern wieder her',
+    legendary_class_sturm_tagline: 'Hilft, wenn ihr feststeckt',
+    legendary_class_mond_tagline: 'Zeigt euch den Weg, wenn ihr ihn nicht seht',
+    legendary_class_erde_tagline: 'Verdoppelt den Schatz eines Abenteuers',
+    legendary_ability_licht_name: 'Lichtfunke',
+    legendary_ability_sturm_name: 'Sturmschritt',
+    legendary_ability_mond_name: 'Mondblick',
+    legendary_ability_erde_name: 'Wurzelsegen',
+    legendary_disabled_spent: 'Schon eingesetzt — kommt im nächsten Abenteuer wieder.',
+    legendary_disabled_morale_already_full: 'Eure Moral ist schon voll.',
+    legendary_disabled_must_try_first: 'Versucht die Szene erst — dann kann der Sturm helfen.',
+    legendary_disabled_scene_already_resolved: 'Szene ist schon vorbei.',
+    legendary_disabled_pre_adventure_only: 'Nur vor dem Abenteuer aktivierbar.',
+    legendary_erde_prompt: 'Soll {name} ihre Naturmacht wirken? Der Schatz dieses Abenteuers wird verdoppelt.',
+    legendary_erde_use: 'Ja, jetzt nutzen',
+    legendary_erde_save: 'Diesmal sparen',
+    legendary_erde_blessed: '{name} kniet sich und webt einen Segen in die Erde.',
+    legendary_card_subtitle: 'Unterstützt eure Reise',
+    legendary_card_bond: 'Gemeinsame Abenteuer: {n}',
+    legendary_companion_row: 'Legendärer Begleiter',
+    legendary_companion_desc: 'Ein Mentor schreitet neben den Kindern. Optional — Abenteuer laufen auch ohne genauso.',
+    legendary_undeletable: 'Legendäre Helden können nicht entfernt werden',
+    legendary_cap_reached: 'Die legendäre Truppe ist voll',
+    legendary_effect_licht: '✨ {name} stellt einen Moralstern wieder her.',
+    legendary_effect_sturm: '🌪 {name} bringt euch mit einem Sturmschritt durch die Szene.',
+    legendary_mond_overlay_title: '🌙 Mondblick',
+    legendary_mond_hint_generic: 'Der Weg vorne schimmert sanft.',
+    legendary_mond_hint_option: 'Versucht: {label}',
+    chronicle_legendary_recruited: '✨ {name} ({className}) wurde nach {streak} Tagen Strähne angeworben.',
+    chronicle_legendary_ability_licht: '✨ Lichtfunke — {name} hat einen Moralstern wiederhergestellt.',
+    chronicle_legendary_ability_sturm: '🌪 Sturmschritt — {name} hat die Gruppe durch eine harte Szene gebracht.',
+    chronicle_legendary_ability_mond: '🌙 Mondblick — {name} hat den Weg gezeigt.',
+    chronicle_legendary_ability_erde: '🌳 Wurzelsegen — {name} hat den Abenteuer-Schatz verdoppelt.',
+    chronicle_legendary_milestone_generic: '🤝 {name} hat {n} Abenteuer mit der Gemeinschaft geteilt.',
+    chronicle_legendary_milestone_licht_5_adventures: '✨ {name} kennt jetzt die Stimmen der Kinder. Heute hat sie ohne Aufforderung geholfen.',
+    chronicle_legendary_milestone_sturm_5_adventures: '🌪 {name} hat fünf Stürme mit euch durchquert.',
+    chronicle_legendary_milestone_mond_5_adventures: '🌙 {name} hat in fünf Abenteuern den Weg erleuchtet.',
+    chronicle_legendary_milestone_erde_5_adventures: '🌳 {name} hat fünf Reisen lang Wurzeln mit der Gemeinschaft geschlagen.',
+    open_hero_sheet: 'Heldenbogen',
     achievement_unlocked: 'Erfolg',
     achievements_title: 'Erfolge',
     achievements_desc: 'Trophäen, die dein Held gesammelt hat.',
@@ -6613,6 +6985,12 @@ function deleteKid(kidId) {
   if (!pinVerified) { requirePin(() => deleteKid(kidId), 'pin_required'); return; }
   const k = kidById(kidId);
   if (!k) return;
+  // Legendary mentors are permanent — no UI path renders this button on
+  // their card, but defense-in-depth in case of console invocation.
+  if (isLegendaryHero(k)) {
+    toast(t('legendary_undeletable') || 'Legendary heroes cannot be removed', 'error');
+    return;
+  }
   pendingDeleteKidId = kidId;
   const nameEl = document.getElementById('deleteHeroName');
   if (nameEl) nameEl.textContent = k.name;
@@ -6653,6 +7031,9 @@ function renderKids() {
     return;
   }
   grid.innerHTML = state.kids.map(k => {
+    // R3-S4: legendary mentors render with a stripped-down card variant.
+    // No stats, no purse, no goal, no quest dropdown, no remove button.
+    if (isLegendaryHero(k)) return renderLegendaryMentorCard(k);
     const cls = CLASSES.find(c => c.id === k.class) || CLASSES[0];
     const statsHtml = STAT_KEYS.map(sk => {
       const b = statBreakdown(k, sk);
@@ -6777,6 +7158,39 @@ function earnFromSelect(kidId) {
     }
   }
 }
+// R3-S4 — Legendary mentor card on the Helden tab. No stats / purse /
+// goal / quest dropdown / delete button. Replaces all that with a
+// support-line + bond counter and a class pill.
+function renderLegendaryMentorCard(k) {
+  const cdef = legendaryClassDef(k.legendary.class);
+  const lang = (state.settings && state.settings.lang) || 'en';
+  const cosmeticsHtml = renderCosmeticGalleryForHero(k);
+  const avatarInner = k.portrait
+    ? `<img src="${k.portrait}" alt="${escapeHtml(k.name)}" />`
+    : `<div class="legendary-emoji" style="font-size:54px; line-height:1;" aria-hidden="true">${cdef.emoji}</div>`;
+  const bond = (k.legendary && k.legendary.bondLevel) || 0;
+  const bondLabel = t('legendary_card_bond').replace('{n}', String(bond));
+  const className = t('legendary_class_' + k.legendary.class);
+  const ability = t('legendary_class_' + k.legendary.class + '_tagline');
+  return `
+    <div class="kid-card" data-kid="${k.id}" data-legendary="true" style="--legendary-color: ${cdef.color};">
+      <div class="kid-head">
+        <div class="kid-head-click" onclick="openHeroSheet('${k.id}')" title="${escapeHtml(t('open_hero_sheet') || 'Hero sheet')}">
+          <div class="avatar avatar-svg-box">${avatarInner}</div>
+          <div style="flex:1; min-width:0;">
+            <h3 class="kid-name">${escapeHtml(k.name)} <span class="legendary-class-pill" style="--legendary-color: ${cdef.color}; color: ${cdef.color}; border-color: ${cdef.color};">✦ ${escapeHtml(className)}</span></h3>
+            <div class="kid-class">${cdef.emoji} ${escapeHtml(ability)}</div>
+          </div>
+        </div>
+        <!-- Legendary heroes are not deletable: ✕ button intentionally absent. -->
+      </div>
+      <div class="legendary-support-line">${escapeHtml(t('legendary_card_subtitle'))}</div>
+      <div class="legendary-bond-line">${escapeHtml(bondLabel)}</div>
+      ${cosmeticsHtml ? '' : ''}
+    </div>
+  `;
+}
+
 function previewQuest(kidId) {
   const sel = document.getElementById('quest-select-' + kidId);
   const prev = document.getElementById('quest-preview-' + kidId);
@@ -7283,8 +7697,93 @@ const COSMETIC_POOL = [
   { id: 'hat_cap',            slot: 'hat',       name: { de: 'Federhut',            en: 'Plumed Cap' },       icon: '🎓' },
   { id: 'cape_blue',          slot: 'cape',      name: { de: 'Blauer Umhang',       en: 'Blue Cape' },        icon: '🧥' },
   { id: 'pet_butterfly',      slot: 'pet',       name: { de: 'Schmetterlingsfee',   en: 'Butterfly Fairy' },  icon: '🦋' },
-  { id: 'accessory_lantern',  slot: 'accessory', name: { de: 'Wanderlaterne',       en: 'Wanderer Lantern' }, icon: '🏮' }
+  { id: 'accessory_lantern',  slot: 'accessory', name: { de: 'Wanderlaterne',       en: 'Wanderer Lantern' }, icon: '🏮' },
+  // Legendary starter cosmetics — only granted via the Heldenweihe and
+  // (later) special rewards. Marked legendary:true so the regular Tier-7
+  // pool ignores them.
+  { id: 'halo_gold',          slot: 'hat',       name: { de: 'Goldener Heiligenschein', en: 'Golden Halo' }, icon: '😇', legendary: true },
+  { id: 'cape_white',         slot: 'cape',      name: { de: 'Weißer Lichtumhang',   en: 'Cloak of Light' }, icon: '🤍', legendary: true },
+  { id: 'wings_feather',      slot: 'accessory', name: { de: 'Federflügel',          en: 'Feathered Wings' }, icon: '🪶', legendary: true },
+  { id: 'hood_indigo',        slot: 'hat',       name: { de: 'Indigo-Kapuze',        en: 'Indigo Hood' }, icon: '🧙', legendary: true },
+  { id: 'cape_lightning',     slot: 'cape',      name: { de: 'Blitzumhang',          en: 'Lightning Cloak' }, icon: '⚡', legendary: true },
+  { id: 'staff_storm',        slot: 'accessory', name: { de: 'Sturmstab',            en: 'Storm Staff' }, icon: '🌪', legendary: true },
+  { id: 'mask_silver',        slot: 'hat',       name: { de: 'Silbermaske',          en: 'Silver Mask' }, icon: '🎭', legendary: true },
+  { id: 'cape_starlit',       slot: 'cape',      name: { de: 'Sternenumhang',        en: 'Starlit Cloak' }, icon: '✨', legendary: true },
+  { id: 'orb_moon',           slot: 'accessory', name: { de: 'Mondkugel',            en: 'Moon Orb' }, icon: '🌕', legendary: true },
+  { id: 'crown_leaves',       slot: 'hat',       name: { de: 'Blätterkrone',         en: 'Leaf Crown' }, icon: '🍃', legendary: true },
+  { id: 'cape_moss',          slot: 'cape',      name: { de: 'Moosumhang',           en: 'Mossy Cloak' }, icon: '🌿', legendary: true },
+  { id: 'staff_wood',         slot: 'accessory', name: { de: 'Wurzelstab',           en: 'Rootwood Staff' }, icon: '🌳', legendary: true }
 ];
+
+// =====================================================================
+// R3-S4 — LEGENDARY HEROES (mentor / co-protagonist system)
+// =====================================================================
+// Four canonical classes. Each has a colour motif (used for the glowing
+// border and ability burst), an emoji, an ability id, and a discoverability
+// tagline shown on the recruitment-ritual class-offering cards.
+const LEGENDARY_CLASSES = [
+  { id: 'licht', color: '#f6c344', emoji: '🦸', ability: 'restore_morale',     particle: 'sparkles' },
+  { id: 'sturm', color: '#534ab7', emoji: '🥷', ability: 'skip_failed_scene', particle: 'wind' },
+  { id: 'mond',  color: '#c5c8d4', emoji: '🧙', ability: 'peek_solution',     particle: 'glow' },
+  { id: 'erde',  color: '#5e8b5a', emoji: '🧝', ability: 'bounty',            particle: 'leaves' }
+];
+const LEGENDARY_STARTER_COSMETICS = {
+  licht: ['halo_gold', 'cape_white', 'wings_feather'],
+  sturm: ['hood_indigo', 'cape_lightning', 'staff_storm'],
+  mond:  ['mask_silver', 'cape_starlit', 'orb_moon'],
+  erde:  ['crown_leaves', 'cape_moss', 'staff_wood']
+};
+const LEGENDARY_SUGGESTED_NAMES = {
+  licht: { de: ['Mira','Aurel','Lumi','Sonja','Helian'], en: ['Mira','Aurel','Lumi','Sonja','Helian'] },
+  sturm: { de: ['Boras','Levin','Kira','Storm','Wira'],  en: ['Boras','Levin','Kira','Storm','Wira'] },
+  mond:  { de: ['Selene','Nox','Lirio','Mona','Astra'],  en: ['Selene','Nox','Lirio','Mona','Astra'] },
+  erde:  { de: ['Toras','Brynn','Eika','Mossa','Linden'], en: ['Toras','Brynn','Eika','Mossa','Linden'] }
+};
+const LEGENDARY_MAX = 4;
+
+// Top-up-on-load + migration. Existing R3-S1 boolean-legendary kids stay
+// as kids — the new mentor system uses kid.legendary as an OBJECT with
+// a .class field. Code that branches on the new model checks
+// `isLegendaryHero(k)` defined below.
+function ensureLegendaryState() {
+  if (!state.legendary || typeof state.legendary !== 'object') {
+    state.legendary = { heroesRecruited: 0, pendingRecruitment: null, abilityHistory: [] };
+  }
+  if (!Array.isArray(state.legendary.abilityHistory)) state.legendary.abilityHistory = [];
+  if (typeof state.legendary.heroesRecruited !== 'number') state.legendary.heroesRecruited = 0;
+}
+function isLegendaryHero(k) {
+  return !!(k && k.legendary && typeof k.legendary === 'object' && k.legendary.class);
+}
+function legendaryClassDef(id) {
+  return LEGENDARY_CLASSES.find(c => c.id === id) || LEGENDARY_CLASSES[0];
+}
+function pickOfferedLegendaryClasses() {
+  const all = LEGENDARY_CLASSES.map(c => c.id);
+  const owned = (state.kids || []).filter(isLegendaryHero).map(k => k.legendary.class);
+  const unowned = all.filter(c => !owned.includes(c));
+  const offered = [...unowned];
+  while (offered.length < 3) {
+    const candidates = all.filter(c => !offered.includes(c));
+    if (!candidates.length) break;
+    offered.push(candidates[Math.floor(Math.random() * candidates.length)]);
+  }
+  // Shuffle so the order isn't predictable.
+  for (let i = offered.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [offered[i], offered[j]] = [offered[j], offered[i]];
+  }
+  return offered.slice(0, 3);
+}
+function pickLegendaryCosmeticForExisting() {
+  // When the family has already capped at 4 legendary mentors, the 30-day
+  // reward switches to a legendary cosmetic for any kid hero (parents'
+  // collection grows). Choose one not yet in the inventory.
+  const owned = new Set((state.cosmeticInventory || []).map(c => c.id));
+  const pool = COSMETIC_POOL.filter(c => c.legendary && !owned.has(c.id));
+  if (!pool.length) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 
 // Convert a timestamp into a local-day key string ("YYYY-MM-DD") using
 // the family's tz and the 04:00 cutoff. Anything before 04:00 belongs
@@ -7427,7 +7926,9 @@ function grantWeeklyFreezeIfDue() {
 
 function pickRandomCosmetic() {
   const owned = new Set((state.cosmeticInventory || []).map(c => c.id));
-  const available = COSMETIC_POOL.filter(c => !owned.has(c.id));
+  // Exclude legendary cosmetics from the weekly Tier-7 pool — those are
+  // reserved for the Heldenweihe ritual and the post-cap 30-day reward.
+  const available = COSMETIC_POOL.filter(c => !c.legendary && !owned.has(c.id));
   if (!available.length) return null;
   return available[Math.floor(Math.random() * available.length)];
 }
@@ -7519,7 +8020,17 @@ function maybeShowNextReward() {
   } else if (r.tier === 'tier30') {
     icon = '👑';
     titleKey = 'streak_tier30_title';
-    body = t('streak_tier30_body');
+    if (c.type === 'legendary_recruitment_ritual') {
+      body = t('streak_tier30_body_ritual');
+    } else if (c.type === 'legendary_cosmetic') {
+      const cosmetic = COSMETIC_POOL.find(x => x.id === c.cosmeticId);
+      icon = cosmetic ? cosmetic.icon : '👑';
+      const lang2 = (state.settings && state.settings.lang) || 'en';
+      const itemName = cosmetic ? (cosmetic.name[lang2] || cosmetic.name.en) : '';
+      body = t('streak_tier30_body_cosmetic').replace('{item}', itemName);
+    } else {
+      body = t('streak_tier30_body');
+    }
   }
   const target = document.getElementById('rewardBody');
   target.innerHTML = `
@@ -7548,7 +8059,28 @@ function claimNextReward() {
       state.cosmeticInventory.push({ id: def.id, slot: def.slot, icon: def.icon, acquiredAt: new Date().toISOString() });
     }
   } else if (c.type === 'legendary_hero_slot') {
+    // Legacy R3-S1 reward type. Convert into a fresh ritual reward and
+    // hand off to the Heldenweihe so old data still flows through the
+    // new mentor system.
+    ensureLegendaryState();
+    if ((state.legendary.heroesRecruited || 0) < LEGENDARY_MAX) {
+      save();
+      closeModal('rewardModal');
+      openRecruitmentRitual();
+      return;
+    }
     state.legendaryRecruitsAvailable = (state.legendaryRecruitsAvailable || 0) + 1;
+  } else if (c.type === 'legendary_recruitment_ritual') {
+    save();
+    closeModal('rewardModal');
+    openRecruitmentRitual();
+    return;
+  } else if (c.type === 'legendary_cosmetic') {
+    if (!state.cosmeticInventory) state.cosmeticInventory = [];
+    const def = COSMETIC_POOL.find(x => x.id === c.cosmeticId);
+    if (def && !state.cosmeticInventory.some(x => x.id === def.id)) {
+      state.cosmeticInventory.push({ id: def.id, slot: def.slot, icon: def.icon, acquiredAt: new Date().toISOString(), legendary: true });
+    }
   }
   save();
   closeModal('rewardModal');
@@ -7622,11 +8154,276 @@ function evaluateFamilyRewards() {
     }
   }
   if (current >= 30 && current % 30 === 0 && !dayClaimed('tier30')) {
-    s.pendingRewards.push({ tier: 'tier30', day: today, ts: Date.now(),
-      contents: { type: 'legendary_hero_slot' } });
+    // R3-S4: at the 30-day milestone, mint a Heldenweihe ritual UNLESS
+    // the family already has 4 legendary mentors, in which case fall
+    // back to a legendary cosmetic for the kid roster (no recruitment).
+    ensureLegendaryState();
+    if ((state.legendary.heroesRecruited || 0) < LEGENDARY_MAX) {
+      s.pendingRewards.push({ tier: 'tier30', day: today, ts: Date.now(),
+        contents: { type: 'legendary_recruitment_ritual' } });
+    } else {
+      const cosmetic = pickLegendaryCosmeticForExisting();
+      if (cosmetic) {
+        s.pendingRewards.push({ tier: 'tier30', day: today, ts: Date.now(),
+          contents: { type: 'legendary_cosmetic', cosmeticId: cosmetic.id } });
+      } else {
+        // Roster + cosmetic pool both saturated. Fall back to a generous
+        // lucky-charm bundle so the streak still rewards the family.
+        s.pendingRewards.push({ tier: 'tier30', day: today, ts: Date.now(),
+          contents: { type: 'lucky_charm', qty: 3 } });
+      }
+    }
     s.rewardsClaimed.tier30++;
     s._lastClaimedDay.tier30 = today;
   }
+}
+
+// =====================================================================
+// R3-S4 — HELDENWEIHE (legendary recruitment ritual)
+// =====================================================================
+// 5-step modal: invocation → class offering → name → starter cosmetic →
+// welcome. Each step rebuilds #ritualBody. State lives in `ritualState`
+// for the duration of the flow. The 30-day reward routes here.
+let ritualState = null;
+
+function openRecruitmentRitual() {
+  ensureLegendaryState();
+  if ((state.legendary.heroesRecruited || 0) >= LEGENDARY_MAX) {
+    toast(t('legendary_cap_reached') || 'Legendary roster is full', 'info');
+    return;
+  }
+  ritualState = {
+    step: 1,
+    offeredClasses: pickOfferedLegendaryClasses(),
+    chosenClass: null,
+    name: '',
+    chosenCosmetic: null,
+    heroId: null
+  };
+  state.legendary.pendingRecruitment = {
+    ts: Date.now(),
+    offeredClasses: ritualState.offeredClasses
+  };
+  save();
+  openModal('recruitmentRitualModal');
+  renderRitualStep();
+}
+
+function closeRecruitmentRitual() {
+  // Clear pendingRecruitment only if a hero was actually created. Closing
+  // mid-flow leaves it set so the user can resume on next reload.
+  if (ritualState && ritualState.heroId) {
+    if (state.legendary) state.legendary.pendingRecruitment = null;
+    save();
+  }
+  ritualState = null;
+  closeModal('recruitmentRitualModal');
+}
+
+function renderRitualStep() {
+  if (!ritualState) return;
+  const target = document.getElementById('ritualBody');
+  if (!target) return;
+  target.classList.add('ritual-body');
+  const lang = (state.settings && state.settings.lang) || 'en';
+  if (ritualState.step === 1) {
+    target.innerHTML = `
+      <h3 class="ritual-step-title">${escapeHtml(t('legendary_ritual_title'))}</h3>
+      <div class="ritual-line">${escapeHtml(t('legendary_ritual_inv1'))}</div>
+      <div class="ritual-line l2">${escapeHtml(t('legendary_ritual_inv2'))}</div>
+      <div class="ritual-line l3">${escapeHtml(t('legendary_ritual_inv3'))}</div>
+      <div class="ritual-actions">
+        <button class="btn btn-ghost" onclick="closeRecruitmentRitual()">${escapeHtml(t('legendary_ritual_skip'))}</button>
+        <button class="btn btn-primary" onclick="ritualNextFromInvocation()">${escapeHtml(t('legendary_ritual_next'))}</button>
+      </div>`;
+    return;
+  }
+  if (ritualState.step === 2) {
+    const cards = ritualState.offeredClasses.map(cid => {
+      const def = legendaryClassDef(cid);
+      const sel = ritualState.chosenClass === cid ? ' selected' : '';
+      return `
+        <div class="ritual-class-card${sel}" style="--legendary-color: ${def.color};" onclick="ritualPickClass('${cid}')">
+          <div class="ritual-class-emoji">${def.emoji}</div>
+          <div class="ritual-class-name" style="color: ${def.color};">${escapeHtml(t('legendary_class_' + cid))}</div>
+          <div class="ritual-class-tag">${escapeHtml(t('legendary_class_' + cid + '_tagline'))}</div>
+        </div>`;
+    }).join('');
+    target.innerHTML = `
+      <h3 class="ritual-step-title">${escapeHtml(t('legendary_ritual_class_title'))}</h3>
+      <div class="ritual-class-grid">${cards}</div>
+      <div class="ritual-actions">
+        <button class="btn btn-ghost" onclick="ritualBack()">${escapeHtml(t('back_btn'))}</button>
+        <button class="btn btn-primary" id="ritualClassNextBtn" onclick="ritualNextFromClass()" ${ritualState.chosenClass ? '' : 'disabled'}>${escapeHtml(t('legendary_ritual_next'))}</button>
+      </div>`;
+    return;
+  }
+  if (ritualState.step === 3) {
+    const suggestions = (LEGENDARY_SUGGESTED_NAMES[ritualState.chosenClass] || {})[lang] || LEGENDARY_SUGGESTED_NAMES[ritualState.chosenClass].en;
+    const chips = suggestions.map(n => `<span class="ritual-name-chip" onclick="ritualPickName('${escapeHtml(n)}')">${escapeHtml(n)}</span>`).join('');
+    target.innerHTML = `
+      <h3 class="ritual-step-title">${escapeHtml(t('legendary_ritual_name_prompt'))}</h3>
+      <div class="ritual-name-chips">${chips}</div>
+      <input type="text" id="ritualHeroName" class="input" maxlength="20" value="${escapeHtml(ritualState.name)}" oninput="ritualState.name = this.value.trim(); document.getElementById('ritualNameNextBtn').disabled = !ritualNameValid();" />
+      <div class="ritual-actions">
+        <button class="btn btn-ghost" onclick="ritualBack()">${escapeHtml(t('back_btn'))}</button>
+        <button class="btn btn-primary" id="ritualNameNextBtn" onclick="ritualNextFromName()" ${ritualNameValid() ? '' : 'disabled'}>${escapeHtml(t('legendary_ritual_next'))}</button>
+      </div>`;
+    setTimeout(() => { const i = document.getElementById('ritualHeroName'); if (i) i.focus(); }, 50);
+    return;
+  }
+  if (ritualState.step === 4) {
+    const ids = LEGENDARY_STARTER_COSMETICS[ritualState.chosenClass] || [];
+    const cards = ids.map(cid => {
+      const def = COSMETIC_POOL.find(x => x.id === cid);
+      if (!def) return '';
+      const sel = ritualState.chosenCosmetic === cid ? ' selected' : '';
+      const name = (def.name && (def.name[lang] || def.name.en)) || cid;
+      const cdef = legendaryClassDef(ritualState.chosenClass);
+      return `
+        <div class="ritual-cosmetic-card${sel}" style="--legendary-color: ${cdef.color};" onclick="ritualPickCosmetic('${cid}')">
+          <div class="ritual-cosmetic-icon">${def.icon}</div>
+          <div class="ritual-cosmetic-name">${escapeHtml(name)}</div>
+        </div>`;
+    }).join('');
+    target.innerHTML = `
+      <h3 class="ritual-step-title">${escapeHtml(t('legendary_ritual_cosmetic_prompt'))}</h3>
+      <div class="ritual-cosmetic-grid">${cards}</div>
+      <div class="ritual-actions">
+        <button class="btn btn-ghost" onclick="ritualBack()">${escapeHtml(t('back_btn'))}</button>
+        <button class="btn btn-primary" id="ritualCosmeticNextBtn" onclick="ritualNextFromCosmetic()" ${ritualState.chosenCosmetic ? '' : 'disabled'}>${escapeHtml(t('legendary_ritual_confirm'))}</button>
+      </div>`;
+    return;
+  }
+  if (ritualState.step === 5) {
+    const def = legendaryClassDef(ritualState.chosenClass);
+    const welcome = t('legendary_ritual_welcome').replace('{name}', escapeHtml(ritualState.name));
+    target.innerHTML = `
+      <h3 class="ritual-step-title">${escapeHtml(t('legendary_ritual_welcome_title'))}</h3>
+      <div class="ritual-welcome-portrait" style="--legendary-color: ${def.color};">
+        <div class="legendary-emoji" aria-hidden="true">${def.emoji}</div>
+        <div class="ritual-class-name" style="color: ${def.color}; margin-top: 4px;">${escapeHtml(ritualState.name)} · ${escapeHtml(t('legendary_class_' + ritualState.chosenClass))}</div>
+      </div>
+      <div class="ritual-line" style="animation-delay: 200ms;">${welcome}</div>
+      <div class="ritual-actions" style="justify-content: center;">
+        <button class="btn btn-primary" onclick="closeRecruitmentRitual()">${escapeHtml(t('legendary_ritual_to_chamber'))}</button>
+      </div>`;
+    return;
+  }
+}
+
+function ritualNextFromInvocation() { ritualState.step = 2; renderRitualStep(); }
+function ritualPickClass(cid) {
+  ritualState.chosenClass = cid;
+  renderRitualStep();
+}
+function ritualNextFromClass() {
+  if (!ritualState.chosenClass) return;
+  ritualState.step = 3;
+  renderRitualStep();
+}
+function ritualPickName(name) {
+  ritualState.name = String(name).trim();
+  renderRitualStep();
+}
+function ritualNameValid() {
+  if (!ritualState) return false;
+  const n = (ritualState.name || '').trim();
+  if (n.length < 1 || n.length > 20) return false;
+  // Reject duplicates against any existing hero name (kid or legendary).
+  const lower = n.toLowerCase();
+  if ((state.kids || []).some(k => (k.name || '').trim().toLowerCase() === lower)) return false;
+  return true;
+}
+function ritualNextFromName() {
+  if (!ritualNameValid()) { toast(t('legendary_ritual_name_invalid'), 'error'); return; }
+  ritualState.step = 4;
+  renderRitualStep();
+}
+function ritualPickCosmetic(cid) {
+  ritualState.chosenCosmetic = cid;
+  renderRitualStep();
+}
+function ritualBack() {
+  if (!ritualState) return;
+  if (ritualState.step > 1) {
+    ritualState.step--;
+    renderRitualStep();
+  }
+}
+function ritualNextFromCosmetic() {
+  if (!ritualState.chosenCosmetic) return;
+  // Materialize the legendary mentor and add to roster.
+  const def = legendaryClassDef(ritualState.chosenClass);
+  const cdef = COSMETIC_POOL.find(x => x.id === ritualState.chosenCosmetic);
+  const newHero = {
+    id: id(),
+    userName: 'legend_' + ritualState.chosenClass + '_' + Date.now().toString(36),
+    name: ritualState.name.trim(),
+    avatar: def.emoji,
+    class: 'legendary',
+    stats: { brave: 0, clever: 0, kind: 0 },
+    balance: null, totalEarned: null, totalPaidOut: null,
+    portrait: null,
+    inventory: [],
+    equipment: { hat: null, armor: null, weapon: null, accessory: null },
+    cosmetics: cdef ? { [cdef.slot]: cdef.id } : {},
+    features: generateFeatures(Date.now() + ':' + ritualState.name),
+    xp: { brave: 0, clever: 0, kind: 0 },
+    legendary: {
+      class: ritualState.chosenClass,
+      recruitedAt: new Date().toISOString(),
+      recruitedAfterStreak: (state.streak && state.streak.activeDays) ? computeFamilyStreak() : 0,
+      abilityCharges: { perAdventure: 1, currentAdventure: 1 },
+      timesUsed: 0,
+      bondLevel: 0
+    }
+  };
+  // Stamp the chosen cosmetic into the family inventory if not already there.
+  if (cdef) {
+    if (!state.cosmeticInventory) state.cosmeticInventory = [];
+    if (!state.cosmeticInventory.some(c => c.id === cdef.id)) {
+      state.cosmeticInventory.push({ id: cdef.id, slot: cdef.slot, icon: cdef.icon, acquiredAt: new Date().toISOString(), legendary: true });
+    }
+  }
+  state.kids.push(newHero);
+  state.legendary.heroesRecruited = (state.legendary.heroesRecruited || 0) + 1;
+  state.legendary.pendingRecruitment = null;
+  ritualState.heroId = newHero.id;
+  // Chronicle: structured event so chronicle render can localize at display
+  // time. Linked to the new hero so tx filters keep working.
+  logTx(newHero.id, 'legendary_recruited', 0, '', {
+    event: 'legendary_recruited',
+    payload: {
+      heroName: newHero.name,
+      legendaryClass: newHero.legendary.class,
+      streakDays: newHero.legendary.recruitedAfterStreak
+    }
+  });
+  save();
+  renderKids();
+  renderHistoryFilter();
+  playFanfare();
+  ritualState.step = 5;
+  renderRitualStep();
+}
+
+// Resume a ritual that was opened in a previous session and not finished.
+function maybeResumeRecruitmentRitual() {
+  ensureLegendaryState();
+  if (!state.legendary.pendingRecruitment) return;
+  if (document.querySelector('.modal-backdrop.open')) return;
+  // Surface a tiny chip-style nudge in the toast queue. Actual reopen is
+  // user-initiated by clicking the nudge — we don't auto-pop the modal
+  // because the spec wants the ritual to feel ceremonial, not nag-y.
+  const reopen = () => openRecruitmentRitual();
+  setTimeout(() => {
+    toast(t('legendary_ritual_resume') || 'A hero awaits the consecration', 'info');
+    // Tap the family-streak badge to reopen — simpler than building a
+    // dedicated CTA. The user can also wait for the next reward modal.
+  }, 1800);
+  // Make the reopen function discoverable for tests / console.
+  window.__resumeLegendaryRitual = reopen;
 }
 
 // =====================================================================
@@ -8050,6 +8847,29 @@ function renderChronicleNote(tx) {
     }
     case 'royal_endowment':
       return `👑 ${t('royal_endowment')}`;
+    case 'legendary_recruited': {
+      const p = tx.payload || {};
+      const className = p.legendaryClass ? t('legendary_class_' + p.legendaryClass) : '';
+      const tmpl = t('chronicle_legendary_recruited');
+      return tmpl
+        .replace('{name}', p.heroName || '')
+        .replace('{className}', className)
+        .replace('{streak}', String(p.streakDays || 0));
+    }
+    case 'legendary_ability_used': {
+      const p = tx.payload || {};
+      const k = tx.kidId ? kidById(tx.kidId) : null;
+      const heroName = k ? k.name : '';
+      const tmpl = t('chronicle_legendary_ability_' + (p.class || 'licht'));
+      return tmpl.replace('{name}', heroName);
+    }
+    case 'legendary_milestone': {
+      const p = tx.payload || {};
+      const heroName = p.heroName || (tx.kidId ? (kidById(tx.kidId) || {}).name : '') || '';
+      const key = `chronicle_legendary_milestone_${p.class || 'licht'}_${p.milestone || '5_adventures'}`;
+      const tmpl = t(key) || t('chronicle_legendary_milestone_generic');
+      return tmpl.replace('{name}', heroName).replace('{n}', String(p.bondLevel || 0));
+    }
   }
   // Fallback: pre-migration entry. Render the stored string verbatim.
   return tx.note || '';
@@ -9875,6 +10695,10 @@ let adventureState = {
   mode: 'select', // 'select' | 'intro' | 'scene' | 'result' | 'end'
   adventureId: null,
   party: [],     // kid ids
+  legendaryId: null, // R3-S4: optional 4th-slot legendary companion
+  legendaryFailedAtLeastOnce: false, // gates Sturmheld:in ability per scene
+  legendaryAbilityUsedThisRun: false, // diagnostics
+  lootMultiplier: 1, // R3-S4: Erdheld:in pre-adventure ability sets to 2
   hp: 5,
   maxHp: 5,
   sceneIdx: 0,
@@ -9883,6 +10707,51 @@ let adventureState = {
   chosenOption: null, // for choice scenes
   awaitingRoll: false
 };
+
+// R3-S4: render the optional legendary-companion row below the kid
+// picker. Hidden when the family has no legendary mentors.
+function renderLegendaryCompanionRow() {
+  const legendaries = (state.kids || []).filter(isLegendaryHero);
+  if (!legendaries.length) return '';
+  const chips = legendaries.map(k => {
+    const def = legendaryClassDef(k.legendary.class);
+    const sel = adventureState.legendaryId === k.id;
+    const ariaLabel = `${k.name} ✦ ${t('legendary_class_' + k.legendary.class)} — ${sel ? t('in_party') : t('tap_to_add')}`;
+    return `
+      <div class="adventure-hero-card${sel ? ' selected' : ''}" onclick="toggleLegendaryCompanion('${k.id}')"
+           role="button" tabindex="0"
+           aria-pressed="${sel}"
+           aria-label="${escapeHtml(ariaLabel)}"
+           style="--legendary-color: ${def.color}; ${sel ? 'border-color:' + def.color + ';' : ''}"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleLegendaryCompanion('${k.id}');}">
+        <span class="adv-hero-pick-marker" aria-hidden="true">${sel ? '✓' : '+'}</span>
+        <div class="avatar-svg-box" style="background: rgba(244,211,94,0.08); border-color: ${def.color};"><div style="font-size:32px; line-height:1;">${def.emoji}</div></div>
+        <div class="adv-hero-meta">
+          <div class="adv-hero-name" style="color: ${def.color};">${escapeHtml(k.name)} <span class="legendary-class-pill" style="border-color:${def.color}; color:${def.color};">✦ ${escapeHtml(t('legendary_class_' + k.legendary.class))}</span></div>
+          <div class="adv-hero-user">${escapeHtml(t('legendary_class_' + k.legendary.class + '_tagline'))}</div>
+        </div>
+        <div class="adv-hero-pick-hint" aria-hidden="true">${sel ? t('in_party') : t('tap_to_add')}</div>
+      </div>`;
+  }).join('');
+  return `
+    <h3 style="margin-top: 18px; font-family: 'Cinzel', serif; color: var(--gold-bright); font-size: 14px;">✦ ${escapeHtml(t('legendary_companion_row'))}</h3>
+    <p style="font-style: italic; color: var(--ink-muted); font-size: 12px; margin: 4px 0 8px;">${escapeHtml(t('legendary_companion_desc'))}</p>
+    <div class="adventure-hero-picker">${chips}</div>`;
+}
+
+function toggleLegendaryCompanion(heroId) {
+  if (adventureState.legendaryId === heroId) {
+    adventureState.legendaryId = null;
+  } else {
+    adventureState.legendaryId = heroId;
+  }
+  renderAdventure();
+}
+
+function legendaryInParty() {
+  if (!adventureState.legendaryId) return null;
+  return kidById(adventureState.legendaryId) || null;
+}
 
 function renderAdventure() {
   if (adventureState.mode === 'select') renderAdventureSelect();
@@ -9923,7 +10792,9 @@ function renderAdventureSelect() {
       </div>`;
   }
   const pml = partyMinLevel();
-  const heroes = state.kids.map(k => {
+  // Kid heroes only — legendary mentors get their own row below.
+  const kidHeroes = state.kids.filter(k => !isLegendaryHero(k));
+  const heroes = kidHeroes.map(k => {
     const cls = CLASSES.find(x => x.id === k.class) || CLASSES[0];
     const sel = adventureState.party.includes(k.id) ? ' selected' : '';
     const lvl = heroLevel(k);
@@ -9995,6 +10866,7 @@ function renderAdventureSelect() {
       <div style="margin-top: 10px; color: var(--ink-muted); font-size: 13px;">${t('party_order_hint')}</div>
       <div class="party-order-strip" id="partyOrderStrip">${renderPartyOrderChips()}</div>
       <div style="margin-top: 4px; color: var(--ink-muted); font-size: 13px;">${t('party_size')}: ${adventureState.party.length}${adventureState.party.length > 0 ? ` · ${t('party_level')}: ${pml}` : ''}</div>
+      ${renderLegendaryCompanionRow()}
     </div>
     <div class="section">
       <h2>${t('choose_quest')}</h2>
@@ -10104,9 +10976,97 @@ function chooseAdventure(advId) {
   adventureState.log = [];
   adventureState.chosenOption = null;
   adventureState.lootDropCount = 0; // reset per-run 3-item cap
+  adventureState.legendaryFailedAtLeastOnce = false;
+  adventureState.legendaryAbilityUsedThisRun = false;
+  adventureState.lootMultiplier = 1;
+  // R3-S4: prep legendary companion charges per the spec — every class
+  // resets on adventure-start EXCEPT Erdheld:in, whose unspent charge
+  // persists across adventures (the only "save it for later" option).
+  const lh = legendaryInParty();
+  if (lh && isLegendaryHero(lh)) {
+    const cls = lh.legendary.class;
+    if (cls === 'erde') {
+      // Preserve spent state; never auto-restore mid-cycle.
+    } else {
+      lh.legendary.abilityCharges.currentAdventure = lh.legendary.abilityCharges.perAdventure || 1;
+    }
+    // For Erdheld:in: open the pre-adventure prompt before the intro.
+    if (cls === 'erde' && lh.legendary.abilityCharges.currentAdventure > 0) {
+      openErdePrompt(lh, () => {
+        adventureState.mode = 'intro';
+        playFanfare();
+        renderAdventure();
+      });
+      return;
+    }
+  }
   adventureState.mode = 'intro';
   playFanfare();
   renderAdventure();
+}
+
+// Erdheld:in pre-adventure prompt: doubles loot on this run, costs the
+// charge. "Diesmal sparen" leaves the charge intact for next time.
+function openErdePrompt(legendary, onProceed) {
+  const promptBody = document.getElementById('erdePromptBody');
+  const useBtn = document.getElementById('erdePromptUse');
+  const skipBtn = document.getElementById('erdePromptSkip');
+  if (!promptBody || !useBtn || !skipBtn) { onProceed(); return; }
+  promptBody.textContent = t('legendary_erde_prompt').replace('{name}', legendary.name);
+  const onUse = () => {
+    cleanup();
+    legendary.legendary.abilityCharges.currentAdventure = 0;
+    legendary.legendary.timesUsed = (legendary.legendary.timesUsed || 0) + 1;
+    adventureState.lootMultiplier = 2;
+    adventureState.legendaryAbilityUsedThisRun = true;
+    pushAbilityHistory(legendary, 'erde', null);
+    logTx(legendary.id, 'legendary_ability_used', 0, '', {
+      event: 'legendary_ability_used',
+      payload: { class: 'erde', adventureId: adventureState.adventureId }
+    });
+    save();
+    closeModal('erdePromptModal');
+    triggerAbilityBurst('erde');
+    toast(t('legendary_erde_blessed').replace('{name}', legendary.name), 'success');
+    onProceed();
+  };
+  const onSkip = () => {
+    cleanup();
+    closeModal('erdePromptModal');
+    onProceed();
+  };
+  function cleanup() {
+    useBtn.removeEventListener('click', onUse);
+    skipBtn.removeEventListener('click', onSkip);
+  }
+  useBtn.addEventListener('click', onUse);
+  skipBtn.addEventListener('click', onSkip);
+  openModal('erdePromptModal');
+}
+
+// Cap the family ability-history list at 60 entries — used for chronicle
+// continuity / parent dashboard, not for game logic.
+function pushAbilityHistory(legendary, cls, sceneId) {
+  ensureLegendaryState();
+  state.legendary.abilityHistory.push({
+    ts: Date.now(),
+    heroId: legendary.id,
+    class: cls,
+    sceneId: sceneId || null
+  });
+  while (state.legendary.abilityHistory.length > 60) state.legendary.abilityHistory.shift();
+}
+
+// Visual flourish when an ability fires — class-coloured emoji burst
+// over the viewport, removed after animation. No-op for reduced-motion.
+function triggerAbilityBurst(cls) {
+  const def = legendaryClassDef(cls);
+  const el = document.createElement('div');
+  el.className = 'ability-burst-overlay';
+  el.style.setProperty('--legendary-color', def.color);
+  el.textContent = def.emoji;
+  document.body.appendChild(el);
+  setTimeout(() => { try { el.remove(); } catch (e) {} }, 1100);
 }
 
 function currentAdventure() { return ADVENTURES.find(a => a.id === adventureState.adventureId); }
@@ -10120,6 +11080,9 @@ function persistAdventure() {
     mode: adventureState.mode,
     adventureId: adventureState.adventureId,
     party: [...adventureState.party],
+    legendaryId: adventureState.legendaryId || null,
+    legendaryFailedAtLeastOnce: !!adventureState.legendaryFailedAtLeastOnce,
+    lootMultiplier: adventureState.lootMultiplier || 1,
     hp: adventureState.hp,
     maxHp: adventureState.maxHp,
     sceneIdx: adventureState.sceneIdx,
@@ -10141,6 +11104,10 @@ function resumeSavedAdventure() {
     mode: s.mode || 'scene',
     adventureId: s.adventureId,
     party: [...(s.party || [])],
+    legendaryId: s.legendaryId || null,
+    legendaryFailedAtLeastOnce: !!s.legendaryFailedAtLeastOnce,
+    legendaryAbilityUsedThisRun: false,
+    lootMultiplier: s.lootMultiplier || 1,
     hp: s.hp != null ? s.hp : 5,
     maxHp: s.maxHp || 5,
     sceneIdx: s.sceneIdx || 0,
@@ -10226,7 +11193,139 @@ function partyBarHtml() {
     if (!k) return '';
     return `<div class="avatar-svg-box party-avatar-svg" title="${escapeHtml(k.name)} (@${escapeHtml(k.userName)}) · Lv ${heroLevel(k)}">${renderCharacterSVG(k, true)}</div>`;
   }).join('');
-  return `<div class="party-bar">${avatars}<div class="party-hp">${t('courage_stars')}: ${stars}</div></div>`;
+  // R3-S4: legendary companion avatar shown alongside the kid party,
+  // with a class-coloured glow border so it reads as separate.
+  const lh = legendaryInParty();
+  let legendaryHtml = '';
+  if (lh) {
+    const def = legendaryClassDef(lh.legendary.class);
+    legendaryHtml = `<div class="avatar-svg-box party-avatar-svg" style="border-color: ${def.color}; box-shadow: 0 0 8px ${def.color};" title="${escapeHtml(lh.name)} ✦ ${escapeHtml(t('legendary_class_' + lh.legendary.class))}"><div style="font-size:32px; line-height:1; text-align:center;">${def.emoji}</div></div>`;
+  }
+  return `<div class="party-bar">${avatars}${legendaryHtml}<div class="party-hp">${t('courage_stars')}: ${stars}</div>${legendaryAbilityButtonHtml()}</div>`;
+}
+
+// R3-S4: returns the ability-button HTML for the current legendary
+// companion, or '' if there is none. The button's enabled state is
+// computed against the live scene state (morale full?, scene failed?).
+function legendaryAbilityButtonHtml() {
+  const lh = legendaryInParty();
+  if (!lh) return '';
+  const cls = lh.legendary.class;
+  const def = legendaryClassDef(cls);
+  const charges = lh.legendary.abilityCharges.currentAdventure || 0;
+  // Erdheld:in fires before the scene loop, so its button has no role
+  // during scenes — hide it to avoid confusion.
+  if (cls === 'erde') return '';
+  const abilityName = t('legendary_ability_' + cls + '_name');
+  let disabled = false;
+  let reason = '';
+  if (charges <= 0) { disabled = true; reason = 'spent'; }
+  else if (cls === 'licht' && adventureState.hp >= adventureState.maxHp) { disabled = true; reason = 'morale_already_full'; }
+  else if (cls === 'sturm' && !adventureState.legendaryFailedAtLeastOnce) { disabled = true; reason = 'must_try_first'; }
+  else if (cls === 'mond' && adventureState.mode !== 'scene') { disabled = true; reason = 'scene_already_resolved'; }
+  const tip = reason ? t('legendary_disabled_' + reason) : `${lh.name} · ${abilityName}`;
+  return `
+    <button class="legendary-ability-btn"
+            ${disabled ? 'disabled' : ''}
+            data-class="${cls}"
+            style="--legendary-color: ${def.color};"
+            onclick="useLegendaryAbility()"
+            aria-label="${escapeHtml(lh.name + ' · ' + abilityName + (disabled ? ' (' + tip + ')' : ''))}"
+            title="${escapeHtml(tip)}">
+      <span class="ability-portrait" aria-hidden="true">${def.emoji}</span>
+      <span class="ability-name">${escapeHtml(abilityName)}</span>
+      <span class="ability-charge" aria-hidden="true">${charges > 0 ? '⚡' : '✕'}</span>
+    </button>`;
+}
+
+// R3-S4: fire the legendary ability for the active companion against
+// the current scene state. Each class branches into its own effect.
+function useLegendaryAbility() {
+  const lh = legendaryInParty();
+  if (!lh) return;
+  const cls = lh.legendary.class;
+  const charges = lh.legendary.abilityCharges.currentAdventure || 0;
+  if (charges <= 0) { toast(t('legendary_disabled_spent'), 'info'); return; }
+  if (cls === 'licht' && adventureState.hp >= adventureState.maxHp) { toast(t('legendary_disabled_morale_already_full'), 'info'); return; }
+  if (cls === 'sturm' && !adventureState.legendaryFailedAtLeastOnce) { toast(t('legendary_disabled_must_try_first'), 'info'); return; }
+  if (cls === 'mond' && adventureState.mode !== 'scene') { toast(t('legendary_disabled_scene_already_resolved'), 'info'); return; }
+
+  lh.legendary.abilityCharges.currentAdventure--;
+  lh.legendary.timesUsed = (lh.legendary.timesUsed || 0) + 1;
+  adventureState.legendaryAbilityUsedThisRun = true;
+  const sceneId = currentAdventure() && currentAdventure().scenes[adventureState.sceneIdx]
+    ? `${currentAdventure().id}:${adventureState.sceneIdx}`
+    : null;
+  pushAbilityHistory(lh, cls, sceneId);
+  logTx(lh.id, 'legendary_ability_used', 0, '', {
+    event: 'legendary_ability_used',
+    payload: { class: cls, sceneId, adventureId: adventureState.adventureId }
+  });
+  triggerAbilityBurst(cls);
+
+  if (cls === 'licht') {
+    adventureState.hp = Math.min(adventureState.maxHp, adventureState.hp + 1);
+    save();
+    persistAdventure();
+    renderAdventure();
+    toast(t('legendary_effect_licht').replace('{name}', lh.name), 'success');
+    return;
+  }
+  if (cls === 'sturm') {
+    // Mark the scene as resolved at half reward and advance.
+    adventureState.legendaryFailedAtLeastOnce = false;
+    adventureState.chosenOption = null;
+    const adv = currentAdventure();
+    const next = adventureState.sceneIdx + 1;
+    if (adv && next >= adv.scenes.length) {
+      // Last scene — head straight to result.
+      adventureState.mode = 'result';
+      adventureState.lastRoll = { roll: 10, bonus: 0, total: 10, dc: 10, success: true, viaSturm: true };
+    } else {
+      adventureState.sceneIdx = next;
+    }
+    save();
+    persistAdventure();
+    renderAdventure();
+    toast(t('legendary_effect_sturm').replace('{name}', lh.name), 'success');
+    return;
+  }
+  if (cls === 'mond') {
+    save();
+    showMondSolutionOverlay(3000);
+    persistAdventure();
+    return;
+  }
+}
+
+// Mond: a 3-second hint overlay over the scene. For choice scenes we
+// surface the option with the highest party-best margin; for other
+// scene types we just fade the strongest hint we have.
+function showMondSolutionOverlay(durationMs) {
+  const adv = currentAdventure();
+  if (!adv) return;
+  const scene = adv.scenes[adventureState.sceneIdx];
+  let hintText = t('legendary_mond_hint_generic');
+  if (scene && scene.options && scene.options.length) {
+    // Pick the option with the highest stat-margin for the kid party.
+    const heroes = adventureState.party.map(pid => kidById(pid)).filter(Boolean);
+    let best = null, bestMargin = -Infinity;
+    scene.options.forEach((o, i) => {
+      const vals = heroes.map(h => effectiveStats(h)[o.stat] || 0);
+      const bestVal = vals.length ? Math.max(...vals) : 0;
+      const margin = bestVal - dcFor(o.dc);
+      if (margin > bestMargin) { bestMargin = margin; best = { i, o }; }
+    });
+    if (best) {
+      const labelTxt = L(best.o.label);
+      hintText = t('legendary_mond_hint_option').replace('{label}', labelTxt);
+    }
+  }
+  const ov = document.createElement('div');
+  ov.className = 'mond-solution-overlay';
+  ov.innerHTML = `<h3>${escapeHtml(t('legendary_mond_overlay_title'))}</h3><div>${escapeHtml(hintText)}</div>`;
+  document.body.appendChild(ov);
+  setTimeout(() => { try { ov.remove(); } catch (e) {} }, durationMs || 3000);
 }
 function renderSceneProgress(idx, total) {
   const filled = Math.min(idx + 1, total);
@@ -10517,7 +11616,7 @@ function answerPuzzle(idx) {
     adventureState.log.push({ sceneTitle: L(scene.title), heroId: recipientId, roll: null, total: null, dc: null, success: true, loot: droppedItem ? droppedItem.id : null, type: 'puzzle' });
   } else if (s.tried.length >= 2) {
     s.failed = true;
-    adventureState.hp = Math.max(0, adventureState.hp - 1);
+    adventureState.hp = Math.max(0, adventureState.hp - 1); adventureState.legendaryFailedAtLeastOnce = true;
     playChime();
     adventureState.log.push({ sceneTitle: L(scene.title), heroId: null, success: false, type: 'puzzle' });
   } else {
@@ -10659,7 +11758,7 @@ function pickSequenceTile(idx) {
     playChime();
     if (st.attempts >= 2) {
       st.failed = true;
-      adventureState.hp = Math.max(0, adventureState.hp - 1);
+      adventureState.hp = Math.max(0, adventureState.hp - 1); adventureState.legendaryFailedAtLeastOnce = true;
       const a = currentAdventure();
       const scene = a.scenes[adventureState.sceneIdx];
       adventureState.log.push({ sceneTitle: L(scene.title), heroId: null, success: false, type: 'sequence' });
@@ -10826,7 +11925,7 @@ function flipMemoryCard(idx) {
         setTimeout(() => {
           if (!adventureState.memoryState || adventureState.memoryState !== st) return;
           st.failed = true;
-          adventureState.hp = Math.max(0, adventureState.hp - 1);
+          adventureState.hp = Math.max(0, adventureState.hp - 1); adventureState.legendaryFailedAtLeastOnce = true;
           c1.flipped = false; c2.flipped = false;
           st.flippedIdxs = [];
           st.locked = false;
@@ -10941,7 +12040,7 @@ function pickStatCheck(idx) {
     adventureState.log.push({ sceneTitle: L(scene.title), heroId: recipientId, success: true, loot: droppedItem ? droppedItem.id : null, type: 'statcheck' });
   } else {
     playChime();
-    adventureState.hp = Math.max(0, adventureState.hp - 1);
+    adventureState.hp = Math.max(0, adventureState.hp - 1); adventureState.legendaryFailedAtLeastOnce = true;
     adventureState.log.push({ sceneTitle: L(scene.title), heroId: null, success: false, type: 'statcheck' });
   }
   renderAdventure();
@@ -11067,7 +12166,7 @@ function runSplitScene() {
     adventureState.log.push({ sceneTitle: L(scene.title), heroId: recipientId, success: true, loot: droppedItem ? droppedItem.id : null, type: 'split' });
   } else {
     playChime();
-    adventureState.hp = Math.max(0, adventureState.hp - 1);
+    adventureState.hp = Math.max(0, adventureState.hp - 1); adventureState.legendaryFailedAtLeastOnce = true;
     adventureState.log.push({ sceneTitle: L(scene.title), heroId: null, success: false, type: 'split' });
   }
   renderAdventure();
@@ -11124,7 +12223,7 @@ function attemptChallenge() {
   else playChime();
 
   if (!success) {
-    adventureState.hp = Math.max(0, adventureState.hp - 1); // kid-friendly: no extra fumble penalty
+    adventureState.hp = Math.max(0, adventureState.hp - 1); adventureState.legendaryFailedAtLeastOnce = true; // kid-friendly: no extra fumble penalty
   } else if (challenge.heal) {
     adventureState.hp = Math.min(adventureState.maxHp, adventureState.hp + 1);
   }
@@ -11200,6 +12299,10 @@ function nextScene() {
   adventureState.sceneIdx++;
   adventureState.mode = 'scene';
   adventureState.chosenOption = null;
+  // R3-S4: per-scene flag for Sturmheld:in. Sturmheld can only fire
+  // AFTER a scene has been failed once; reset on scene transition so
+  // each scene re-gates the ability cleanly.
+  adventureState.legendaryFailedAtLeastOnce = false;
   // Reset scratch state for the new scene's interactive type (if any).
   adventureState.puzzleState = null;
   adventureState.sequenceState = null;
@@ -11229,8 +12332,26 @@ function endAdventure(triumphant) {
     else if (tier === 'close')   awardTreasure(0.3);
     else                          awardConsolationTreasure();
   }
+  // R3-S4: bond milestone — bump bondLevel for the legendary companion
+  // and emit a milestone chronicle entry on threshold hits.
+  const lh = legendaryInParty();
+  if (lh && isLegendaryHero(lh)) {
+    lh.legendary.bondLevel = (lh.legendary.bondLevel || 0) + 1;
+    const milestones = { 5: '5_adventures', 10: '10_adventures', 20: '20_adventures', 30: '30_adventures' };
+    const key = milestones[lh.legendary.bondLevel];
+    if (key) {
+      logTx(lh.id, 'legendary_milestone', 0, '', {
+        event: 'legendary_milestone',
+        payload: { class: lh.legendary.class, milestone: key, bondLevel: lh.legendary.bondLevel,
+                   adventureId: adventureState.adventureId, heroName: lh.name }
+      });
+    }
+  }
   // Adventure ended — clear any saved mid-adventure state
   state.savedAdventure = null;
+  // Clear the per-run flags so the next adventure starts clean.
+  adventureState.legendaryFailedAtLeastOnce = false;
+  adventureState.lootMultiplier = 1;
   save();
   renderAdventure();
 }
@@ -11310,6 +12431,14 @@ function awardTreasure(tierMultiplier) {
       item = rollLoot(favorRare || Math.random() < 0.25);
       giveItemToKid(h.id, item);
       markLootDropped();
+    }
+    // R3-S4: Erdheld:in pre-adventure ability doubles coin + item drops.
+    // Apply post-cap so the weekly allowance still gates whether ANY
+    // coins are paid; the multiplier scales the amount when it is.
+    if (paidAmount > 0 && (adventureState.lootMultiplier || 1) > 1) {
+      const bonus = paidAmount * (adventureState.lootMultiplier - 1);
+      h.balance += bonus;
+      h.totalEarned = (h.totalEarned || 0) + bonus;
     }
     const note = paidAmount > 0
       ? (item ? `🏆 ${L(adv.title)} ${t('treasure_word')} · ${item.icon} ${item.name}`
@@ -12240,6 +13369,7 @@ load();
 // Family streak: lazy-init data block, grant the weekly shield if due,
 // auto-apply a shield if yesterday was missed and a streak is alive.
 ensureFamilyStreakState();
+ensureLegendaryState();
 grantWeeklyFreezeIfDue();
 applyFreezeIfNeeded();
 applyLandingVisibility();  // decide before other renders which shell is visible
