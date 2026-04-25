@@ -1957,6 +1957,7 @@
     margin: 12px 0;
   }
   .adventure-hero-card {
+    position: relative;
     border: 2px solid var(--parchment-darker);
     background: rgba(62,40,23,0.05);
     border-radius: 6px;
@@ -1965,11 +1966,84 @@
     display: flex; align-items: center; gap: 10px;
     transition: all 0.15s;
   }
-  .adventure-hero-card:hover { border-color: var(--gold-dark); }
+  .adventure-hero-card:hover { border-color: var(--gold-dark); transform: translateY(-1px); }
+  .adventure-hero-card:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
   .adventure-hero-card.selected {
     border-color: var(--gold-dark);
     background: linear-gradient(135deg, rgba(244,211,94,0.3), rgba(212,175,55,0.2));
     box-shadow: 0 0 12px rgba(212,175,55,0.4);
+  }
+  /* Pick-marker badge — '+' before pick, '✓' after. Makes the call to
+     action obvious at a glance without needing a tutorial. */
+  .adv-hero-pick-marker {
+    position: absolute; top: 6px; right: 8px;
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 14px;
+    background: var(--parchment);
+    color: var(--wood-dark);
+    border: 1.5px solid var(--gold-dark);
+    transition: all 0.15s;
+  }
+  .adventure-hero-card.selected .adv-hero-pick-marker {
+    background: linear-gradient(180deg, #7dd3a4, #2d6a4f);
+    color: #fff;
+    border-color: #1a3d2a;
+  }
+  .adv-hero-pick-hint {
+    position: absolute; bottom: 4px; right: 10px;
+    font-family: 'MedievalSharp', cursive;
+    font-size: 11px; font-style: italic;
+    color: var(--ink-muted);
+    opacity: 0.8;
+    pointer-events: none;
+  }
+  .adventure-hero-card.selected .adv-hero-pick-hint {
+    color: var(--emerald);
+    opacity: 1;
+  }
+
+  /* Dice-roll animation: a brief spin/pulse to build tension before the
+     number reveals. Keeps everything else static. */
+  @keyframes diceSpin {
+    0%   { transform: rotate(0deg)   scale(1);   filter: brightness(1); }
+    25%  { transform: rotate(-18deg) scale(1.08); filter: brightness(1.15); }
+    50%  { transform: rotate(20deg)  scale(1.12); filter: brightness(1.25); }
+    75%  { transform: rotate(-10deg) scale(1.05); filter: brightness(1.1); }
+    100% { transform: rotate(0deg)   scale(1);   filter: brightness(1); }
+  }
+  .dice-display.rolling {
+    animation: diceSpin 700ms ease-in-out;
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold)) !important;
+    color: var(--wood-dark) !important;
+  }
+
+  /* Icon picker — grouped by suggested stat so parents scan faster */
+  .icon-group-head {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    color: var(--gold-bright);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 8px 0 4px;
+  }
+  .icon-group-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .icon-group-row .emoji-btn { position: relative; }
+
+  /* Pity indicator badge near the roll button */
+  .pity-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: linear-gradient(180deg, #6ad4ff, #2a7fa8);
+    color: var(--wood-dark);
+    border: 1px solid #1a4f6a;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-left: 8px;
+    box-shadow: 0 0 8px rgba(106,212,255,0.45);
+    vertical-align: middle;
   }
   .adventure-hero-card .avatar { width: 44px; height: 44px; font-size: 24px; }
   .adv-hero-meta { flex: 1; min-width: 0; }
@@ -3227,6 +3301,9 @@ const TRANSLATIONS = {
     install_app: '⬇ Install app',
     install_ios: '⬇ Add to Home Screen',
     install_ios_hint: 'To install: tap the Share icon, then "Add to Home Screen".',
+    tap_to_add: '+ Tap to add to party',
+    in_party: '✓ In the party',
+    pity_label: '+1 Pity',
     chronicle: '📖 The Chronicle', all_heroes: 'All Heroes', empty_chronicle: 'The chronicle is yet unwritten',
     council_chamber: '⚙ Council Chamber',
     coinage: 'Coinage', coinage_desc: "The mark of the realm's currency",
@@ -3537,6 +3614,9 @@ const TRANSLATIONS = {
     install_app: '⬇ App installieren',
     install_ios: '⬇ Zum Home-Bildschirm',
     install_ios_hint: 'Zum Installieren: Teilen-Symbol antippen und „Zum Home-Bildschirm" wählen.',
+    tap_to_add: '+ Zur Gruppe hinzufügen',
+    in_party: '✓ In der Gruppe',
+    pity_label: '+1 Trostbonus',
     chronicle: '📖 Die Chronik', all_heroes: 'Alle Helden', empty_chronicle: 'Die Chronik ist noch unbeschrieben',
     council_chamber: '⚙ Ratskammer',
     coinage: 'Münzwesen', coinage_desc: 'Das Zeichen der Landeswährung',
@@ -4019,6 +4099,31 @@ function updateNarratorBtn() {
 }
 const AVATARS = ['⚔️','🏹','🧙‍♂️','🧝‍♀️','🛡️','👑','🗡️','🪄','🐉','🦄','🐺','🦅','🦁','🐲','🧚','🧛','🧞','🧟','⚡','🌟'];
 const ICONS = ['⚔️','🛡️','🏹','🗡️','🪄','🧪','📜','🗝️','💎','🏰','🐉','🐺','🧹','🛏️','📚','🦷','🚿','🐕','🗑️','🌱'];
+// Each quest sigil gets a short label per locale (for tooltips + aria) and
+// a "suggests" stat so parents can see at a glance which icon fits which
+// kind of chore. Order in ICONS is preserved.
+const ICON_META = {
+  '⚔️':  { en: 'Sword',         de: 'Schwert',        suggests: 'brave'  },
+  '🛡️':  { en: 'Shield',        de: 'Schild',         suggests: 'brave'  },
+  '🏹':  { en: 'Bow',           de: 'Bogen',          suggests: 'brave'  },
+  '🗡️':  { en: 'Dagger',        de: 'Dolch',          suggests: 'brave'  },
+  '🪄':  { en: 'Wand',          de: 'Zauberstab',     suggests: 'clever' },
+  '🧪':  { en: 'Potion',        de: 'Trank',          suggests: 'clever' },
+  '📜':  { en: 'Scroll',        de: 'Schriftrolle',   suggests: 'clever' },
+  '🗝️':  { en: 'Key',           de: 'Schlüssel',      suggests: 'clever' },
+  '💎':  { en: 'Gem',           de: 'Edelstein',      suggests: 'clever' },
+  '🏰':  { en: 'Castle',        de: 'Burg',           suggests: 'brave'  },
+  '🐉':  { en: 'Dragon',        de: 'Drache',         suggests: 'brave'  },
+  '🐺':  { en: 'Wolf',          de: 'Wolf',           suggests: 'brave'  },
+  '🧹':  { en: 'Broom (chores)', de: 'Besen (putzen)', suggests: 'kind'   },
+  '🛏️':  { en: 'Bed (tidy room)', de: 'Bett (Zimmer)', suggests: 'kind'  },
+  '📚':  { en: 'Books (homework)', de: 'Bücher (Hausaufgaben)', suggests: 'clever' },
+  '🦷':  { en: 'Tooth (brush)', de: 'Zahn (putzen)',  suggests: 'kind'   },
+  '🚿':  { en: 'Shower',        de: 'Dusche',         suggests: 'kind'   },
+  '🐕':  { en: 'Dog (walk/feed)', de: 'Hund (Gassi)', suggests: 'kind'   },
+  '🗑️':  { en: 'Trash (out)',   de: 'Müll',           suggests: 'kind'   },
+  '🌱':  { en: 'Plant (water)', de: 'Pflanze',        suggests: 'kind'   }
+};
 
 const CLASSES = [
   { id: 'magician', icon: '🧙‍♂️', bonus: 'clever' },
@@ -5612,14 +5717,24 @@ function renderKids() {
     const statsHtml = STAT_KEYS.map(sk => {
       const b = statBreakdown(k, sk);
       const row = renderStatIconRow(b.total);
-      const prog = Math.round(xpProgress((k.xp || {})[sk]) * 100);
-      const tooltip = `${t(sk)}: ${b.total} (You + ${b.xpBonus ? 'XP ' : ''}${b.itemBonus ? 'Gear' : ''}) `.trim();
+      const xpVal = (k.xp || {})[sk] || 0;
+      const prog = Math.round(xpProgress(xpVal) * 100);
+      const max = STAT_MAX_DISPLAY;
+      const tooltip = `${t(sk)}: ${b.total}/${max}` + (b.xpBonus ? ` · +${b.xpBonus} XP` : '') + (b.itemBonus ? ` · +${b.itemBonus} Gear` : '');
       const filledIcons = STAT_META[sk].icon.repeat(row.filled);
       const emptyIcons = STAT_META[sk].empty.repeat(row.empty);
+      // role=group wraps the visual stat indicator + the XP progress so a
+      // screen-reader announces a meaningful "Brave 3 of 5, XP 40%" instead
+      // of "fire fire fire fire fire". Emoji decoration stays for sighted
+      // users, but is aria-hidden so it isn't read aloud as gibberish.
       return `
-      <div class="stat-row" title="${tooltip}" aria-label="${tooltip}">
-        <span class="stat-row-icons">${filledIcons}${emptyIcons}</span>
-        <div class="xp-bar"><div class="xp-fill" style="width:${prog}%"></div></div>
+      <div class="stat-row" role="group" title="${escapeHtml(tooltip)}" aria-label="${escapeHtml(tooltip)}">
+        <span class="stat-row-icons" aria-hidden="true">${filledIcons}${emptyIcons}</span>
+        <div class="xp-bar" role="progressbar"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="${prog}"
+             aria-label="${escapeHtml(t(sk) + ' XP')}">
+          <div class="xp-fill" style="width:${prog}%"></div>
+        </div>
       </div>
     `;
     }).join('');
@@ -5989,12 +6104,37 @@ function confirmDonate() {
 function renderIconPicker() {
   const el = document.getElementById('actEmojiPicker');
   el.innerHTML = '';
-  ICONS.forEach(i => {
-    const b = document.createElement('button');
-    b.className = 'emoji-btn' + (i === selectedIcon ? ' selected' : '');
-    b.textContent = i;
-    b.onclick = () => { selectedIcon = i; renderIconPicker(); };
-    el.appendChild(b);
+  const lang = (state.settings && state.settings.lang) || 'en';
+  // Group by suggested stat so a parent scanning for "a chore" finds the
+  // kindness icons together rather than hunting through 20 mixed glyphs.
+  const groups = [
+    { stat: 'brave',  label: t('brave')  },
+    { stat: 'clever', label: t('clever') },
+    { stat: 'kind',   label: t('kind')   }
+  ];
+  groups.forEach(g => {
+    const head = document.createElement('div');
+    head.className = 'icon-group-head';
+    head.textContent = `${STAT_META[g.stat].icon} ${g.label}`;
+    el.appendChild(head);
+    const row = document.createElement('div');
+    row.className = 'icon-group-row';
+    ICONS.forEach(ic => {
+      const meta = ICON_META[ic] || {};
+      if (meta.suggests !== g.stat) return;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'emoji-btn' + (ic === selectedIcon ? ' selected' : '');
+      b.textContent = ic;
+      const label = (meta[lang] || meta.en || '').toString();
+      if (label) {
+        b.title = label;
+        b.setAttribute('aria-label', label);
+      }
+      b.onclick = () => { selectedIcon = ic; renderIconPicker(); };
+      row.appendChild(b);
+    });
+    el.appendChild(row);
   });
 }
 
@@ -6296,13 +6436,18 @@ function renderHeroSheet() {
     if (b.xpBonus) breakdown.push(`${t('xp_gives')} ${STAT_META[sk].icon.repeat(b.xpBonus)}`);
     if (b.itemBonus) breakdown.push(`${t('gear_gives')} ${STAT_META[sk].icon.repeat(b.itemBonus)}`);
     breakdown.push(`<strong>${t('total_label')}: ${STAT_META[sk].icon.repeat(b.total)}</strong>`);
+    const aria = `${t(sk)} ${b.total}/${STAT_MAX_DISPLAY}`;
     return `
-    <div class="hero-sheet-xp-row">
+    <div class="hero-sheet-xp-row" role="group" aria-label="${escapeHtml(aria)}">
       <div class="hero-sheet-xp-head">
         <span class="hero-sheet-xp-label">${t(sk)}</span>
-        <span class="stat-row-icons">${filledIcons}${emptyIcons}</span>
+        <span class="stat-row-icons" aria-hidden="true">${filledIcons}${emptyIcons}</span>
       </div>
-      <div class="hero-sheet-xp-bar"><div class="hero-sheet-xp-fill" style="width:${prog}%"></div></div>
+      <div class="hero-sheet-xp-bar" role="progressbar"
+           aria-valuemin="0" aria-valuemax="100" aria-valuenow="${prog}"
+           aria-label="${escapeHtml(t(sk) + ' XP')}">
+        <div class="hero-sheet-xp-fill" style="width:${prog}%"></div>
+      </div>
       <details class="stat-details">
         <summary>(i) ${t('details')}</summary>
         <div class="stat-breakdown">${breakdown.map(l => `<div>${l}</div>`).join('')}</div>
@@ -7900,14 +8045,22 @@ function renderAdventureSelect() {
     const cls = CLASSES.find(x => x.id === k.class) || CLASSES[0];
     const sel = adventureState.party.includes(k.id) ? ' selected' : '';
     const lvl = heroLevel(k);
+    const isIn = !!sel;
+    const ariaLabel = `${k.name} — ${isIn ? t('in_party') : t('tap_to_add')}`;
     return `
-      <div class="adventure-hero-card${sel}" onclick="toggleParty('${k.id}')">
+      <div class="adventure-hero-card${sel}" onclick="toggleParty('${k.id}')"
+           role="button" tabindex="0"
+           aria-pressed="${isIn}"
+           aria-label="${escapeHtml(ariaLabel)}"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleParty('${k.id}');}">
+        <span class="adv-hero-pick-marker" aria-hidden="true">${isIn ? '✓' : '+'}</span>
         <div class="avatar-svg-box">${renderCharacterSVG(k, true)}</div>
         <div class="adv-hero-meta">
           <div class="adv-hero-name">${escapeHtml(k.name)} <span class="level-badge">Lv ${lvl}</span></div>
           <div class="adv-hero-user">@${escapeHtml(k.userName)} · ${className(cls)}</div>
           <div class="adv-hero-user">${rankName(k)}</div>
         </div>
+        <div class="adv-hero-pick-hint" aria-hidden="true">${isIn ? t('in_party') : t('tap_to_add')}</div>
       </div>`;
   }).join('');
   const advs = ADVENTURES.map(a => {
@@ -8361,7 +8514,7 @@ function renderAdventureScene() {
       <div class="adventure-narrative">${escapeHtmlMultiline(L(scene.text))}</div>
       ${approachLine}
       <div class="adventure-challenge">
-        <div class="adv-chal-title">⚠ ${t('challenge')} · DC ${dcFor(challenge.dc)}${adventureState.nextRollBonus && state.settings.iTriedBonus !== false ? ` · <span style="color:#6ad4ff;">+${adventureState.nextRollBonus} ${t('i_tried_bonus')}</span>` : ''}</div>
+        <div class="adv-chal-title">⚠ ${t('challenge')} · DC ${dcFor(challenge.dc)}${adventureState.nextRollBonus && state.settings.iTriedBonus !== false ? ` <span class="pity-badge">+${adventureState.nextRollBonus} ${t('pity_label')}</span>` : ''}</div>
         <div class="adv-chal-stat">${sIcon} ${sLabel}</div>
         <div class="party-math">${heroes.map(h => {
           const v = effectiveStats(h)[challenge.stat] || 0;
@@ -8372,6 +8525,9 @@ function renderAdventureScene() {
       <div class="party-contrib-grid">${heroContribs}</div>
       <div style="text-align:center; margin: 14px 0;">
         <button class="btn btn-primary" style="font-size: 16px; padding: 14px 32px;" onclick="attemptChallenge()">🎲 ${t('roll_dice')}</button>
+        ${adventureState.nextRollBonus && state.settings.iTriedBonus !== false
+          ? `<div style="margin-top:8px;"><span class="pity-badge">+${adventureState.nextRollBonus} ${t('pity_label')}</span></div>`
+          : ''}
       </div>
       <div style="display:flex; gap:8px; justify-content:flex-end; padding-top: 10px; border-top: 1px dashed rgba(244,211,94,0.3);">
         <button class="btn btn-ghost btn-sm" onclick="chosenOptionBack()">← ${t('back')}</button>
@@ -8998,6 +9154,31 @@ function attemptChallenge() {
   const scene = a.scenes[adventureState.sceneIdx];
   const challenge = adventureState.chosenOption;
   if (!challenge) return;
+  // Build tension before the reveal — replace the roll button with a
+  // spinning d20 for ~700ms, then resolve. Skipped under reduced-motion
+  // or under automation (Playwright) so tests don't have to slow down.
+  if (!adventureState._rolling) {
+    const reduce = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+      || navigator.webdriver
+      || /HeadlessChrome|Playwright/.test(navigator.userAgent || '');
+    if (!reduce) {
+      adventureState._rolling = true;
+      const c = document.getElementById('adventureContainer');
+      const btn = c && c.querySelector('button[onclick="attemptChallenge()"]');
+      if (btn) {
+        btn.disabled = true;
+        btn.style.position = 'relative';
+        btn.innerHTML = `<span class="dice-display rolling" style="display:inline-flex; width:46px; height:46px; align-items:center; justify-content:center; font-size:26px; border-radius:8px;">🎲</span>`;
+      }
+      try { playChime(); } catch (e) {}
+      setTimeout(() => {
+        adventureState._rolling = false;
+        attemptChallenge();
+      }, 720);
+      return;
+    }
+  }
+  adventureState._rolling = false;
   const heroes = adventureState.party.map(pid => kidById(pid)).filter(Boolean);
   // Effective DC after Council difficulty setting
   const effectiveDc = dcFor(challenge.dc);

@@ -12,7 +12,10 @@ export default defineConfig({
     baseURL: 'http://localhost:8765',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure'
+    video: 'retain-on-failure',
+    // Skip motion-based delays (dice spin, hero transitions) so tests
+    // resolve instantly. The app honours prefers-reduced-motion.
+    reducedMotion: 'reduce'
   },
 
   // Spin up the static file server for tests. Reuses an already-running
