@@ -5329,17 +5329,33 @@ function getNarration(scene, kind, run) {
       if (kind !== 'intro' && entry.intro) return getNarration({ narration: entry.intro }, 'intro', run);
       return '';
     }
-    const advId = (run && run.adventureId) || (currentAdventure && currentAdventure().id) || '';
+    const advId = (run && run.adventureId)
+      || (typeof currentAdventure === 'function' && currentAdventure() && currentAdventure().id)
+      || '';
     const sceneId = (scene.id) || `scene_${(adventureState && adventureState.sceneIdx) || 0}`;
-    const seed = `${(run && run.id) || advId || ''}|${sceneId}|${kind}|${lang}`;
+    const runId = (run && run.id) || advId || '';
+    // Within a single playthrough (same runId), keep the resolved variant
+    // stable so 🔊 re-plays read the EXACT line on screen. Cache lives
+    // on the scene under a per-runId bucket; clearing happens implicitly
+    // when the page reloads or chooseAdventure() mints a new runId.
+    scene._narrationCache = scene._narrationCache || {};
+    const cacheKey = `${runId}|${kind}|${lang}`;
+    if (scene._narrationCache[cacheKey] != null) {
+      const idx = scene._narrationCache[cacheKey];
+      if (Array.isArray(pool) && pool[idx] != null) {
+        scene._lastResolvedVariantIndex = scene._lastResolvedVariantIndex || {};
+        scene._lastResolvedVariantIndex[kind] = idx;
+        return pool[idx];
+      }
+    }
+    const seed = `${runId}|${sceneId}|${kind}|${lang}`;
     const history = (state.narrationHistory && state.narrationHistory[advId]
                      && state.narrationHistory[advId][sceneId]
                      && state.narrationHistory[advId][sceneId][kind]) || [];
     const { index, text } = pickVariantWithMemory(pool, seed, history, 3);
-    // Lightly cache the picked index on the scene so the 🔊 replay reads
-    // exactly the same line, then bump history when the run completes.
     scene._lastResolvedVariantIndex = scene._lastResolvedVariantIndex || {};
     scene._lastResolvedVariantIndex[kind] = index;
+    scene._narrationCache[cacheKey] = index;
     rememberNarrationVariant(advId, sceneId, kind, index);
     return text;
   }
@@ -13030,6 +13046,55 @@ function createMemoryAdapter() {
   let st;
   let onFinishCb;
   let lockTimer;
+  // R3-S2 fix: wire window.__mg* handlers BEFORE the return so they
+  // actually run on factory invocation. Earlier they were placed after
+  // `return { ... }` and never executed — fresh `MINIGAME_TYPES.memory()`
+  // calls would leave the global handlers undefined and the rendered
+  // onclick attributes would throw on tap.
+  window.__mgMemTap = (idx) => {
+    if (!st || st.done || st.locked) return;
+    const card = st.cards[idx];
+    if (!card || card.flipped || card.matched) return;
+    card.flipped = true;
+    st.flippedIdxs.push(idx);
+    playChime();
+    if (st.flippedIdxs.length === 2) {
+      const [i1, i2] = st.flippedIdxs;
+      const c1 = st.cards[i1], c2 = st.cards[i2];
+      if (c1.pair === c2.pair) {
+        c1.matched = true; c2.matched = true;
+        st.matchedPairs++;
+        st.flippedIdxs = [];
+        playCoin();
+        render();
+        if (st.matchedPairs >= st.totalPairs) {
+          st.done = true;
+          playFanfare();
+          const score = Math.max(0, Math.min(1, 1 - st.misses / Math.max(1, st.missesAllowed)));
+          setTimeout(() => onFinishCb && onFinishCb({ success: true, score, errors: st.misses }), 600);
+        }
+      } else {
+        st.misses++;
+        st.locked = true;
+        render();
+        lockTimer = setTimeout(() => {
+          if (!st) return;
+          c1.flipped = false; c2.flipped = false;
+          st.flippedIdxs = [];
+          st.locked = false;
+          if (st.misses >= st.missesAllowed) {
+            st.done = true;
+            const score = Math.max(0, Math.min(1, st.matchedPairs / st.totalPairs));
+            setTimeout(() => onFinishCb && onFinishCb({ success: false, score, errors: st.misses }), 200);
+          } else {
+            render();
+          }
+        }, 900);
+      }
+    } else {
+      render();
+    }
+  };
   return {
     mount(container, config, onFinish, opts) {
       onFinishCb = onFinish;
@@ -13084,50 +13149,6 @@ function createMemoryAdapter() {
       </div>
       <div class="memory-grid" style="grid-template-columns: repeat(${cols}, 1fr);">${cardsHtml}</div>`;
   }
-  window.__mgMemTap = (idx) => {
-    if (!st || st.done || st.locked) return;
-    const card = st.cards[idx];
-    if (!card || card.flipped || card.matched) return;
-    card.flipped = true;
-    st.flippedIdxs.push(idx);
-    playChime();
-    if (st.flippedIdxs.length === 2) {
-      const [i1, i2] = st.flippedIdxs;
-      const c1 = st.cards[i1], c2 = st.cards[i2];
-      if (c1.pair === c2.pair) {
-        c1.matched = true; c2.matched = true;
-        st.matchedPairs++;
-        st.flippedIdxs = [];
-        playCoin();
-        render();
-        if (st.matchedPairs >= st.totalPairs) {
-          st.done = true;
-          playFanfare();
-          const score = Math.max(0, Math.min(1, 1 - st.misses / Math.max(1, st.missesAllowed)));
-          setTimeout(() => onFinishCb && onFinishCb({ success: true, score, errors: st.misses }), 600);
-        }
-      } else {
-        st.misses++;
-        st.locked = true;
-        render();
-        lockTimer = setTimeout(() => {
-          if (!st) return;
-          c1.flipped = false; c2.flipped = false;
-          st.flippedIdxs = [];
-          st.locked = false;
-          if (st.misses >= st.missesAllowed) {
-            st.done = true;
-            const score = Math.max(0, Math.min(1, st.matchedPairs / st.totalPairs));
-            setTimeout(() => onFinishCb && onFinishCb({ success: false, score, errors: st.misses }), 200);
-          } else {
-            render();
-          }
-        }, 900);
-      }
-    } else {
-      render();
-    }
-  };
 }
 
 // ---- Sortier-Spiel (sort items into buckets) ----
@@ -13137,6 +13158,36 @@ function createMemoryAdapter() {
 function createSortGame() {
   let st;
   let onFinishCb;
+  // Wire global tap handlers BEFORE the return so they actually run.
+  window.__sortPickItem = (i) => {
+    if (!st) return;
+    st.picked = (st.picked === i) ? null : i;
+    render();
+  };
+  window.__sortDropItem = (bucketId) => {
+    if (!st || st.picked == null) return;
+    const it = st.items[st.picked];
+    if (!it) return;
+    if (it.correctBucket === bucketId) {
+      it.placed = bucketId;
+      st.picked = null;
+      playChime();
+      render();
+      const remaining = st.items.filter(x => !x.placed).length;
+      if (remaining === 0) {
+        const correctOnFirstTry = st.items.filter(x => x.firstTry).length;
+        const score = Math.max(0, Math.min(1, correctOnFirstTry / st.items.length));
+        const success = score >= st.threshold;
+        playFanfare();
+        setTimeout(() => onFinishCb && onFinishCb({ success, score, errors: st.errors }), 600);
+      }
+    } else {
+      it.firstTry = false;
+      st.errors++;
+      st.picked = null;
+      render();
+    }
+  };
   return {
     mount(container, config, onFinish, opts) {
       onFinishCb = onFinish;
@@ -13195,38 +13246,6 @@ function createSortGame() {
         <div class="sort-buckets">${bucketsHtml}</div>
       </div>`;
   }
-  // Expose tap handlers — the global is namespaced enough to survive
-  // multiple instances (each mount overwrites the closure).
-  window.__sortPickItem = (i) => {
-    if (!st) return;
-    st.picked = (st.picked === i) ? null : i;
-    render();
-  };
-  window.__sortDropItem = (bucketId) => {
-    if (!st || st.picked == null) return;
-    const it = st.items[st.picked];
-    if (!it) return;
-    if (it.correctBucket === bucketId) {
-      it.placed = bucketId;
-      st.picked = null;
-      playChime();
-      render();
-      const remaining = st.items.filter(x => !x.placed).length;
-      if (remaining === 0) {
-        const correctOnFirstTry = st.items.filter(x => x.firstTry).length;
-        const score = Math.max(0, Math.min(1, correctOnFirstTry / st.items.length));
-        const success = score >= st.threshold;
-        playFanfare();
-        setTimeout(() => onFinishCb && onFinishCb({ success, score, errors: st.errors }), 600);
-      }
-    } else {
-      it.firstTry = false;
-      st.errors++;
-      st.picked = null;
-      // Visual nudge: shake the bucket via inline style.
-      render();
-    }
-  };
 }
 
 // ---- Zähl-Spiel (subitizing) ----
@@ -13235,13 +13254,38 @@ function createSortGame() {
 function createCountGame() {
   let st;
   let onFinishCb;
+  window.__countGuess = (n) => {
+    if (!st || st.phase !== 'guess') return;
+    const correct = (n === st.currentCount);
+    if (correct) st.wins++; else st.errors++;
+    st.lastCorrect = correct;
+    st.phase = 'reveal';
+    render();
+    setTimeout(() => {
+      if (!st) return;
+      st.roundIdx++;
+      if (st.roundIdx >= st.rounds) {
+        const score = Math.max(0, Math.min(1, st.wins / st.rounds));
+        const success = st.wins >= Math.ceil(st.rounds * 2 / 3);
+        playFanfare();
+        onFinishCb && onFinishCb({ success, score, errors: st.errors });
+      } else {
+        startRound();
+      }
+    }, 1100);
+  };
   return {
     mount(container, config, onFinish, opts) {
       onFinishCb = onFinish;
       const diff = (opts && opts.difficulty) || 'knappe';
-      const min = diff === 'sproessling' ? 2 : 2;
-      const max = diff === 'sproessling' ? 4 : diff === 'ritter' ? 8 : 6;
-      const flashMs = diff === 'sproessling' ? 3000 : diff === 'ritter' ? 1500 : 2000;
+      // Difficulty knobs are the default; explicit config overrides win.
+      const cfg = config || {};
+      const minD = diff === 'sproessling' ? 2 : 2;
+      const maxD = diff === 'sproessling' ? 4 : diff === 'ritter' ? 8 : 6;
+      const flashD = diff === 'sproessling' ? 3000 : diff === 'ritter' ? 1500 : 2000;
+      const min = (typeof cfg.min === 'number') ? cfg.min : minD;
+      const max = (typeof cfg.max === 'number') ? cfg.max : maxD;
+      const flashMs = (typeof cfg.flashDurationMs === 'number') ? cfg.flashDurationMs : flashD;
       st = {
         rounds: (config && config.rounds) || 3,
         roundIdx: 0,
@@ -13296,26 +13340,6 @@ function createCountGame() {
         ${revealHtml}
       </div>`;
   }
-  window.__countGuess = (n) => {
-    if (!st || st.phase !== 'guess') return;
-    const correct = (n === st.currentCount);
-    if (correct) st.wins++; else st.errors++;
-    st.lastCorrect = correct;
-    st.phase = 'reveal';
-    render();
-    setTimeout(() => {
-      if (!st) return;
-      st.roundIdx++;
-      if (st.roundIdx >= st.rounds) {
-        const score = Math.max(0, Math.min(1, st.wins / st.rounds));
-        const success = st.wins >= Math.ceil(st.rounds * 2 / 3);
-        playFanfare();
-        onFinishCb && onFinishCb({ success, score, errors: st.errors });
-      } else {
-        startRound();
-      }
-    }, 1100);
-  };
 }
 
 // ---- Pfad-Spiel (maze) ----
@@ -13325,6 +13349,37 @@ function createCountGame() {
 function createMazeGame() {
   let st;
   let onFinishCb;
+  window.__mgMazeStep = (x, y) => {
+    if (!st || st.done) return;
+    const dx = Math.abs(st.pos.x - x), dy = Math.abs(st.pos.y - y);
+    if (dx + dy !== 1) return;
+    if (st.obstacleSet.has(`${x},${y}`)) {
+      st.errors++;
+      st.moves++;
+      render();
+      const cell = document.querySelectorAll('.maze-cell')[y * st.w + x];
+      if (cell) {
+        cell.classList.add('maze-bump');
+        setTimeout(() => cell && cell.classList.remove('maze-bump'), 300);
+      }
+      if (st.moves >= st.moveLimit) finishMaze(false);
+      return;
+    }
+    st.pos = { x, y };
+    st.moves++;
+    playChime();
+    render();
+    if (x === st.goal.x && y === st.goal.y) finishMaze(true);
+    else if (st.moves >= st.moveLimit) finishMaze(false);
+  };
+  function finishMaze(win) {
+    st.done = true; st.win = win;
+    const score = win
+      ? Math.max(0.3, Math.min(1, (st.moveLimit - st.errors * 2) / st.moveLimit))
+      : Math.max(0, 0.3 - st.errors * 0.05);
+    if (win) playFanfare(); else playChime();
+    setTimeout(() => onFinishCb && onFinishCb({ success: win, score, errors: st.errors }), 600);
+  }
   return {
     mount(container, config, onFinish, opts) {
       onFinishCb = onFinish;
@@ -13377,38 +13432,6 @@ function createMazeGame() {
         <div class="maze-grid" style="grid-template-columns: repeat(${st.w}, 1fr);">${cells.join('')}</div>
       </div>`;
   }
-  window.__mgMazeStep = (x, y) => {
-    if (!st || st.done) return;
-    const dx = Math.abs(st.pos.x - x), dy = Math.abs(st.pos.y - y);
-    if (dx + dy !== 1) return;
-    if (st.obstacleSet.has(`${x},${y}`)) {
-      st.errors++;
-      st.moves++;
-      // Visual nudge — bump animation, no position change.
-      render();
-      const cell = document.querySelectorAll('.maze-cell')[y * st.w + x];
-      if (cell) {
-        cell.classList.add('maze-bump');
-        setTimeout(() => cell && cell.classList.remove('maze-bump'), 300);
-      }
-      if (st.moves >= st.moveLimit) finishMaze(false);
-      return;
-    }
-    st.pos = { x, y };
-    st.moves++;
-    playChime();
-    render();
-    if (x === st.goal.x && y === st.goal.y) finishMaze(true);
-    else if (st.moves >= st.moveLimit) finishMaze(false);
-  };
-  function finishMaze(win) {
-    st.done = true; st.win = win;
-    const score = win
-      ? Math.max(0.3, Math.min(1, (st.moveLimit - st.errors * 2) / st.moveLimit))
-      : Math.max(0, 0.3 - st.errors * 0.05);
-    if (win) playFanfare(); else playChime();
-    setTimeout(() => onFinishCb && onFinishCb({ success: win, score, errors: st.errors }), 600);
-  }
 }
 
 // ---- Rhythmus-Spiel (rhythm) ----
@@ -13418,6 +13441,35 @@ function createRhythmGame() {
   let st;
   let onFinishCb;
   let actx;
+  window.__mgRhythmStart = () => { if (st) startRound(); };
+  window.__mgRhythmTap = (idx) => {
+    if (!st || st.phase !== 'play') return;
+    playDrum(idx);
+    flashPad(idx);
+    st.playerSeq.push(idx);
+    const expected = st.pattern[st.playerSeq.length - 1];
+    if (idx !== expected) {
+      st.errors++;
+      st.playerSeq.length = st.pattern.length;
+    }
+    if (st.playerSeq.length >= st.pattern.length) {
+      const correct = st.pattern.every((v, i) => st.playerSeq[i] === v);
+      if (correct) st.wins++;
+      st.roundIdx++;
+      if (st.roundIdx >= st.rounds) {
+        st.phase = 'done';
+        const score = Math.max(0, Math.min(1, st.wins / st.rounds));
+        const success = st.wins >= st.rounds;
+        render();
+        if (success) playFanfare(); else playChime();
+        setTimeout(() => onFinishCb && onFinishCb({ success, score, errors: st.errors }), 900);
+      } else {
+        st.phase = 'between';
+        render();
+        setTimeout(() => { if (st) startRound(); }, 900);
+      }
+    }
+  };
   return {
     mount(container, config, onFinish, opts) {
       onFinishCb = onFinish;
@@ -13532,36 +13584,6 @@ function createRhythmGame() {
         <div class="rhythm-actions">${startBtn}</div>
       </div>`;
   }
-  window.__mgRhythmStart = () => { if (st) startRound(); };
-  window.__mgRhythmTap = (idx) => {
-    if (!st || st.phase !== 'play') return;
-    playDrum(idx);
-    flashPad(idx);
-    st.playerSeq.push(idx);
-    const expected = st.pattern[st.playerSeq.length - 1];
-    if (idx !== expected) {
-      st.errors++;
-      // Wrong note — mark round failed but let kid finish for closure.
-      st.playerSeq.length = st.pattern.length; // skip ahead to round-end check
-    }
-    if (st.playerSeq.length >= st.pattern.length) {
-      const correct = st.pattern.every((v, i) => st.playerSeq[i] === v);
-      if (correct) st.wins++;
-      st.roundIdx++;
-      if (st.roundIdx >= st.rounds) {
-        st.phase = 'done';
-        const score = Math.max(0, Math.min(1, st.wins / st.rounds));
-        const success = st.wins >= st.rounds; // both rounds correct
-        render();
-        if (success) playFanfare(); else playChime();
-        setTimeout(() => onFinishCb && onFinishCb({ success, score, errors: st.errors }), 900);
-      } else {
-        st.phase = 'between';
-        render();
-        setTimeout(() => { if (st) startRound(); }, 900);
-      }
-    }
-  };
 }
 
 // ---- Suche-Spiel (find the difference) ----
@@ -13576,6 +13598,42 @@ function createRhythmGame() {
 function createSpotGame() {
   let st;
   let onFinishCb;
+  window.__mgSpotTap = (ev, el) => {
+    if (!st || st.done) return;
+    const rect = el.getBoundingClientRect();
+    const fx = (ev.clientX - rect.left) / rect.width;
+    const fy = (ev.clientY - rect.top) / rect.height;
+    let hit = null;
+    for (const d of st.diffs) {
+      if (d.found) continue;
+      const r = d.rightAreaPct;
+      if (fx >= r[0] && fx <= r[0] + r[2] && fy >= r[1] && fy <= r[1] + r[3]) { hit = d; break; }
+    }
+    if (hit) {
+      hit.found = true;
+      playCoin();
+      armHint();
+      render();
+      const remaining = st.diffs.filter(d => !d.found).length;
+      if (remaining === 0) {
+        st.done = true;
+        playFanfare();
+        const elapsed = Date.now() - st.startedAt;
+        const score = Math.max(0.3, Math.min(1, 1 - st.wrongs * 0.1 - Math.max(0, elapsed - 20000) / 60000));
+        setTimeout(() => onFinishCb && onFinishCb({ success: true, score, errors: st.wrongs }), 700);
+      }
+    } else {
+      st.wrongs++;
+      const marker = document.createElement('div');
+      marker.className = 'spot-wrong-marker';
+      marker.style.left = (fx * 100) + '%';
+      marker.style.top = (fy * 100) + '%';
+      marker.textContent = '✕';
+      el.appendChild(marker);
+      setTimeout(() => { try { marker.remove(); } catch (e) {} }, 700);
+      render();
+    }
+  };
   return {
     mount(container, config, onFinish, opts) {
       onFinishCb = onFinish;
@@ -13677,45 +13735,6 @@ function createSpotGame() {
         <div class="spot-hint-line">${escapeHtml(t('spot_hint_line'))}</div>
       </div>`;
   }
-  window.__mgSpotTap = (ev, el) => {
-    if (!st || st.done) return;
-    const rect = el.getBoundingClientRect();
-    const fx = (ev.clientX - rect.left) / rect.width;
-    const fy = (ev.clientY - rect.top) / rect.height;
-    let hit = null;
-    for (const d of st.diffs) {
-      if (d.found) continue;
-      const r = d.rightAreaPct;
-      if (fx >= r[0] && fx <= r[0] + r[2] && fy >= r[1] && fy <= r[1] + r[3]) { hit = d; break; }
-    }
-    if (hit) {
-      hit.found = true;
-      playCoin();
-      armHint();
-      render();
-      const remaining = st.diffs.filter(d => !d.found).length;
-      if (remaining === 0) {
-        st.done = true;
-        playFanfare();
-        const elapsed = Date.now() - st.startedAt;
-        const score = Math.max(0.3, Math.min(1, 1 - st.wrongs * 0.1 - Math.max(0, elapsed - 20000) / 60000));
-        setTimeout(() => onFinishCb && onFinishCb({ success: true, score, errors: st.wrongs }), 700);
-      }
-    } else {
-      st.wrongs++;
-      // No penalty — just a tiny shake at the tap site to acknowledge.
-      const marker = document.createElement('div');
-      marker.className = 'spot-wrong-marker';
-      marker.style.left = (fx * 100) + '%';
-      marker.style.top = (fy * 100) + '%';
-      marker.textContent = '✕';
-      el.appendChild(marker);
-      setTimeout(() => { try { marker.remove(); } catch (e) {} }, 700);
-      render(); // refresh status counter
-      // status overwrote the panel; re-attach the wrong-marker is gone now,
-      // which is fine — the kid only sees it for the brief flash.
-    }
-  };
 }
 
 function renderAdventureResult() {
@@ -14906,6 +14925,15 @@ if (typeof window !== 'undefined') {
   window.RARITY_BONUS = RARITY_BONUS;
   window.XP_PER_LEVEL = XP_PER_LEVEL;
   window.STAT_MAX_DISPLAY = STAT_MAX_DISPLAY;
+  // R3 — explicit window exports so tests can reach top-level `const`
+  // bindings (which `<script>` puts in the lexical env, not on window).
+  window.COSMETIC_POOL = COSMETIC_POOL;
+  window.LEGENDARY_CLASSES = LEGENDARY_CLASSES;
+  window.LEGENDARY_STARTER_COSMETICS = LEGENDARY_STARTER_COSMETICS;
+  window.LEGENDARY_SUGGESTED_NAMES = LEGENDARY_SUGGESTED_NAMES;
+  window.LEGENDARY_MAX = LEGENDARY_MAX;
+  window.MINIGAME_TYPES = MINIGAME_TYPES;
+  window.FAMILY_DAY_CUTOFF_HOUR = FAMILY_DAY_CUTOFF_HOUR;
   Object.defineProperty(window, 'pinVerified', {
     get: () => pinVerified,
     set: v => { pinVerified = v; },
