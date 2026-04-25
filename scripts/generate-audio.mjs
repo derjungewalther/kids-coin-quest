@@ -16,11 +16,24 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const AUDIO_DIR = resolve(__dirname, '..', 'audio');
 const TEXTS_FILE = resolve(AUDIO_DIR, 'texts.json');
 const MANIFEST_FILE = resolve(AUDIO_DIR, 'manifest.json');
+const ENV_FILE = resolve(__dirname, '..', '.env');
+
+// Tiny .env loader so the user doesn't need to export the key every time.
+// Only supports KEY=VALUE lines. Anything quoted, multiline, or expanded is
+// out of scope — keep this simple and unsurprising.
+if (!process.env.OPENAI_API_KEY && existsSync(ENV_FILE)) {
+  for (const line of readFileSync(ENV_FILE, 'utf8').split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2];
+  }
+}
 
 const API_KEY = process.env.OPENAI_API_KEY;
 if (!API_KEY) {
-  console.error('Missing OPENAI_API_KEY env var. Get one from https://platform.openai.com/api-keys');
-  console.error('Then: export OPENAI_API_KEY=sk-... && npm run generate-audio');
+  console.error('Missing OPENAI_API_KEY.');
+  console.error('Either: echo "OPENAI_API_KEY=sk-..." > .env');
+  console.error('Or:     export OPENAI_API_KEY=sk-...   then npm run generate-audio');
+  console.error('Get a key from https://platform.openai.com/api-keys');
   process.exit(1);
 }
 

@@ -74,7 +74,14 @@ test.describe('Quest completion', () => {
   });
 
   test('level-up toast fires when crossing an XP threshold', async ({ page }) => {
-    const kidId = await seedHero(page, { userName: 'aboutto', xp: { brave: 0, clever: 4.5, kind: 0 } });
+    // Pre-seed totalEarned and first_quest achievement so the level-up toast
+    // isn't immediately overwritten by an Achievement-unlocked toast.
+    const kidId = await seedHero(page, { userName: 'aboutto', xp: { brave: 0, clever: 4.5, kind: 0 }, totalEarned: 5 });
+    await page.evaluate((id) => {
+      const k = window.kidById(id);
+      k.achievements = ['first_quest'];
+      window.save();
+    }, kidId);
     const selector = `#quest-select-${kidId}`;
     // the "Study scrolls" quest (amount 2) — adds 2 clever → crosses level threshold
     await page.locator(selector).selectOption({ index: 1 });

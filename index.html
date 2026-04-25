@@ -969,6 +969,120 @@
     .pwa-install-chip { left: 10px; bottom: 10px; font-size: 12px; padding: 8px 14px; }
   }
 
+  /* ======================= GOAL JAR + STREAK (hero card) ======================= */
+  .streak-badge {
+    display: inline-block;
+    background: linear-gradient(180deg, #ff8a00, #c93b00);
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid #7a2400;
+    box-shadow: 0 0 8px rgba(255,138,0,0.45);
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .goal-strip {
+    margin: 8px 0 4px;
+    padding: 8px 10px;
+    background: rgba(62,40,23,0.35);
+    border: 1px dashed rgba(244,211,94,0.35);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .goal-strip:hover {
+    background: rgba(244,211,94,0.08);
+    border-color: var(--gold-dark);
+  }
+  .goal-strip.reached {
+    background: linear-gradient(180deg, rgba(125,211,164,0.18), rgba(45,106,79,0.25));
+    border: 1px solid var(--emerald);
+    border-style: solid;
+  }
+  .goal-strip-empty {
+    text-align: center;
+    color: var(--parchment-darker);
+    font-style: italic;
+    font-family: 'MedievalSharp', cursive;
+    font-size: 13px;
+    border-style: dashed;
+  }
+  .goal-strip-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+    font-size: 13px;
+  }
+  .goal-strip-emoji { font-size: 16px; }
+  .goal-strip-name {
+    flex: 1; min-width: 0;
+    font-family: 'MedievalSharp', cursive;
+    color: var(--gold-bright);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .goal-strip-amount {
+    color: var(--parchment);
+    font-family: 'Lora', serif;
+    font-size: 12px;
+    opacity: 0.85;
+    flex-shrink: 0;
+  }
+  .goal-bar {
+    height: 6px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .goal-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+    transition: width 0.4s ease-out;
+  }
+  .goal-strip.reached .goal-bar-fill {
+    background: linear-gradient(90deg, #7dd3a4, #b6f5cf);
+  }
+
+  .achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .achievement-tile {
+    text-align: center;
+    padding: 10px 8px;
+    border: 2px solid var(--wood);
+    border-radius: 8px;
+    background: rgba(62,40,23,0.3);
+    transition: transform 0.15s;
+  }
+  .achievement-tile.unlocked {
+    border-color: var(--gold-dark);
+    background: linear-gradient(180deg, rgba(244,211,94,0.15), rgba(139,105,20,0.18));
+  }
+  .achievement-tile.locked { opacity: 0.4; filter: grayscale(0.7); }
+  .achievement-tile-icon { font-size: 24px; }
+  .achievement-tile-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    color: var(--gold-bright);
+    margin-top: 4px;
+    letter-spacing: 0.4px;
+  }
+  .achievement-tile-desc {
+    font-family: 'Lora', serif;
+    font-size: 10px;
+    color: var(--parchment);
+    opacity: 0.7;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+
   /* ======================= AUTH (sign-in modal) ======================= */
   .auth-google-btn {
     width: 100%;
@@ -2933,6 +3047,30 @@
   </div>
 </div>
 
+<!-- Goal Jar Modal — set or edit a kid's savings goal -->
+<div class="modal-backdrop" id="goalModal">
+  <div class="modal">
+    <h3>🎯 <span data-i18n="goal_modal_title">Savings Goal</span></h3>
+    <p style="color: var(--ink-muted); font-style: italic; margin-bottom: 10px;" data-i18n="goal_modal_desc">
+      What is this hero saving up for?
+    </p>
+    <input type="hidden" id="goalKidId" />
+    <label data-i18n="goal_emoji_label">Pick an emoji</label>
+    <div id="goalEmojiPicker" class="emoji-grid" style="margin-top:6px;"></div>
+    <label style="margin-top:10px; display:block;" data-i18n="goal_name_label">What it is</label>
+    <input type="text" id="goalName" maxlength="40" placeholder="Bicycle / Lego set / …" />
+    <label style="margin-top:10px; display:block;" data-i18n="goal_target_label">How many coins</label>
+    <input type="text" inputmode="decimal" id="goalTarget" placeholder="80" />
+    <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:12px; flex-wrap:wrap;">
+      <button class="btn btn-danger btn-sm" id="goalClearBtn" onclick="clearGoalFromModal()" style="display:none;" data-i18n="goal_clear_btn">Remove goal</button>
+      <div style="display:flex; gap:8px; margin-left:auto;">
+        <button class="btn btn-ghost" onclick="closeModal('goalModal')" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="saveGoalFromModal()" data-i18n="save_goal_btn">Save goal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Delete-account Modal (requires typing DELETE to enable the button) -->
 <div class="modal-backdrop" id="deleteAccountModal">
   <div class="modal">
@@ -3110,6 +3248,23 @@ const TRANSLATIONS = {
     reset_password_title: 'Set a new password',
     reset_password_desc: 'Enter a new password for your account.',
     set_password_btn: 'Set password',
+    set_goal: 'Set a savings goal',
+    edit_goal: 'Edit savings goal',
+    goal_modal_title: 'Savings Goal',
+    goal_modal_desc: 'What is this hero saving up for?',
+    goal_emoji_label: 'Pick an emoji',
+    goal_name_label: 'What it is',
+    goal_target_label: 'How many coins',
+    goal_clear_btn: 'Remove goal',
+    save_goal_btn: 'Save goal',
+    goal_needs_name: 'Give the goal a name first.',
+    goal_needs_target: 'Enter a coin amount greater than zero.',
+    goal_saved: 'Goal saved — quest on!',
+    goal_reached_short: 'goal reached!',
+    streak_tooltip: '{n}-day quest streak',
+    achievement_unlocked: 'Achievement',
+    achievements_title: 'Achievements',
+    achievements_desc: 'Trophies your hero has earned along the way.',
     delete_account_title: 'Delete my account',
     delete_account_warn: 'This permanently erases your heroes, transactions, and account. This cannot be undone.',
     delete_account_confirm_label: 'Type DELETE to confirm',
@@ -3385,6 +3540,23 @@ const TRANSLATIONS = {
     reset_password_title: 'Neues Passwort setzen',
     reset_password_desc: 'Gib ein neues Passwort für dein Konto ein.',
     set_password_btn: 'Passwort setzen',
+    set_goal: 'Sparziel setzen',
+    edit_goal: 'Sparziel bearbeiten',
+    goal_modal_title: 'Sparziel',
+    goal_modal_desc: 'Worauf spart dieser Held?',
+    goal_emoji_label: 'Emoji wählen',
+    goal_name_label: 'Was es ist',
+    goal_target_label: 'Wie viele Münzen',
+    goal_clear_btn: 'Ziel entfernen',
+    save_goal_btn: 'Ziel speichern',
+    goal_needs_name: 'Bitte erst einen Namen vergeben.',
+    goal_needs_target: 'Bitte einen Münzbetrag größer als null eingeben.',
+    goal_saved: 'Ziel gespeichert — auf zur Quest!',
+    goal_reached_short: 'Ziel erreicht!',
+    streak_tooltip: '{n}-Tage-Streak',
+    achievement_unlocked: 'Erfolg',
+    achievements_title: 'Erfolge',
+    achievements_desc: 'Trophäen, die dein Held gesammelt hat.',
     delete_account_title: 'Mein Konto löschen',
     delete_account_warn: 'Das löscht deine Helden, Transaktionen und dein Konto endgültig. Nicht rückgängig zu machen.',
     delete_account_confirm_label: 'Tippe DELETE zum Bestätigen',
@@ -4601,6 +4773,7 @@ function sceneArtVariant(adv, sceneIdx) {
   if (adv.id === 'crypt')  return 'throne';
   if (adv.id === 'dragon') return 'hoard';
   if (adv.id === 'tower')  return 'boss';
+  if (adv.id === 'bakery') return 'heart-pendant';
   return null;
 }
 
@@ -4611,7 +4784,80 @@ function renderSceneBackground(adv, sceneIdx) {
   if (adv.id === 'crypt')  return renderCryptBg(v);
   if (adv.id === 'dragon') return renderDragonBg(v);
   if (adv.id === 'tower')  return renderTowerBg(v);
+  if (adv.id === 'bakery') return renderBakeryBg(v);
   return '';
+}
+
+// Warm cobblestone-village bakery interior — cream walls, wooden counter,
+// honey-amber light from a window. The 'heart-pendant' variant adds the
+// glowing honeycomb on a velvet cushion for the climactic final scene.
+function renderBakeryBg(variant) {
+  const heart = variant === 'heart-pendant' ? `
+    <g transform="translate(300,135)">
+      <ellipse cx="0" cy="42" rx="42" ry="6" fill="#5a1f1f" opacity="0.6"/>
+      <rect x="-32" y="20" width="64" height="20" rx="4" fill="#7a2424" stroke="#3d2817" stroke-width="1.5"/>
+      <g transform="translate(0,-2)">
+        <polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11"
+                 fill="#f4d35e" stroke="#8b6914" stroke-width="2.5"/>
+        <polygon points="0,-12 10,-6 10,6 0,12 -10,6 -10,-6" fill="#fff5c4" opacity="0.55"/>
+        <circle cx="0" cy="0" r="3" fill="#8b6914"/>
+        <circle cx="-7" cy="-4" r="1.5" fill="#8b6914"/>
+        <circle cx="7" cy="-4" r="1.5" fill="#8b6914"/>
+        <circle cx="-7" cy="4"  r="1.5" fill="#8b6914"/>
+        <circle cx="7"  cy="4"  r="1.5" fill="#8b6914"/>
+      </g>
+      <circle cx="0" cy="0" r="50" fill="url(#bakery-glow)" opacity="0.45"/>
+    </g>` : '';
+  return `
+    <defs>
+      <linearGradient id="bakery-wall" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#f5e2b8"/>
+        <stop offset="1" stop-color="#d8ad6b"/>
+      </linearGradient>
+      <linearGradient id="bakery-counter" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#a06a3c"/>
+        <stop offset="1" stop-color="#5a3a20"/>
+      </linearGradient>
+      <radialGradient id="bakery-window" cx="50%" cy="40%" r="55%">
+        <stop offset="0" stop-color="#fff5c4"/>
+        <stop offset="1" stop-color="#f4c862"/>
+      </radialGradient>
+      <radialGradient id="bakery-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0" stop-color="#fff5c4" stop-opacity="0.9"/>
+        <stop offset="1" stop-color="#fff5c4" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="600" height="300" fill="url(#bakery-wall)"/>
+    <!-- window -->
+    <rect x="60" y="40" width="140" height="100" rx="12" fill="url(#bakery-window)" stroke="#8b6914" stroke-width="3"/>
+    <line x1="130" y1="40" x2="130" y2="140" stroke="#8b6914" stroke-width="2"/>
+    <line x1="60" y1="90" x2="200" y2="90" stroke="#8b6914" stroke-width="2"/>
+    <!-- shelves with bread -->
+    <rect x="400" y="50" width="160" height="8" fill="#7a4a26"/>
+    <ellipse cx="430" cy="46" rx="14" ry="8" fill="#caa15c"/>
+    <ellipse cx="465" cy="46" rx="12" ry="7" fill="#b07b3c"/>
+    <ellipse cx="498" cy="46" rx="14" ry="8" fill="#caa15c"/>
+    <ellipse cx="535" cy="46" rx="11" ry="7" fill="#b07b3c"/>
+    <rect x="400" y="100" width="160" height="8" fill="#7a4a26"/>
+    <ellipse cx="430" cy="96" rx="11" ry="6" fill="#e8b3a0"/>
+    <ellipse cx="465" cy="96" rx="11" ry="6" fill="#e8b3a0"/>
+    <ellipse cx="500" cy="96" rx="11" ry="6" fill="#caa15c"/>
+    <ellipse cx="535" cy="96" rx="11" ry="6" fill="#caa15c"/>
+    <!-- striped awning -->
+    <path d="M0 160 L600 160 L580 180 L20 180 Z" fill="#8b1a1a" opacity="0.55"/>
+    <path d="M40 160 L40 180 M120 160 L120 180 M200 160 L200 180 M280 160 L280 180 M360 160 L360 180 M440 160 L440 180 M520 160 L520 180" stroke="#fff5c4" stroke-width="6" opacity="0.4"/>
+    <!-- counter at the bottom -->
+    <rect x="0" y="220" width="600" height="80" fill="url(#bakery-counter)"/>
+    <line x1="0" y1="220" x2="600" y2="220" stroke="#3d2817" stroke-width="3"/>
+    <!-- floating sparkles -->
+    <g opacity="0.7">
+      <circle cx="240" cy="80" r="2" fill="#fff5c4"/>
+      <circle cx="290" cy="120" r="2" fill="#fff5c4"/>
+      <circle cx="340" cy="70" r="2" fill="#fff5c4"/>
+      <circle cx="380" cy="150" r="2" fill="#fff5c4"/>
+    </g>
+    ${heart}
+  `;
 }
 
 function renderSceneIllustration(adv, sceneIdx) {
@@ -5217,13 +5463,37 @@ function renderKids() {
     const avatarInner = k.portrait
       ? `<img src="${k.portrait}" alt="${escapeHtml(k.name)}" />`
       : renderCharacterSVG(k, true);
+    const streakDays = effectiveStreak(k);
+    const streakHtml = streakDays >= 2
+      ? `<span class="streak-badge" title="${escapeHtml(t('streak_tooltip').replace('{n}', streakDays))}">🔥 ${streakDays}</span>`
+      : '';
+    const goal = k.goal;
+    let goalHtml = '';
+    if (goal) {
+      const pct = Math.min(100, Math.round((k.balance / goal.target) * 100));
+      const reached = !!goal.achievedAt || k.balance >= goal.target;
+      goalHtml = `
+        <div class="goal-strip${reached ? ' reached' : ''}" onclick="event.stopPropagation(); openGoalModal('${k.id}')" title="${escapeHtml(t('edit_goal'))}">
+          <div class="goal-strip-line">
+            <span class="goal-strip-emoji">${goal.emoji}</span>
+            <span class="goal-strip-name">${escapeHtml(goal.name)}</span>
+            <span class="goal-strip-amount">${fmt(k.balance)} / ${fmt(goal.target)}</span>
+          </div>
+          <div class="goal-bar"><div class="goal-bar-fill" style="width:${pct}%"></div></div>
+        </div>`;
+    } else {
+      goalHtml = `
+        <div class="goal-strip goal-strip-empty" onclick="event.stopPropagation(); openGoalModal('${k.id}')">
+          🎯 ${t('set_goal')}
+        </div>`;
+    }
     return `
-    <div class="kid-card">
+    <div class="kid-card" data-kid="${k.id}">
       <div class="kid-head">
         <div class="kid-head-click" onclick="openHeroSheet('${k.id}')" title="View character sheet">
           <div class="avatar">${avatarInner}</div>
           <div style="flex:1; min-width:0;">
-            <h3 class="kid-name">${escapeHtml(k.name)} <span class="level-badge">Lv ${heroLevel(k)}</span></h3>
+            <h3 class="kid-name">${escapeHtml(k.name)} <span class="level-badge">Lv ${heroLevel(k)}</span> ${streakHtml}</h3>
             <div class="kid-user">@${escapeHtml(k.userName || 'hero')}</div>
             <div class="kid-class">${cls.icon} ${className(cls)} · ${rankName(k)}</div>
           </div>
@@ -5233,6 +5503,7 @@ function renderKids() {
       <div class="stats-grid">${statsHtml}</div>
       <div class="kid-balance"><span class="cur">${state.settings.currency}</span>${(Math.round(k.balance*100)/100).toFixed(2)}</div>
       <div class="kid-balance-label">${t('purse_label')}</div>
+      ${goalHtml}
       <div class="pay-earned">
         <div>${t('earned')}<strong>${fmt(k.totalEarned || 0)}</strong></div>
         <div>${t('spent')}<strong>${fmt(k.totalPaidOut || 0)}</strong></div>
@@ -5293,6 +5564,8 @@ function earn(kidId, actId) {
   if (!k || !a) return;
   k.balance += a.amount;
   k.totalEarned = (k.totalEarned || 0) + a.amount;
+  bumpStreak(k);
+  checkGoalReached(k);
 
   // XP toward the activity's stat type
   const st = a.statType || 'brave';
@@ -5323,6 +5596,177 @@ function earn(kidId, actId) {
     toast(`⭐ ${k.name}'s ${STAT_META[st].label} leveled up! Now +${newLevel}`, 'success');
   } else {
     toast(`${k.name} earned ${fmt(a.amount)} + ${a.amount} ${STAT_META[st].label} XP`, 'success');
+  }
+  // Achievement checks fire after every earn — they're cheap and idempotent.
+  checkAchievements(k, 'earn');
+}
+
+// =====================================================================
+// GOAL JAR — kids set a savings goal with a name, emoji, target amount;
+// each quest fills the bar. When balance >= target we celebrate once.
+// =====================================================================
+function setKidGoal(kidId, goal) {
+  const k = kidById(kidId);
+  if (!k) return;
+  k.goal = goal && goal.target > 0
+    ? { emoji: goal.emoji || '🎯', name: String(goal.name || '').slice(0, 40), target: Math.round(goal.target * 100) / 100, startedAt: new Date().toISOString(), achievedAt: null }
+    : null;
+  save();
+  renderKids();
+}
+function checkGoalReached(k) {
+  if (!k || !k.goal || k.goal.achievedAt) return;
+  if (k.balance < k.goal.target) return;
+  k.goal.achievedAt = new Date().toISOString();
+  // Celebrate next tick — let the balance animation land first.
+  setTimeout(() => {
+    playFanfare();
+    toast(`🎉 ${k.name}: ${k.goal.emoji} ${k.goal.name} ${t('goal_reached_short')}`, 'success');
+    requestAnimationFrame(() => {
+      const card = document.querySelector(`.kid-card[data-kid="${k.id}"]`);
+      if (card) {
+        sparkleAt(card, 16, ['🎉','🌟','✨','🪙']);
+        levelUpBurst(card, `🎉 ${k.goal.emoji} ${k.goal.name}!`);
+      }
+    });
+    checkAchievements(k, 'goal_reached');
+  }, 350);
+}
+function openGoalModal(kidId) {
+  const k = kidById(kidId);
+  if (!k) return;
+  document.getElementById('goalKidId').value = kidId;
+  document.getElementById('goalName').value = (k.goal && k.goal.name) || '';
+  document.getElementById('goalTarget').value = (k.goal && k.goal.target) || '';
+  selectedGoalEmoji = (k.goal && k.goal.emoji) || GOAL_EMOJIS[0];
+  renderGoalEmojiPicker();
+  const clearBtn = document.getElementById('goalClearBtn');
+  if (clearBtn) clearBtn.style.display = k.goal ? '' : 'none';
+  openModal('goalModal');
+  setTimeout(() => document.getElementById('goalName').focus(), 50);
+}
+const GOAL_EMOJIS = ['🚲','🎮','🪀','🧸','📚','🍦','🎨','⚽','🪁','🎁','🎸','🦄','🚀','🪙','👟','🎂'];
+let selectedGoalEmoji = GOAL_EMOJIS[0];
+function renderGoalEmojiPicker() {
+  const el = document.getElementById('goalEmojiPicker');
+  if (!el) return;
+  el.innerHTML = GOAL_EMOJIS.map(e =>
+    `<button class="emoji-btn${e === selectedGoalEmoji ? ' selected' : ''}" type="button" onclick="selectedGoalEmoji='${e}'; renderGoalEmojiPicker();">${e}</button>`
+  ).join('');
+}
+function saveGoalFromModal() {
+  const kidId = document.getElementById('goalKidId').value;
+  const name = document.getElementById('goalName').value.trim();
+  const target = parseNum(document.getElementById('goalTarget').value);
+  if (!name) { toast(t('goal_needs_name'), 'error'); return; }
+  if (!target || target <= 0) { toast(t('goal_needs_target'), 'error'); return; }
+  setKidGoal(kidId, { emoji: selectedGoalEmoji, name, target });
+  closeModal('goalModal');
+  playChime();
+  toast(t('goal_saved'), 'success');
+}
+function clearGoalFromModal() {
+  const kidId = document.getElementById('goalKidId').value;
+  setKidGoal(kidId, null);
+  closeModal('goalModal');
+  playChime();
+}
+
+// =====================================================================
+// STREAK — consecutive days with at least one earn.
+// Stored as { lastDay: 'YYYY-MM-DD', days: number } per kid.
+// =====================================================================
+function todayYmd() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function ymdMinus(ymd, n) {
+  const [y, m, d] = ymd.split('-').map(Number);
+  const dt = new Date(y, m - 1, d - n);
+  return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+}
+function effectiveStreak(k) {
+  if (!k || !k.streak || !k.streak.lastDay) return 0;
+  const today = todayYmd();
+  if (k.streak.lastDay === today) return k.streak.days || 0;
+  if (k.streak.lastDay === ymdMinus(today, 1)) return k.streak.days || 0; // still alive, just not bumped today
+  return 0; // broken
+}
+function bumpStreak(k) {
+  if (!k) return;
+  const today = todayYmd();
+  if (!k.streak) k.streak = { lastDay: null, days: 0, best: 0 };
+  if (k.streak.lastDay === today) return; // already counted today
+  if (k.streak.lastDay === ymdMinus(today, 1)) k.streak.days = (k.streak.days || 0) + 1;
+  else k.streak.days = 1;
+  k.streak.lastDay = today;
+  k.streak.best = Math.max(k.streak.best || 0, k.streak.days);
+  // Achievements driven by streak length
+  checkAchievements(k, 'streak');
+}
+
+// =====================================================================
+// ACHIEVEMENTS — small, hand-curated catalogue. Stored as a string set
+// on each kid: kid.achievements = ['first_quest', 'level_5', ...].
+// =====================================================================
+const ACHIEVEMENTS = [
+  { id: 'first_quest',   icon: '🪙', en: 'First Coin',          de: 'Erste Münze',
+    descEn: 'Complete your first quest',                descDe: 'Erlöse die erste Quest',
+    test: k => (k.totalEarned || 0) > 0 },
+  { id: 'level_5',       icon: '⭐', en: 'Apprentice',          de: 'Lehrling',
+    descEn: 'Reach level 5 with any stat',              descDe: 'Erreiche Stufe 5 in einem Wert',
+    test: k => Object.values(k.xp || {}).some(v => xpLevelBonus(v) >= 5) },
+  { id: 'level_10',      icon: '🌟', en: 'Veteran',              de: 'Veteran',
+    descEn: 'Reach level 10 with any stat',             descDe: 'Erreiche Stufe 10 in einem Wert',
+    test: k => Object.values(k.xp || {}).some(v => xpLevelBonus(v) >= 10) },
+  { id: 'coins_50',      icon: '💰', en: 'Saver',                de: 'Sparfuchs',
+    descEn: 'Earn 50 coins in total',                   descDe: 'Verdiene insgesamt 50 Münzen',
+    test: k => (k.totalEarned || 0) >= 50 },
+  { id: 'coins_200',     icon: '🏦', en: 'Treasurer',            de: 'Schatzmeister',
+    descEn: 'Earn 200 coins in total',                  descDe: 'Verdiene insgesamt 200 Münzen',
+    test: k => (k.totalEarned || 0) >= 200 },
+  { id: 'streak_3',      icon: '🔥', en: 'On a Roll',            de: 'Heißer Lauf',
+    descEn: 'Quest 3 days in a row',                    descDe: '3 Tage in Folge eine Quest',
+    test: k => effectiveStreak(k) >= 3 },
+  { id: 'streak_7',      icon: '🔥', en: 'Week Warrior',         de: 'Wochenkämpfer',
+    descEn: 'Quest 7 days in a row',                    descDe: '7 Tage in Folge eine Quest',
+    test: k => effectiveStreak(k) >= 7 },
+  { id: 'streak_30',     icon: '🚀', en: 'Unstoppable',          de: 'Unaufhaltsam',
+    descEn: '30-day quest streak',                      descDe: '30-Tage-Streak',
+    test: k => effectiveStreak(k) >= 30 },
+  { id: 'goal_reached',  icon: '🎯', en: 'Dream Achieved',       de: 'Traum erreicht',
+    descEn: 'Hit a savings goal',                       descDe: 'Ein Sparziel erreicht',
+    test: k => !!(k.goal && k.goal.achievedAt) },
+  { id: 'first_victory', icon: '🏆', en: 'Adventurer',           de: 'Abenteurer',
+    descEn: 'Win your first adventure',                 descDe: 'Erstes Abenteuer gewonnen',
+    test: k => state.transactions.some(tx => tx.kidId === k.id && tx.type === 'earn' && (tx.note || '').includes('🏆')) },
+  { id: 'donor',         icon: '💛', en: 'Generous Heart',       de: 'Großherzig',
+    descEn: 'Give alms to charity',                     descDe: 'Spende ein Almosen',
+    test: k => state.transactions.some(tx => tx.kidId === k.id && tx.type === 'donate') },
+  { id: 'all_classes',   icon: '🎭', en: 'Tried Them All',       de: 'Alle probiert',
+    descEn: 'See all 5 hero classes in your fellowship',descDe: 'Alle 5 Klassen in der Gemeinschaft',
+    test: k => new Set(state.kids.map(x => x.class)).size >= 5 }
+];
+function checkAchievements(k, _ev) {
+  if (!k) return;
+  if (!Array.isArray(k.achievements)) k.achievements = [];
+  let newlyUnlocked = [];
+  for (const ach of ACHIEVEMENTS) {
+    if (k.achievements.includes(ach.id)) continue;
+    let pass = false;
+    try { pass = !!ach.test(k); } catch (e) { pass = false; }
+    if (pass) {
+      k.achievements.push(ach.id);
+      newlyUnlocked.push(ach);
+    }
+  }
+  if (newlyUnlocked.length) {
+    save();
+    newlyUnlocked.forEach(a => {
+      const lang = (state.settings && state.settings.lang) || 'en';
+      const label = lang === 'de' ? a.de : a.en;
+      setTimeout(() => toast(`${a.icon} ${t('achievement_unlocked')}: ${label}`, 'success'), 200);
+    });
   }
 }
 
@@ -5370,6 +5814,7 @@ function confirmDonate() {
   if (amt > k.balance) { toast('Vault has insufficient gold!', 'error'); return; }
   k.balance -= amt;
   logTx(donateKidId, 'donate', -amt, `❤ Alms to ${to}`);
+  checkAchievements(k, 'donate');
   save();
   renderKids();
   closeModal('donateModal');
@@ -5742,6 +6187,24 @@ function renderHeroSheet() {
     <div class="inventory-section">
       <h4>🎒 Inventory (${k.inventory.length})</h4>
       <div class="inventory-grid">${invHtml}</div>
+    </div>
+
+    <div class="inventory-section">
+      <h4>🏆 ${t('achievements_title')}</h4>
+      <div style="font-size: 12px; color: var(--ink-muted); font-style: italic; margin-bottom: 6px;">${t('achievements_desc')}</div>
+      <div class="achievements-grid">
+        ${ACHIEVEMENTS.map(a => {
+          const unlocked = (k.achievements || []).includes(a.id);
+          const lang = (state.settings && state.settings.lang) || 'en';
+          const label = lang === 'de' ? a.de : a.en;
+          const desc = lang === 'de' ? a.descDe : a.descEn;
+          return `<div class="achievement-tile ${unlocked ? 'unlocked' : 'locked'}" title="${escapeHtml(desc)}">
+            <div class="achievement-tile-icon">${a.icon}</div>
+            <div class="achievement-tile-label">${escapeHtml(label)}</div>
+            <div class="achievement-tile-desc">${escapeHtml(desc)}</div>
+          </div>`;
+        }).join('')}
+      </div>
     </div>
   `;
 }
@@ -6186,6 +6649,193 @@ const _OLD_ADVENTURES_UNUSED = [
 
 // Kid-friendly rewrite — long intros, 3 options per scene, ages 7–8 language.
 const ADVENTURES = [
+  {
+    id: 'bakery', icon: '🥐', difficulty: 'easy', minLevel: 0, maxHp: 6,
+    title:   { en: 'The Sugarplum Bakery',           de: 'Die Zucker-Bäckerei' },
+    summary: { en: 'A magical recipe book has gone wild. Help Mrs. Honeycomb tame her runaway pastries.',
+               de: 'Ein verzaubertes Rezeptbuch spielt verrückt. Hilf Frau Honigwabe, ihre wilden Backwaren einzufangen.' },
+    intro: {
+      en: 'In the cobblestone village of Marzipan, on the corner of Cinnamon Lane and Honey Street, there is a tiny shop with a striped awning and a doorbell shaped like a butter pat. The sign out front reads "The Sugarplum Bakery", and the smell coming out of the door is enough to make a stone statue smile.\n\nThe owner is a round, cheerful woman named Mrs. Honeycomb. Her apron is always dusted with flour and her cheeks are always pink. She bakes the best apple tarts in the whole kingdom, and she has a magical recipe book that her great-great-grandmother gave her — a book that whispers the next instruction to whoever is baking.\n\nBut today, something is very wrong.\n\nAs your heroes step inside, a crowd of cinnamon rolls scampers past their feet, giggling. A loaf of bread is humming a tune to itself in the corner. Through the kitchen door you can hear something very large and very angry banging pots together.\n\nMrs. Honeycomb hurries out from behind the counter, flour in her hair, a wooden spoon in each hand. "Oh, thank goodness, helpers! My recipe book has the hiccups, and now everything in the kitchen is alive and a little bit naughty. The Honeycomb Heart — that is the magical pendant that powers the bakery — is dimming. If we cannot fix it before sunset, the whole bakery will turn back into an ordinary shop, and all the magic will leave Marzipan forever."\n\nShe presses a small flour-dusted apron into your hero\'s hand. "Will you help me round up the runaways and find the missing recipe page? I will pay you in fresh-baked treats and adventure!"\n\nYour heroes look at each other. Pastry chaos. Singing bread. A magical heart that needs healing. What better way to spend an afternoon?\n\nThey tie on their aprons. The Sugarplum Bakery waits.',
+      de: 'Im kopfsteingepflasterten Dorf Marzipan, an der Ecke Zimtgasse und Honigstraße, gibt es einen winzigen Laden mit einer gestreiften Markise und einer Türklingel in Form eines Butterstücks. Das Schild draußen sagt „Die Zucker-Bäckerei", und der Duft aus der Tür reicht, um einer Steinstatue ein Lächeln zu entlocken.\n\nDie Besitzerin ist eine runde, fröhliche Frau namens Frau Honigwabe. Ihre Schürze ist immer mit Mehl bestaubt, ihre Wangen immer rosig. Sie backt die besten Apfeltörtchen im ganzen Königreich, und sie hat ein magisches Rezeptbuch, das ihre Ur-Ur-Großmutter ihr geschenkt hat — ein Buch, das dem Bäcker den nächsten Schritt ins Ohr flüstert.\n\nDoch heute stimmt etwas ganz und gar nicht.\n\nAls eure Helden den Laden betreten, huscht eine Schar Zimtschnecken kichernd zwischen ihren Füßen hindurch. Ein Brotlaib summt in der Ecke ein Lied. Durch die Küchentür hört man etwas sehr Großes und sehr Wütendes Töpfe gegeneinanderschlagen.\n\nFrau Honigwabe eilt hinter der Theke hervor, Mehl im Haar, einen Holzlöffel in jeder Hand. „Oh, dem Himmel sei Dank, Helfer! Mein Rezeptbuch hat Schluckauf, und jetzt ist alles in der Küche lebendig und ein bisschen frech. Das Honigwaben-Herz — das ist der magische Anhänger, der die Bäckerei am Leben hält — wird schwächer. Wenn wir es nicht bis Sonnenuntergang reparieren, wird die Bäckerei zu einem gewöhnlichen Laden, und alle Magie verlässt Marzipan für immer."\n\nSie drückt eurem Helden eine kleine, mehlbestäubte Schürze in die Hand. „Wollt ihr mir helfen, die Ausreißer einzusammeln und die verlorene Rezeptseite zu finden? Ich bezahle euch mit frischem Gebäck und Abenteuer!"\n\nEure Helden schauen sich an. Backwaren-Chaos. Singendes Brot. Ein magisches Herz, das geheilt werden muss. Was gibt es Schöneres für einen Nachmittag?\n\nSie binden sich die Schürzen um. Die Zucker-Bäckerei wartet.'
+    },
+    victory: { en: '🍯 The Honeycomb Heart shines bright as honey-gold once more! Every pastry settles back into its tray with a contented sigh. Mrs. Honeycomb hugs each of your heroes and stuffs their pockets with warm cinnamon rolls. From this day on, every bakery in Marzipan smells just a little sweeter, because of you.',
+               de: '🍯 Das Honigwaben-Herz strahlt wieder honiggolden! Jedes Gebäck setzt sich mit einem zufriedenen Seufzer in sein Blech zurück. Frau Honigwabe umarmt eure Helden und stopft warme Zimtschnecken in ihre Taschen. Von heute an riecht jede Bäckerei in Marzipan ein klein wenig süßer — eurer wegen.' },
+    defeat:  { en: '🥐 The bakery cools down for a quiet evening. Mrs. Honeycomb pours your heroes some warm milk and promises tomorrow will be sweeter. Magic likes patient bakers.',
+               de: '🥐 Die Bäckerei kühlt sich für einen ruhigen Abend ab. Frau Honigwabe gießt euren Helden warme Milch ein und verspricht, dass morgen süßer wird. Magie mag geduldige Bäcker.' },
+    scenes: [
+      {
+        title: { en: 'The Runaway Cinnamon Rolls', de: 'Die ausgebüxten Zimtschnecken' },
+        text:  { en: 'The first thing your heroes notice is that the floor is moving. Twelve plump cinnamon rolls, each one the size of a kitten, are racing in circles around the front-of-shop, leaving little spirals of icing behind them. They are giggling. A grandmother trying to buy bread shrieks and lifts her feet onto a chair. "Catch them!" calls Mrs. Honeycomb. "But gently — they are very ticklish!"',
+                 de: 'Das Erste, was eure Helden bemerken, ist, dass der Boden sich bewegt. Zwölf pummelige Zimtschnecken, jede so groß wie ein Kätzchen, flitzen kichernd im Kreis durch den Laden und hinterlassen kleine Zuckerguss-Spiralen. Eine Großmutter, die Brot kaufen will, kreischt und stellt die Füße auf einen Stuhl. „Fangt sie!", ruft Frau Honigwabe. „Aber sanft — sie sind furchtbar kitzlig!"' },
+        options: [
+          { stat: 'brave', dc: 10,
+            label:   { en: '💪 Dive after them with a big basket', de: '💪 Mit einem großen Korb hinterherspringen' },
+            success: { en: 'Your hero leaps like a goalkeeper, basket in hand, and scoops up six rolls in one heroic dive. The other six laugh so hard they fall over and surrender on their own.',
+                       de: 'Euer Held springt wie ein Torhüter, Korb in der Hand, und fängt sechs Schnecken in einem heroischen Hechtsprung. Die anderen sechs lachen so sehr, dass sie umfallen und sich freiwillig ergeben.' },
+            failure: { en: 'The rolls are slipperier than they look. Your hero ends up with icing on the nose, but Mrs. Honeycomb produces a bigger basket and the team eventually corners them.',
+                       de: 'Die Schnecken sind glitschiger als gedacht. Euer Held hat Zuckerguss auf der Nase, doch Frau Honigwabe holt einen größeren Korb und gemeinsam treibt ihr sie in die Ecke.' } },
+          { stat: 'clever', dc: 10,
+            label:   { en: '🧠 Lay a trail of icing back to the tray', de: '🧠 Eine Zuckergussspur zurück zum Blech legen' },
+            success: { en: 'Your hero squeezes a perfect dotted line of icing leading from the rolls back to their tray. They follow it like ducklings, climbing into place one by one.',
+                       de: 'Euer Held drückt eine perfekte Zuckerguss-Punktlinie vom Versteck zurück zum Blech. Die Schnecken folgen wie Entlein, eine nach der anderen hüpft an ihren Platz.' },
+            failure: { en: 'The rolls eat the trail before following it. Your hero has to start over with sprinkles, which works — but takes a while.',
+                       de: 'Die Schnecken essen die Spur, bevor sie ihr folgen. Euer Held muss mit Streuseln neu anfangen — klappt am Ende, dauert aber.' } },
+          { stat: 'kind', dc: 10,
+            label:   { en: '💛 Sing them a soothing lullaby', de: '💛 Ein sanftes Schlummerlied singen' },
+            success: { en: 'Your hero hums a slow, warm tune. The rolls stop, listen, and then waddle peacefully into their tray, yawning. Mrs. Honeycomb wipes a tear away.',
+                       de: 'Euer Held summt eine langsame, warme Melodie. Die Schnecken halten an, lauschen und watscheln dann friedlich ins Blech, gähnend. Frau Honigwabe wischt sich eine Träne weg.' },
+            failure: { en: 'The rolls love your singing so much they keep dancing. Your hero changes the tune to a yawn-y one and slowly they curl up to nap.',
+                       de: 'Die Schnecken mögen den Gesang so sehr, dass sie weitertanzen. Euer Held wechselt zu einer gähnigen Melodie, und langsam rollen sie sich zum Nickerchen ein.' } }
+        ]
+      },
+      {
+        type: 'memory',
+        title: { en: 'Mixed-Up Spice Jars', de: 'Vertauschte Gewürzgläser' },
+        text:  { en: 'In the pantry, a row of glass jars is rattling angrily. The labels have come unstuck — sugar and salt have argued, cinnamon and pepper have switched lids, and the vanilla is hiding behind the flour. Mrs. Honeycomb rolls up her sleeves: "Match each jar to its twin so I can re-label them. Be gentle — they\'re proud little jars."',
+                 de: 'In der Speisekammer klappert eine Reihe Gläser zornig. Die Etiketten sind abgelöst — Zucker und Salz haben gestritten, Zimt und Pfeffer haben Deckel getauscht, und die Vanille versteckt sich hinter dem Mehl. Frau Honigwabe krempelt die Ärmel hoch: „Findet die Paare, dann kann ich neu beschriften. Sanft — die Gläser sind stolz."' },
+        icons: ['🧂', '🍯', '🌶', '🥄'],
+        success: { en: 'Each pair finds its twin, the lids click happily into place, and the jars settle into a neat row again, humming a contented little tune.',
+                   de: 'Jedes Paar findet sein Geschwisterglas, die Deckel klicken zufrieden, und die Gläser stehen wieder in einer ordentlichen Reihe und summen vergnügt.' },
+        failure: { en: 'A few jars get re-mismatched and grumble loudly. You still get them mostly sorted, but a sneaky pinch of pepper ends up in tomorrow\'s sugar bowl.',
+                   de: 'Ein paar Gläser werden wieder vertauscht und brummeln laut. Ihr bekommt sie weitgehend sortiert, doch eine schelmische Prise Pfeffer landet morgen im Zuckertopf.' }
+      },
+      {
+        type: 'sequence',
+        title: { en: 'The Singing Bread Loaf', de: 'Der singende Brotlaib' },
+        text:  { en: 'On the wooden counter sits a long, golden loaf of bread that is humming a four-note tune to itself. Mrs. Honeycomb whispers: "If you sing the tune back exactly, it will settle into a slice and stop disturbing the customers. Listen carefully — bread has a short memory."',
+                 de: 'Auf dem Holztisch sitzt ein langer goldener Brotlaib, der ein Vier-Ton-Lied vor sich hin summt. Frau Honigwabe flüstert: „Wenn ihr die Melodie genau zurücksingt, beruhigt es sich zur Scheibe und stört keine Kundschaft mehr. Hört gut hin — Brot hat ein kurzes Gedächtnis."' },
+        tiles: ['🎵', '🌾', '🍞', '✨'],
+        success: { en: 'Your heroes hum the four notes back perfectly. The loaf gives a long, satisfied sigh and slumps gently onto a cutting board, ready for slicing.',
+                   de: 'Eure Helden summen die vier Töne perfekt nach. Der Laib seufzt lang und zufrieden und sinkt sanft auf das Schneidebrett, bereit zum Aufschneiden.' },
+        failure: { en: 'A note slips. The loaf shakes its head and starts a different tune. You catch it on the second go, but it\'s a little grumpy now.',
+                   de: 'Ein Ton verrutscht. Der Laib schüttelt den Kopf und beginnt eine andere Melodie. Beim zweiten Versuch klappt es, doch der Laib ist nun etwas mürrisch.' }
+      },
+      {
+        title: { en: 'The Crying Strawberry Tart', de: 'Das weinende Erdbeertörtchen' },
+        text:  { en: 'On a small plate, a perfect strawberry tart is sniffling. Tiny tears of berry-juice roll down its golden crust. "Nobody ever picks me first," it sniffs. "They always pick the chocolate ones." It blinks up at your heroes with sugary, hopeful eyes. Mrs. Honeycomb whispers: "Sad pastries don\'t bake well. Cheer it up, and it\'ll be ready for the window display."',
+                 de: 'Auf einem kleinen Teller schluchzt ein perfektes Erdbeertörtchen. Winzige Beerensaft-Tränen rollen über die goldene Kruste. „Niemand wählt mich je zuerst", schnieft es. „Immer nur die Schokoladigen." Es blinzelt eure Helden mit zuckersüßen, hoffnungsvollen Augen an. Frau Honigwabe flüstert: „Traurige Backwaren werden nicht gut. Tröstet es, dann ist es bereit für die Auslage."' },
+        options: [
+          { stat: 'kind', dc: 10,
+            label:   { en: '💛 Tell it how beautiful and special it is', de: '💛 Ihm sagen, wie schön und besonders es ist' },
+            success: { en: '"You are the brightest red I have ever seen, and your crust is so golden it makes my eyes happy." The tart blushes, sits up straight, and twirls proudly into the display window.',
+                       de: '„Du bist das röteste Rot, das ich je gesehen habe, und deine Kruste ist so golden, dass mir die Augen lachen." Das Törtchen errötet, setzt sich kerzengerade hin und stolziert in die Auslage.' },
+            failure: { en: 'The compliments come out a little awkward, but the tart appreciates the effort and stops sniffling. It still wants a hug, which your hero gives gently.',
+                       de: 'Die Komplimente kommen etwas schief, doch das Törtchen schätzt den Versuch und hört auf zu schniefen. Es will trotzdem eine Umarmung, die euer Held sanft gibt.' } },
+          { stat: 'clever', dc: 11,
+            label:   { en: '🧠 Explain that being picked last just means most savoured', de: '🧠 Erklären, dass „zuletzt" oft „am meisten genossen" heißt' },
+            success: { en: '"Sometimes the very best dessert is the one you save for last," your hero says. The tart\'s tears stop. "Oh," it whispers, deeply impressed. "I am the savouring tart!" It puffs up its crust proudly.',
+                       de: '„Manchmal ist das beste Dessert das, das man sich für zuletzt aufhebt", sagt euer Held. Die Tränen versiegen. „Oh", flüstert das Törtchen tief beeindruckt. „Ich bin das Geniess-Törtchen!" Stolz plustert es seine Kruste.' },
+            failure: { en: 'The reasoning gets tangled, but the tart catches the gist and decides being unique is enough. Mrs. Honeycomb gives a thumbs up.',
+                       de: 'Die Erklärung verheddert sich etwas, doch das Törtchen versteht den Kern und beschließt, einzigartig zu sein, sei genug. Frau Honigwabe nickt anerkennend.' } },
+          { stat: 'brave', dc: 11,
+            label:   { en: '💪 Promise to defend it from being eaten last', de: '💪 Versprechen, es vor dem Zuletzt-Essen zu beschützen' },
+            success: { en: 'Your hero strikes a heroic pose. "I, brave defender, will guard your honor!" The tart laughs so hard a strawberry pops off, and laughter heals more than promises ever did.',
+                       de: 'Euer Held stellt sich heldenhaft hin. „Ich, tapferer Verteidiger, beschütze deine Ehre!" Das Törtchen lacht so sehr, dass eine Erdbeere abplatzt, und Lachen heilt mehr als jedes Versprechen.' },
+            failure: { en: 'The pose comes out a bit silly, but the tart loves silly. It joins your hero in striking poses until both are laughing too hard to be sad.',
+                       de: 'Die Pose wirkt etwas albern, doch das Törtchen liebt albern. Es macht mit, bis beide zu sehr lachen, um traurig zu sein.' } }
+        ]
+      },
+      {
+        type: 'statcheck',
+        title: { en: 'The Grumpy Old Oven', de: 'Der mürrische alte Ofen' },
+        text:  { en: 'In the back of the kitchen squats the bakery\'s ancient brick oven, named Old Brick by everyone. Today Old Brick is sulking — its door creaks shut every time someone opens it, and it refuses to heat above lukewarm. Mrs. Honeycomb whispers: "Each of you has a different way with stubborn things. Pick the way that suits your fellowship best."',
+                 de: 'Im hinteren Teil der Küche kauert der uralte Backsteinofen, den alle nur „Brückerich" nennen. Heute schmollt Brückerich — die Tür knarrt zu, sobald jemand sie öffnet, und er weigert sich, über lauwarm zu heizen. Frau Honigwabe flüstert: „Jeder hat seinen eigenen Umgang mit Sturköpfen. Wählt den Weg, der zur Gruppe passt."' },
+        options: [
+          { stat: 'brave', threshold: 3,
+            label: { en: '💪 Wedge the door open and stoke the fire yourself', de: '💪 Die Tür aufkeilen und das Feuer selbst schüren' },
+            success: { en: 'Your heroes brace the door, throw on three fragrant logs, and within minutes Old Brick is glowing a happy orange. It harrumphs proudly.',
+                       de: 'Eure Helden klemmen die Tür auf, werfen drei duftende Scheite hinein, und binnen Minuten glüht Brückerich glücklich orange. Er räuspert sich stolz.' },
+            failure: { en: 'The door slams on a hero\'s sleeve. Old Brick eventually warms up out of pity, but the bread takes twice as long.',
+                       de: 'Die Tür klemmt einen Heldenärmel ein. Brückerich erwärmt sich aus Mitleid, doch das Brot braucht doppelt so lange.' } },
+          { stat: 'clever', threshold: 3,
+            label: { en: '🧠 Adjust the chimney damper and study the airflow', de: '🧠 Den Kaminzug anpassen und die Luftströmung studieren' },
+            success: { en: 'Your hero sees a half-closed flue, opens it carefully, and Old Brick whooshes to a perfect baking temperature. "Ah, finally a baker who reads my chimney!" it grumbles fondly.',
+                       de: 'Euer Held entdeckt einen halb geschlossenen Zug, öffnet ihn behutsam, und Brückerich rauscht zur perfekten Backtemperatur. „Endlich einer, der meinen Schornstein liest!", brummt er liebevoll.' },
+            failure: { en: 'The flue gets stuck halfway. The oven warms unevenly, but the bread comes out almost-perfect — only a slightly toasty bottom.',
+                       de: 'Der Zug klemmt auf halbem Weg. Der Ofen wärmt ungleich, doch das Brot wird fast perfekt — nur unten etwas gerösteter.' } },
+          { stat: 'kind', threshold: 3,
+            label: { en: '💛 Talk to Old Brick about why it\'s sad today', de: '💛 Mit Brückerich darüber sprechen, warum er heute traurig ist' },
+            success: { en: '"What\'s wrong, dear oven?" your hero asks. Old Brick admits no one polished its bricks this month. Your hero gives it a quick polish, and it lights up beaming red, glowing with pride.',
+                       de: '„Was bedrückt dich, lieber Ofen?", fragt euer Held. Brückerich gibt zu, dass dieses Monat niemand seine Steine poliert hat. Euer Held poliert kurz nach, und er strahlt freudig rot vor Stolz.' },
+            failure: { en: 'Your hero\'s words are kind but a bit shy. Old Brick still warms up halfway out of appreciation. Better than nothing.',
+                       de: 'Die Worte sind lieb, aber etwas schüchtern. Brückerich erwärmt sich aus Dankbarkeit halb. Besser als nichts.' } }
+        ]
+      },
+      {
+        type: 'split',
+        title: { en: 'Three Pastries in Trouble', de: 'Drei Gebäcke in Not' },
+        text:  { en: 'A muffled crash from upstairs. Mrs. Honeycomb gasps: "Three rooms, three problems, all at once! A wedding cake is collapsing, a sourdough starter has grown to the size of a sheep, and a gingerbread guard has lost his head — literally. Split up! Each of you take one room!"',
+                 de: 'Ein gedämpfter Knall von oben. Frau Honigwabe stockt der Atem: „Drei Räume, drei Probleme, alle gleichzeitig! Eine Hochzeitstorte stürzt ein, ein Sauerteig ist schafgroß geworden, und einem Lebkuchenwächter ist der Kopf abhanden gekommen — buchstäblich. Aufteilen! Jeder einen Raum!"' },
+        tasks: [
+          { stat: 'brave', dc: 10,
+            label: { en: '🎂 Catch the falling wedding cake', de: '🎂 Die fallende Hochzeitstorte fangen' },
+            success: { en: 'Your hero dives sliding under the leaning top tier and catches it just in time. Frosting saved.',
+                       de: 'Euer Held rutscht unter die schräge oberste Etage und fängt sie gerade noch. Glasur gerettet.' },
+            failure: { en: 'A bit of frosting gets on the ceiling, but the tier is mostly upright. Bridezilla averted.',
+                       de: 'Etwas Glasur landet an der Decke, doch die Etage steht halbwegs. Brautzilla abgewendet.' } },
+          { stat: 'clever', dc: 10,
+            label: { en: '🍞 Tame the giant sourdough starter', de: '🍞 Den riesigen Sauerteig bändigen' },
+            success: { en: 'Your hero whispers a measured ratio of flour-to-water, calms the dough, and shrinks it back to a polite glass jar.',
+                       de: 'Euer Held flüstert ein genaues Mehl-Wasser-Verhältnis, beruhigt den Teig, und er schrumpft zurück in ein höfliches Glas.' },
+            failure: { en: 'The dough still grumbles, but you wrangle it into a big bowl. Tomorrow\'s pizza will be glorious.',
+                       de: 'Der Teig brummt, doch ihr bekommt ihn in eine große Schüssel. Die Pizza morgen wird grandios.' } },
+          { stat: 'kind', dc: 10,
+            label: { en: '🍪 Reattach the gingerbread guard\'s head', de: '🍪 Dem Lebkuchenwächter den Kopf wieder ansetzen' },
+            success: { en: 'Your hero finds the head behind a flour sack, gently hums a calming song, and dabs icing as glue. The guard salutes happily.',
+                       de: 'Euer Held findet den Kopf hinter einem Mehlsack, summt ein beruhigendes Lied und klebt mit Zuckerguss. Der Wächter salutiert glücklich.' },
+            failure: { en: 'The head goes on slightly crooked, but the guard insists it\'s a more dashing angle and stands proudly.',
+                       de: 'Der Kopf sitzt etwas schief, doch der Wächter besteht darauf, das sei ein keckeres Profil, und steht stolz da.' } }
+        ],
+        success: { en: 'All three rooms quiet down at once. Your fellowship reunites at the bottom of the stairs, dusted in flour, sugar and pride.',
+                   de: 'Alle drei Räume werden still zugleich. Eure Gruppe trifft sich am Fuß der Treppe wieder, überzogen mit Mehl, Zucker und Stolz.' },
+        failure: { en: 'Some chaos lingers, but the bakery is no longer in danger. Mrs. Honeycomb gives each hero a clean apron and a wink.',
+                   de: 'Etwas Chaos bleibt, doch die Bäckerei ist außer Gefahr. Frau Honigwabe gibt jedem eine saubere Schürze und ein Augenzwinkern.' }
+      },
+      {
+        type: 'puzzle',
+        title: { en: 'The Missing Recipe Page', de: 'Die verlorene Rezeptseite' },
+        text:  { en: 'The magical recipe book sits on a wooden lectern with a single page missing. Where the page should be, a riddle has appeared in shimmering icing letters: "I am sweet but never grown, I come from bees but am not honey, I melt on your tongue and remember the sun. What am I?"',
+                 de: 'Das magische Rezeptbuch ruht auf einem Holzpult — eine Seite fehlt. Wo sie hingehört, schimmert ein Rätsel in Zuckerguss-Buchstaben: „Süß bin ich, doch wachs\' ich nicht, von Bienen komm ich, doch Honig bin ich nicht, auf der Zunge schmelze ich, der Sonne Erinnerung bin ich. Was bin ich?"' },
+        question: { en: 'What is the answer?', de: 'Was ist die Antwort?' },
+        hint:  { en: 'Bees make it from wax. It glows softly. People light it on dark winter nights.', de: 'Bienen machen es aus Wachs. Es leuchtet sanft. Man entzündet es in dunklen Winternächten.' },
+        answers: [
+          { label: { en: '🍯 Honey',         de: '🍯 Honig' } },
+          { label: { en: '🕯 Beeswax candle', de: '🕯 Bienenwachskerze' }, correct: true },
+          { label: { en: '🍬 Caramel',       de: '🍬 Karamell' } }
+        ],
+        success: { en: 'The riddle dissolves into golden sparkles. The missing page floats down from the rafters and slots itself back into the book with a satisfied flutter.',
+                   de: 'Das Rätsel löst sich in goldene Funken auf. Die verlorene Seite schwebt von den Dachbalken herab und schmiegt sich zufrieden zurück ins Buch.' },
+        failure: { en: 'Almost! The book gives a kindly shake of its pages and points at a candle on the windowsill. Now you see it. The page returns anyway, gentler than usual.',
+                   de: 'Fast! Das Buch wackelt freundlich mit den Seiten und zeigt auf eine Kerze am Fensterbrett. Jetzt seht ihr\'s. Die Seite kehrt trotzdem zurück, etwas sanfter als sonst.' }
+      },
+      {
+        title: { en: 'The Honeycomb Heart', de: 'Das Honigwaben-Herz' },
+        text:  { en: 'In the heart of the bakery, on a small velvet cushion, rests the Honeycomb Heart — a hexagonal pendant of golden honeycomb that should glow warm amber. Today it flickers like a candle in a draft. Mrs. Honeycomb is teary. "It needs three things to mend, and only a hero can give them. A brave act, a clever insight, or a kind word — whatever your fellowship has most of."',
+                 de: 'Im Herzen der Bäckerei, auf einem kleinen Samtkissen, ruht das Honigwaben-Herz — ein sechseckiger Anhänger aus goldener Wabe, der warm bernsteinfarben leuchten sollte. Heute flackert er wie eine Kerze im Zug. Frau Honigwabe hat Tränen in den Augen. „Drei Dinge braucht er zum Heilen, und nur ein Held kann sie geben. Eine mutige Tat, eine kluge Einsicht oder ein liebes Wort — was eure Gruppe am meisten hat."' },
+        options: [
+          { stat: 'kind', dc: 11,
+            label:   { en: '💛 Tell the Heart how loved this bakery is', de: '💛 Dem Herzen erzählen, wie geliebt die Bäckerei ist' },
+            success: { en: '"Children dream of your apple tarts. Old men remember their mothers when they smell your bread. You are loved more than you know." The Heart pulses, blooms golden, and fills the room with the scent of warm cinnamon.',
+                       de: '„Kinder träumen von deinen Apfeltörtchen. Alte Männer erinnern sich beim Brotduft an ihre Mütter. Du wirst mehr geliebt, als du ahnst." Das Herz pulst, erblüht golden und füllt den Raum mit warmem Zimtduft.' },
+            failure: { en: 'The words wobble, but the Heart hears the love behind them. It glows softer than full bright but steady, and that\'s enough.',
+                       de: 'Die Worte wackeln, doch das Herz spürt die Liebe darunter. Es leuchtet weicher als voll hell, aber stetig, und das genügt.' } },
+          { stat: 'brave', dc: 12,
+            label:   { en: '💪 Hold the Heart up high and shout the bakery\'s name', de: '💪 Das Herz hoch halten und den Namen der Bäckerei rufen' },
+            success: { en: '"THE SUGARPLUM BAKERY!" your hero cries, holding the Heart toward the rafters. The whole building vibrates with happy magic. Pastries cheer. The Heart blazes amber.',
+                       de: '„DIE ZUCKER-BÄCKEREI!", ruft euer Held und hält das Herz Richtung Dachbalken. Das ganze Gebäude vibriert vor glücklicher Magie. Backwaren jubeln. Das Herz lodert bernsteinfarben.' },
+            failure: { en: 'The shout cracks a little, but the Heart appreciates the courage. It glows steadily, just not blazingly. The day is still saved.',
+                       de: 'Der Ruf bricht etwas, doch das Herz schätzt den Mut. Es leuchtet stetig, wenn auch nicht lodernd. Der Tag ist gerettet.' } },
+          { stat: 'clever', dc: 12,
+            label:   { en: '🧠 Solve the engraving on its back', de: '🧠 Die Gravur auf der Rückseite entschlüsseln' },
+            success: { en: 'On the back, in tiny script: "Mend me with what I am made of." Your hero realizes — honey! A drop of honey from Mrs. Honeycomb\'s own jar. The Heart drinks it in and shines like noon sun.',
+                       de: 'Auf der Rückseite, in winziger Schrift: „Heile mich mit dem, woraus ich bin." Euer Held erkennt — Honig! Ein Tropfen aus Frau Honigwabes eigenem Glas. Das Herz trinkt ihn und strahlt wie Mittagssonne.' },
+            failure: { en: 'The script is stubbornly tiny. Your hero guesses honey anyway, and luckily that\'s right — close enough for the magic to stir back to life.',
+                       de: 'Die Schrift bleibt sturköpfig klein. Euer Held rät trotzdem auf Honig, und glücklicherweise stimmt das — die Magie erwacht doch noch.' } }
+        ]
+      }
+    ]
+  },
+
   {
     id: 'grove', icon: '🌲', difficulty: 'easy', minLevel: 0, maxHp: 6,
     title:   { en: 'The Enchanted Grove',                de: 'Der verzauberte Hain' },
@@ -8332,6 +8982,8 @@ function awardConsolationTreasure() {
       ? `🎁 ${adv ? L(adv.title) : ''} · ${t('consolation_note')}`
       : `🎁 ${adv ? L(adv.title) : ''} · ${t('consolation_no_coin')}`;
     logTx(h.id, 'earn', amount, note, { adventurePaid: mayPayCoins, adventureRunId: runId });
+    if (amount > 0) bumpStreak(h);
+    checkAchievements(h, 'adventure_consolation');
     return { kidId: h.id, amount, item: null };
   });
   adventureState.treasureRewards = rewards;
@@ -8387,6 +9039,9 @@ function awardTreasure(tierMultiplier) {
       ? (item ? `🏆 ${L(adv.title)} treasure · ${item.icon} ${item.name}` : `🏆 ${L(adv.title)} treasure`)
       : (item ? `🎁 ${L(adv.title)} gift · ${item.icon} ${item.name}` : `🎁 ${L(adv.title)} gift`);
     logTx(h.id, 'earn', paidAmount, note, { adventurePaid: mayPayCoins, adventureRunId: runId, itemInstanceId: null });
+    bumpStreak(h);
+    checkGoalReached(h);
+    checkAchievements(h, 'adventure_win');
     return { kidId: h.id, amount: paidAmount, item };
   });
   adventureState.treasureRewards = rewards;

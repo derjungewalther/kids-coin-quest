@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-24T19:33:57.114Z",
+  "generatedAt": "2026-04-25T05:36:31.462Z",
   "texts": [
     {
       "id": "019fc05ff733e6ae",
@@ -20,6 +20,11 @@
       "id": "02cf08a298bc43f4",
       "lang": "de",
       "text": "Endlich erreicht ihr den Thronsaal. Er ist kleiner als gedacht — kleiner als eine Küche. In der Mitte steht ein kleiner Stuhl aus geschnitztem Knochen, und auf dem Stuhl sitzt der Körper eines elfjährigen Jungen. Er sieht aus, als ob er schläft. Auf seiner Stirn ruht eine kleine silberne Krone mit winzigen Flussperlen. Der Raum duftet sanft nach Zimtäpfeln, seiner Lieblingsspeise. Und hinter dem Stuhl steht, groß und dünn in goldenem Gewand, ein Skelett mit einer Schreibfeder. Es ist Corvus Dunn, der alte Lehrer. Er hat auf euch gewartet. Er sieht nicht wütend aus. Er sieht nur sehr, sehr müde aus."
+    },
+    {
+      "id": "02f827fd373c8889",
+      "lang": "de",
+      "text": "Jedes Paar findet sein Geschwisterglas, die Deckel klicken zufrieden, und die Gläser stehen wieder in einer ordentlichen Reihe und summen vergnügt."
     },
     {
       "id": "03ff6bc8e1984c17",
@@ -127,6 +132,11 @@
       "text": "Euer Held packt die Käfigstäbe und BIEGT sie auseinander, wie in einer Heldengeschichte. Der Kobold springt heraus, verneigt sich dreimal und quiekt die ganze Lebensgeschichte des Drachen in einem aufgeregten Atemzug."
     },
     {
+      "id": "194c88185c92c08a",
+      "lang": "de",
+      "text": "Der Teig brummt, doch ihr bekommt ihn in eine große Schüssel. Die Pizza morgen wird grandios."
+    },
+    {
       "id": "1abdf77b3ac70dd7",
       "lang": "de",
       "text": "Die Worte stolpern etwas. Corvus verneigt sich steif und reicht trotzdem die Krone, doch seine Augenhöhlen sind feucht. Freundlichkeit hilft auch, wenn die Worte nicht perfekt kommen."
@@ -167,9 +177,19 @@
       "text": "Die Frösche machen Mittagsschlaf. Sie brummeln und drehen sich weg. Ihr müsst laufen — langsam, vorsichtig, Matsch für Matsch."
     },
     {
+      "id": "2359f0af95db1c7d",
+      "lang": "de",
+      "text": "Ein paar Gläser werden wieder vertauscht und brummeln laut. Ihr bekommt sie weitgehend sortiert, doch eine schelmische Prise Pfeffer landet morgen im Zuckertopf."
+    },
+    {
       "id": "241b865d160333a6",
       "lang": "de",
       "text": "Ein schmaler Durchgang wird von einem steinernen Hüter in Form einer Maus mit Gelehrtenhut versperrt. „Vor der inneren Kammer beweist euren Wert\", piept er. „Wählt die Stärke, die eure Gruppe am meisten hat. Lügt, bleibt die Tür zu. Sagt die Wahrheit, öffnet sie sich.\""
+    },
+    {
+      "id": "24adf6edf3389a19",
+      "lang": "de",
+      "text": "Die Schnecken essen die Spur, bevor sie ihr folgen. Euer Held muss mit Streuseln neu anfangen — klappt am Ende, dauert aber."
     },
     {
       "id": "25636c702038a2c4",
@@ -257,14 +277,29 @@
       "text": "Euer Held holt einen kleinen glänzenden Kiesel aus der Tasche — den vom Morgen — und hält ihn hin. Die Kobolde staunen, als hätten sie nie einen Schatz gesehen. Sie stimmen sofort zu und verneigen sich wie kleine Adlige."
     },
     {
+      "id": "3791f3332a8402c3",
+      "lang": "de",
+      "text": "In der Speisekammer klappert eine Reihe Gläser zornig. Die Etiketten sind abgelöst — Zucker und Salz haben gestritten, Zimt und Pfeffer haben Deckel getauscht, und die Vanille versteckt sich hinter dem Mehl. Frau Honigwabe krempelt die Ärmel hoch: „Findet die Paare, dann kann ich neu beschriften. Sanft — die Gläser sind stolz.\""
+    },
+    {
       "id": "3905707ba6a704f7",
       "lang": "de",
       "text": "Die Maus rückt seinen Hut zufrieden zurecht. „Dann denkt euch voran, kluge Köpfe.\" Die Tür öffnet sich mit höflichem Klick."
     },
     {
+      "id": "39295f3622194a90",
+      "lang": "de",
+      "text": "Der Zug klemmt auf halbem Weg. Der Ofen wärmt ungleich, doch das Brot wird fast perfekt — nur unten etwas gerösteter."
+    },
+    {
       "id": "3adde6af772ff1b7",
       "lang": "de",
       "text": "Euer Held stemmt beide Füße an und drückt mit aller Kraft. Krii-i-i-itsch! Die Tür schwingt überrascht auf, denn noch nie hat jemand einfach gedrückt."
+    },
+    {
+      "id": "3bf1eae09ea4b13d",
+      "lang": "de",
+      "text": "Auf der Rückseite, in winziger Schrift: „Heile mich mit dem, woraus ich bin.\" Euer Held erkennt — Honig! Ein Tropfen aus Frau Honigwabes eigenem Glas. Das Herz trinkt ihn und strahlt wie Mittagssonne."
     },
     {
       "id": "3cdb39d1b1da1d2a",
@@ -275,6 +310,11 @@
       "id": "3d996e5e7786a224",
       "lang": "de",
       "text": "Das Wiegenlied ist tricky, und euer Held verfehlt ein, zwei Töne. Doch die Geister schätzen den Versuch. Einige lassen los und schweben hoch; der Rest verneigt sich freundlich, als ihr vorbeigeht."
+    },
+    {
+      "id": "3e11bb2c31eef0c4",
+      "lang": "de",
+      "text": "„Manchmal ist das beste Dessert das, das man sich für zuletzt aufhebt\", sagt euer Held. Die Tränen versiegen. „Oh\", flüstert das Törtchen tief beeindruckt. „Ich bin das Geniess-Törtchen!\" Stolz plustert es seine Kruste."
     },
     {
       "id": "3e75adcbc2f8cb2c",
@@ -332,6 +372,11 @@
       "text": "Die Sterne blinzeln ungeduldig und erlöschen. Ihr zwängt euch durch einen Nebengang — doch die Umhänge bleiben hängen, und die Laune leidet."
     },
     {
+      "id": "467d5c1d655e2fd8",
+      "lang": "de",
+      "text": "Das Rätsel löst sich in goldene Funken auf. Die verlorene Seite schwebt von den Dachbalken herab und schmiegt sich zufrieden zurück ins Buch."
+    },
+    {
       "id": "47438496d08445bd",
       "lang": "de",
       "text": "Weit weg von der nächsten Stadt, vorbei an der Blaubeerwiese und über die alte Steinbrücke, liegt ein Wald namens Der verzauberte Hain. Alle Tiere dort sagen, es sei der beste Wald der ganzen Welt. Die Eichhörnchen halten Teepartys in den Eichenästen. Die Füchse nehmen Unterricht im Witzeerzählen. Sogar die mürrischen alten Dachse kommen heraus und tanzen, wenn der Mond voll ist.\n\nDoch heute stimmt etwas nicht.\n\nAls eure Helden den Hain betreten, ist der Wald still. Zu still. Die Eichhörnchen lugen ängstlich aus ihren Löchern. Die Füchse erzählen keine Witze. Ein kleines Kaninchen sitzt am Pfad und schnieft in seine winzigen Pfoten.\n\nDa gleitet eine Schleiereule von einer hohen Kiefer herunter und landet sanft auf einem bemoosten Stein. Ihre Federn haben die Farbe von warmer Butter, und ihre Augen sind groß und freundlich. Sie blinzelt eure Helden an und legt den Kopf schief.\n\n„Oh, zum Glück seid ihr gekommen\", sagt sie mit leiser, flüsternder Stimme. „Ich heiße Huu und bin die älteste Eule im Hain. Unser schöner Herzbaum wird sehr krank. Jeden Tag werden seine silbernen Blätter ein wenig grauer. Wenn er stirbt, hört der ganze Wald auf zu singen, und alle meine Freunde müssen ein neues Zuhause suchen.\"\n\nSie zeigt mit einem Flügel auf einen schmalen Pfad zwischen den Bäumen. „Der Weg zum Herzbaum ist lang und voller kleiner Aufgaben. Doch wenn ihr mutig, klug und lieb seid, findet ihr den Weg. Kommt ihr mit?\"\n\nEure Helden sehen sich an. Dann nicken sie. Natürlich kommen sie mit. Wozu ist ein Abenteuer gut, wenn nicht dafür, einem Wald zu helfen?\n\nHuu die Eule lächelt. „Dann folgt dem Moos, ihr Kleinen. Und denkt daran — nicht jeder Freund sieht auf den ersten Blick wie ein Freund aus. Lasst eure Herzen offen.\"\n\nSie breitet ihre Flügel aus und fliegt voraus, um den Pfad zu erkunden. Der verzauberte Hain wartet. Euer Abenteuer beginnt jetzt.\""
@@ -342,9 +387,19 @@
       "text": "Euer Held setzt sich hin und erzählt Xyryth von der kleinen Holzeule in der Tasche, von der Dorf-Oma, von der Blaubeerwiese und von einer Katze namens Pfütze. Xyryth lacht so sehr, dass der Berg wackelt. „Freunde\", grummelt sie glücklich. „FREUNDE.\""
     },
     {
+      "id": "48706a64082a2587",
+      "lang": "de",
+      "text": "Etwas Glasur landet an der Decke, doch die Etage steht halbwegs. Brautzilla abgewendet."
+    },
+    {
       "id": "4c3ba0f5833c579c",
       "lang": "de",
       "text": "Die Stäbe biegen sich nur ein wenig — doch genug, dass der Kobold sich seitwärts hindurchzwängt. Er ist so beeindruckt, dass er euch sein Lieblingsgeheimnis trotzdem verrät."
+    },
+    {
+      "id": "4c478bc1a414f87b",
+      "lang": "de",
+      "text": "Eure Helden klemmen die Tür auf, werfen drei duftende Scheite hinein, und binnen Minuten glüht Brückerich glücklich orange. Er räuspert sich stolz."
     },
     {
       "id": "4dc08df8be5213f2",
@@ -355,6 +410,11 @@
       "id": "4e0acd2bdcabea5f",
       "lang": "de",
       "text": "Die Hand ist zu schwer zum Schütteln! Euer Held braucht beide Arme. Der Wächter lacht dröhnend und lässt euch höflich um ihn herum."
+    },
+    {
+      "id": "4f26f377ee489aa7",
+      "lang": "de",
+      "text": "Euer Held stellt sich heldenhaft hin. „Ich, tapferer Verteidiger, beschütze deine Ehre!\" Das Törtchen lacht so sehr, dass eine Erdbeere abplatzt, und Lachen heilt mehr als jedes Versprechen."
     },
     {
       "id": "502bc659818634ff",
@@ -387,9 +447,24 @@
       "text": "Am Rand der fernsten Karte liegt ein Berg. Die Menschen, die in seiner Nähe wohnen, nennen ihn den Aschenberg, denn er hat immer geraucht, jeden Tag, solange sich irgendjemand erinnert.\n\nHundert Großmütterleben lang hatte das Dorf am Fuß dieses Berges ein freundliches Abkommen mit dem großen Drachen, der darin wohnt: In der längsten Nacht des Jahres legten die Dorfbewohner ihr einen Korb goldener Früchte und einen Kranz aus Wildblumen vor die Höhle. Dafür blieb der Drache — ihr Name ist Xyryth die Rote — ruhig und hielt die Winterstürme fern.\n\nHundert Leben lang funktionierte das.\n\nDoch in diesem Winter änderte sich etwas. Eines Morgens fehlte die kleine Tamsin in ihrem Bett. Auf ihrem Kissen lag nur eine warme, glänzende Drachenschuppe. Am nächsten Morgen war es Jorik, der Sohn des Müllers. Am dritten kam Bäckerin Pel angerannt mit einer weiteren warmen Schuppe in der zitternden Hand. Drei Kinder, drei Winternächte, drei leere Betten.\n\nDie Dorfbewohner saßen lange am Feuer und redeten. Ein durchreisender Kesselflicker sprach schließlich aus, was alle zu sagen fürchteten: „Xyryth ist einsam geworden.\" Drachen leben, müsst ihr wissen, tausende Jahre, doch sie werden traurig, wenn nie jemand kommt. Xyryth hat nirgendwo auf der Welt noch Familie.\n\nDie Kinder sind sicher — Xyryth würde niemals einem Kind wehtun — aber sie will Gesellschaft, und sie weiß nicht, wie man wie ein Mensch fragt. Sie fragte wie ein Drache.\n\nSo sammelte das Dorf jedes mutige Kind und jeden Erwachsenen, die wollten, und sie zogen Strohhalme. Eure Helden wurden gewählt. Eine liebe alte Großmutter drückte dem Jüngsten eine winzige Holzeule in die Hand, zum Glück. Der Dorfälteste gab euch einen in Tuch gewickelten Laib dunkles Brot. Das ganze Dorf begleitete euch bis zum ersten Meilenstein und blieb dann stehen und winkte und weinte ein wenig.\n\n„Bringt heim, wen ihr könnt\", flüsterten sie. „Und vielleicht… bringt Xyryth einen Freund.\"\n\nDer Weg den Berg hinauf ist lang und kalt. Der Rauch aus dem Aschenberg kräuselt sich wie eine langsame Frage in den Himmel. Dort oben sind drei Kinder sicher, doch möchten nach Hause. Dort oben versucht ein einsamer Drache, herauszufinden, wie man sich entschuldigt. Dort oben beginnt euer Abenteuer."
     },
     {
+      "id": "584f638fe8c95b72",
+      "lang": "de",
+      "text": "🍯 Das Honigwaben-Herz strahlt wieder honiggolden! Jedes Gebäck setzt sich mit einem zufriedenen Seufzer in sein Blech zurück. Frau Honigwabe umarmt eure Helden und stopft warme Zimtschnecken in ihre Taschen. Von heute an riecht jede Bäckerei in Marzipan ein klein wenig süßer — eurer wegen."
+    },
+    {
+      "id": "59a59a3c2856a584",
+      "lang": "de",
+      "text": "🥐 Die Bäckerei kühlt sich für einen ruhigen Abend ab. Frau Honigwabe gießt euren Helden warme Milch ein und verspricht, dass morgen süßer wird. Magie mag geduldige Bäcker."
+    },
+    {
       "id": "59f890695cd939ee",
       "lang": "de",
       "text": "„Lieber Wächter\", sagt euer Held sanft, „der Prinz, über den du wachst, ist nicht mehr allein. Wir bringen seine Krone ins Tageslicht.\" Das große Steingesicht zittert. Eine einzelne Kieseltränе rollt herab. Er legt sich langsam hin und lächelt im Einschlafen."
+    },
+    {
+      "id": "5a6463606d95fd18",
+      "lang": "de",
+      "text": "Etwas Chaos bleibt, doch die Bäckerei ist außer Gefahr. Frau Honigwabe gibt jedem eine saubere Schürze und ein Augenzwinkern."
     },
     {
       "id": "5d7d35f6a45cff36",
@@ -422,9 +497,19 @@
       "text": "Oben auf der Klippe erstreckt sich ein rissiger Hof vor einem alten zerbrochenen Tor. Kaum tretet ihr auf die Steinplatten, springen fünf kleine Kobolde hinter Fässern und zerbrochenen Statuen hervor. Es sind keine gruseligen Kobolde — eher die Art, die ihre Mutter im letzten Schneesturm verloren hat. Ihre Kleidung ist zu groß. Ihre Augen sind leuchtend gelb und nervös. Sie halten kleine Holzspieße und versuchen sehr tapfer auszusehen. Der Größte tritt vor und piepst: „Keine Menschen weiter! Wir sind sehr gruselig! Wahrscheinlich!\""
     },
     {
+      "id": "61cbec2c2232d8e1",
+      "lang": "de",
+      "text": "„Kinder träumen von deinen Apfeltörtchen. Alte Männer erinnern sich beim Brotduft an ihre Mütter. Du wirst mehr geliebt, als du ahnst.\" Das Herz pulst, erblüht golden und füllt den Raum mit warmem Zimtduft."
+    },
+    {
       "id": "61f68566d81418e6",
       "lang": "de",
       "text": "Der Sprung ist ein bisschen zu weit. Euer Held wackelt und hüpft zurück. Die Brücke ist heute zu wackelig — ihr müsst anders hinüber."
+    },
+    {
+      "id": "62849c3a375ed03e",
+      "lang": "de",
+      "text": "Euer Held drückt eine perfekte Zuckerguss-Punktlinie vom Versteck zurück zum Blech. Die Schnecken folgen wie Entlein, eine nach der anderen hüpft an ihren Platz."
     },
     {
       "id": "62dde5cc65d717b8",
@@ -467,6 +552,11 @@
       "text": "Eine Katze faucht leise — mehr überrascht als böse. Euer Held macht einen Bogen und umgeht den Raum, was länger dauert, aber klappt."
     },
     {
+      "id": "6c2d11fe048103d4",
+      "lang": "de",
+      "text": "„Was bedrückt dich, lieber Ofen?\", fragt euer Held. Brückerich gibt zu, dass dieses Monat niemand seine Steine poliert hat. Euer Held poliert kurz nach, und er strahlt freudig rot vor Stolz."
+    },
+    {
       "id": "6c8ef55c0907f04b",
       "lang": "de",
       "text": "Hau-ruck! Die Platte hebt sich und darunter liegt ein silberner Schlüssel."
@@ -477,9 +567,19 @@
       "text": "Euer Held entdeckt eine Reihe flacher Trittsteine gerade unter der Brücke. Die ganze Gruppe hüpft von Stein zu Stein, trocken und sicher. Ganz einfach!"
     },
     {
+      "id": "6dd3c8192541c722",
+      "lang": "de",
+      "text": "Im Herzen der Bäckerei, auf einem kleinen Samtkissen, ruht das Honigwaben-Herz — ein sechseckiger Anhänger aus goldener Wabe, der warm bernsteinfarben leuchten sollte. Heute flackert er wie eine Kerze im Zug. Frau Honigwabe hat Tränen in den Augen. „Drei Dinge braucht er zum Heilen, und nur ein Held kann sie geben. Eine mutige Tat, eine kluge Einsicht oder ein liebes Wort — was eure Gruppe am meisten hat.\""
+    },
+    {
       "id": "72ce5138018b2eff",
       "lang": "de",
       "text": "Euer Held greift direkt durch das schwarze Glas — es fühlt sich kühl wie Wasser an — und schüttelt dem schüchternen Selbst fest die Hand. „Danke, dass du vorsichtig bist\", sagt er. „Ab hier mache ich weiter.\" Der Spiegel löst sich in einem sanften Lachen auf."
+    },
+    {
+      "id": "75080207ca0c3ba5",
+      "lang": "de",
+      "text": "Auf dem Holztisch sitzt ein langer goldener Brotlaib, der ein Vier-Ton-Lied vor sich hin summt. Frau Honigwabe flüstert: „Wenn ihr die Melodie genau zurücksingt, beruhigt es sich zur Scheibe und stört keine Kundschaft mehr. Hört gut hin — Brot hat ein kurzes Gedächtnis.\""
     },
     {
       "id": "757b21a11227bc6c",
@@ -512,6 +612,11 @@
       "text": "Der Name passt nicht ganz — der Schatten legt den Kopf schief. Doch Versuchen ist schon eine Güte, und der Herzbaum lächelt ein kleines, müdes Lächeln. Noch ein Name, und er könnte der richtige sein."
     },
     {
+      "id": "7c53dbca7a43cd35",
+      "lang": "de",
+      "text": "Das Erste, was eure Helden bemerken, ist, dass der Boden sich bewegt. Zwölf pummelige Zimtschnecken, jede so groß wie ein Kätzchen, flitzen kichernd im Kreis durch den Laden und hinterlassen kleine Zuckerguss-Spiralen. Eine Großmutter, die Brot kaufen will, kreischt und stellt die Füße auf einen Stuhl. „Fangt sie!\", ruft Frau Honigwabe. „Aber sanft — sie sind furchtbar kitzlig!\""
+    },
+    {
       "id": "7d39b21bf40b965d",
       "lang": "de",
       "text": "Drei rundliche Frösche hüpfen heran, stolz zu helfen. „Quak, springt auf!\" Ihr reitet Froschrücken-Taxi über die Wiese und singt mit den Marienkäfern ein kleines Hüpflied."
@@ -542,6 +647,11 @@
       "text": "Euer Held klopft das Kissen, flüstert ein Wiegenlied und gibt dem Plüsch-Drachen einen Gutenachtkuss. Das Echo ist so gerührt, dass sie euch eine Glasmurmel als Dank in die Hand schweben lässt."
     },
     {
+      "id": "8318f6a707e5b6a1",
+      "lang": "de",
+      "text": "Die Pose wirkt etwas albern, doch das Törtchen liebt albern. Es macht mit, bis beide zu sehr lachen, um traurig zu sein."
+    },
+    {
       "id": "84b35fcbf306dc25",
       "lang": "de",
       "text": "„Xyryth die Rote!\" ruft euer Held so groß wie möglich. Der ganze Körper des Drachen zittert vor Freude. „Seit hundert Jahren hat niemand meinen vollen Namen gesagt.\" Sie neigt ihren riesigen Kopf, bis er fast eure Füße berührt. „Danke, kleiner Freund.\""
@@ -557,6 +667,11 @@
       "text": "Euer Held erinnert sich fast an den Namen, doch nicht ganz. Corvus zuckt traurig — „fast, Kind, fast\" — und übergibt die Krone trotzdem, dankbar für den Versuch."
     },
     {
+      "id": "868a1772ed829b16",
+      "lang": "de",
+      "text": "Euer Held findet den Kopf hinter einem Mehlsack, summt ein beruhigendes Lied und klebt mit Zuckerguss. Der Wächter salutiert glücklich."
+    },
+    {
       "id": "885ce68306851dc1",
       "lang": "de",
       "text": "Die Tür ist heute zu schüchtern und bleibt zu. Doch sie flüstert einen Tipp: das Seitenfenster zu versuchen. Die Gruppe klettert wie Katzen durch ein großes rundes Fenster."
@@ -565,6 +680,11 @@
       "id": "891c764d06f2090f",
       "lang": "de",
       "text": "Im dritten Stockwerk wandern vier riesige Schattenkatzen langsam um einen Teich aus Mondlicht. Sie sind nicht böse — nur sehr einsam, wie alle Wesen in diesem Turm. Ihre Pfoten hinterlassen winzige Frostabdrücke auf dem Stein, und sie schnurren so tief, dass die Wände mitsummen. Als ihr den Raum betretet, drehen sich alle vier um und starren euch mit leuchtenden silbernen Augen an. Eine gähnt in der Größe einer Höhle und zeigt riesige Zähne."
+    },
+    {
+      "id": "8a08cc163e0915f1",
+      "lang": "de",
+      "text": "Im hinteren Teil der Küche kauert der uralte Backsteinofen, den alle nur „Brückerich\" nennen. Heute schmollt Brückerich — die Tür knarrt zu, sobald jemand sie öffnet, und er weigert sich, über lauwarm zu heizen. Frau Honigwabe flüstert: „Jeder hat seinen eigenen Umgang mit Sturköpfen. Wählt den Weg, der zur Gruppe passt.\""
     },
     {
       "id": "8bdad5d06f2d0735",
@@ -587,6 +707,11 @@
       "text": "Euer Held holt ein großes staubiges Buch aus dem Regal und liest darin ein Rätsel. Er löst es in weniger als einer Minute! Die Bibliothekarin klatscht — klatsch, klatsch, klatsch — lautlos, weil sie ein Geist ist, aber so glücklich, dass die Kerzen auf dem Pult auf und ab hüpfen."
     },
     {
+      "id": "93918223e60dace5",
+      "lang": "de",
+      "text": "Euer Held entdeckt einen halb geschlossenen Zug, öffnet ihn behutsam, und Brückerich rauscht zur perfekten Backtemperatur. „Endlich einer, der meinen Schornstein liest!\", brummt er liebevoll."
+    },
+    {
       "id": "94a7b7f72530aaa1",
       "lang": "de",
       "text": "Ein Dorn pikst in den Finger. Euer Held sagt „Aua!\" und lässt das Gestrüpp fast unberührt."
@@ -602,9 +727,19 @@
       "text": "Der nächste Wegabschnitt ist eine matschige Wiese. Brauner Matsch blubbert zwischen den Wildblumen hervor, und jeder Schritt macht ein lautes PLATSCH. Eine Marienkäferfamilie klammert sich an einem Blatt fest, zu ängstlich, um loszulassen. Wählt klug — jeder Weg setzt eine andere Stärke voraus. Worin eure Gruppe am besten ist, wird klappen."
     },
     {
+      "id": "9771db47fefc79fd",
+      "lang": "de",
+      "text": "Die Worte wackeln, doch das Herz spürt die Liebe darunter. Es leuchtet weicher als voll hell, aber stetig, und das genügt."
+    },
+    {
       "id": "98f66db4e8d9bd5e",
       "lang": "de",
       "text": "Ein Teil passt nicht richtig. Euer Held drückt es mit einem Zucken hinein. Immer noch ein Drache, so ungefähr."
+    },
+    {
+      "id": "9972fce6552ff5af",
+      "lang": "de",
+      "text": "Fast! Das Buch wackelt freundlich mit den Seiten und zeigt auf eine Kerze am Fensterbrett. Jetzt seht ihr's. Die Seite kehrt trotzdem zurück, etwas sanfter als sonst."
     },
     {
       "id": "9a0c497d33805894",
@@ -635,6 +770,16 @@
       "id": "9fd4cce146337d62",
       "lang": "de",
       "text": "Es sind viele Geister, und euer Held wird mittendrin müde. Doch die, denen zugehört wurde, ziehen in Frieden weiter, und die anderen winken dankbar, als ihr vorbeigeht."
+    },
+    {
+      "id": "a17fcdf67f9bf870",
+      "lang": "de",
+      "text": "Euer Held rutscht unter die schräge oberste Etage und fängt sie gerade noch. Glasur gerettet."
+    },
+    {
+      "id": "a202bec02b321d4b",
+      "lang": "de",
+      "text": "Das magische Rezeptbuch ruht auf einem Holzpult — eine Seite fehlt. Wo sie hingehört, schimmert ein Rätsel in Zuckerguss-Buchstaben: „Süß bin ich, doch wachs' ich nicht, von Bienen komm ich, doch Honig bin ich nicht, auf der Zunge schmelze ich, der Sonne Erinnerung bin ich. Was bin ich?\""
     },
     {
       "id": "a27b904adae1538b",
@@ -697,6 +842,11 @@
       "text": "Ihr trefft euch auf der Lichtung wieder und lacht über eure kleinen Abenteuer. Huu die Eule kreist stolz über euch."
     },
     {
+      "id": "ac12e1eab46040c5",
+      "lang": "de",
+      "text": "„DIE ZUCKER-BÄCKEREI!\", ruft euer Held und hält das Herz Richtung Dachbalken. Das ganze Gebäude vibriert vor glücklicher Magie. Backwaren jubeln. Das Herz lodert bernsteinfarben."
+    },
+    {
       "id": "ad068c4ff349f09c",
       "lang": "de",
       "text": "Die Kobolde erschrecken vor der lauten Stimme und stieben wie Blätter davon. Eure Gruppe geht etwas verlegen durch den leeren Hof. Na gut — es hat funktioniert, irgendwie?"
@@ -705,6 +855,16 @@
       "id": "b0b633351f973ac6",
       "lang": "de",
       "text": "Der Kiesel ist etwas stumpf. Die Kobolde schnuppern und wirken enttäuscht. Aus Höflichkeit nehmen sie ihn trotzdem und winken die Gruppe mit einem Schulterzucken weiter."
+    },
+    {
+      "id": "b0e513b3643a1b99",
+      "lang": "de",
+      "text": "Was ist die Antwort?"
+    },
+    {
+      "id": "b2136af18e6bb658",
+      "lang": "de",
+      "text": "Euer Held springt wie ein Torhüter, Korb in der Hand, und fängt sechs Schnecken in einem heroischen Hechtsprung. Die anderen sechs lachen so sehr, dass sie umfallen und sich freiwillig ergeben."
     },
     {
       "id": "b288230543add952",
@@ -717,6 +877,11 @@
       "text": "„Du sorgst dich, weil dir Menschen wichtig sind\", sagt euer Held, „und das ist nichts Schlechtes.\" Das Spiegelbild nickt, setzt sich wie ein müder Freund hin, und der Spiegel wird zu Wasser und läuft ab."
     },
     {
+      "id": "b3feeaf038d4007c",
+      "lang": "de",
+      "text": "Eure Helden summen die vier Töne perfekt nach. Der Laib seufzt lang und zufrieden und sinkt sanft auf das Schneidebrett, bereit zum Aufschneiden."
+    },
+    {
       "id": "b439b0cf4b3f8b09",
       "lang": "de",
       "text": "Die Steine sind rutschig von der Gischt. Euer Held entscheidet, dass es nicht sicher ist, und klettert zurück. Zurück zur Brücke!"
@@ -725,6 +890,11 @@
       "id": "b43a64fb2e164208",
       "lang": "de",
       "text": "Die Maus blinzelt. „Klug? Oje. Ein wenig geflunkert.\" Die Tür schiebt sich trotzdem auf — leicht enttäuscht."
+    },
+    {
+      "id": "b553a84021bd9a51",
+      "lang": "de",
+      "text": "„Du bist das röteste Rot, das ich je gesehen habe, und deine Kruste ist so golden, dass mir die Augen lachen.\" Das Törtchen errötet, setzt sich kerzengerade hin und stolziert in die Auslage."
     },
     {
       "id": "b5d1aad05dc5f286",
@@ -772,6 +942,21 @@
       "text": "Euer Held hebt den Riegel, ohne etwas zu verlangen. Die Augen des Kobolds füllen sich mit Tränen. „Mir hat noch nie einfach so jemand geholfen\", flüstert er und verrät euch jedes Drachen-Geheimnis, vom Lieblingskuchen bis zur Schüchternheit mit ihrem Namen."
     },
     {
+      "id": "bb6378bde04ff8e7",
+      "lang": "de",
+      "text": "Die Tür klemmt einen Heldenärmel ein. Brückerich erwärmt sich aus Mitleid, doch das Brot braucht doppelt so lange."
+    },
+    {
+      "id": "bc8170f22f09589e",
+      "lang": "de",
+      "text": "Die Komplimente kommen etwas schief, doch das Törtchen schätzt den Versuch und hört auf zu schniefen. Es will trotzdem eine Umarmung, die euer Held sanft gibt."
+    },
+    {
+      "id": "bd2be0c12545a391",
+      "lang": "de",
+      "text": "Euer Held summt eine langsame, warme Melodie. Die Schnecken halten an, lauschen und watscheln dann friedlich ins Blech, gähnend. Frau Honigwabe wischt sich eine Träne weg."
+    },
+    {
       "id": "bd93a7afc735d6c6",
       "lang": "de",
       "text": "Der weinende Engel lächelt durch die Tränen. „Mitgefühl ist, was Vorgath vergessen hat. Geht — seid seine Erinnerung.\" Das Siegel schmilzt wie Morgenschnee."
@@ -780,6 +965,16 @@
       "id": "bdb5618d109f638a",
       "lang": "de",
       "text": "Ein Nieser! — fast. Euer Held fängt ihn gerade rechtzeitig, wankt aber einen Schritt zurück. Ihr müsst etwas neu beginnen, doch kein Schaden, nur etwas Würde weg."
+    },
+    {
+      "id": "be02852a75a07eab",
+      "lang": "de",
+      "text": "Ein gedämpfter Knall von oben. Frau Honigwabe stockt der Atem: „Drei Räume, drei Probleme, alle gleichzeitig! Eine Hochzeitstorte stürzt ein, ein Sauerteig ist schafgroß geworden, und einem Lebkuchenwächter ist der Kopf abhanden gekommen — buchstäblich. Aufteilen! Jeder einen Raum!\""
+    },
+    {
+      "id": "beb8118c77dd7ba8",
+      "lang": "de",
+      "text": "Der Kopf sitzt etwas schief, doch der Wächter besteht darauf, das sei ein keckeres Profil, und steht stolz da."
     },
     {
       "id": "bf62de628964fb6d",
@@ -810,6 +1005,11 @@
       "id": "c012980fb087e532",
       "lang": "de",
       "text": "Die Kinder sind zuerst scheu und halten Abstand. Doch euer Held setzt sich still mit offenen Armen hin, und nach einer Minute klettert das Kleinste auf den Schoß. Die anderen folgen langsam, eins nach dem anderen."
+    },
+    {
+      "id": "c1bc95a166017e3c",
+      "lang": "de",
+      "text": "Die Schnecken mögen den Gesang so sehr, dass sie weitertanzen. Euer Held wechselt zu einer gähnigen Melodie, und langsam rollen sie sich zum Nickerchen ein."
     },
     {
       "id": "c2598b088860e4e9",
@@ -852,6 +1052,11 @@
       "text": "Drei leuchtende Türen stehen nebeneinander — jede mit einem Kinderspielzeug von Xyryth markiert. Eine kleine Stimme (das Echo ihres jüngeren Ichs) fragt: „Spielt jeder von euch eines meiner Spiele? Ich war so ein einsames Drachenkind — ich durfte nie mit Freunden spielen.\" Die Gruppe muss sich aufteilen, jeder nimmt eine Prüfung."
     },
     {
+      "id": "c8814273beb75064",
+      "lang": "de",
+      "text": "Der Ruf bricht etwas, doch das Herz schätzt den Mut. Es leuchtet stetig, wenn auch nicht lodernd. Der Tag ist gerettet."
+    },
+    {
       "id": "cb507bc9e936ae2a",
       "lang": "de",
       "text": "Das fünfte Stockwerk ist das Herz des Turms. Mitten auf dem Steinboden schlägt eine riesige Zahnrad-und-Feder-Maschine, groß wie ein kleines Haus, tick… tick… tick in langsamem, schwerem Takt. Jedes Ticken lässt den Turm ein wenig erzittern. Das hält Vorgaths Zauber wach. Wenn ihr das Herz verlangsamen könnt, wird der Turm schläfrig, und das oberste Stockwerk leichter erreichbar."
@@ -885,6 +1090,11 @@
       "id": "d14746e820963dd0",
       "lang": "de",
       "text": "Auf jedem Stein steht ein Wort, zusammen ergeben sie ein Rätsel. Euer Held löst es: ein Hinweis für das oberste Stockwerk! „Vorgath fürchtet Mitleid, sehnt sich aber nach Freunden.\" Gut zu wissen."
+    },
+    {
+      "id": "d1a81aeb2b7cb5d9",
+      "lang": "de",
+      "text": "Auf einem kleinen Teller schluchzt ein perfektes Erdbeertörtchen. Winzige Beerensaft-Tränen rollen über die goldene Kruste. „Niemand wählt mich je zuerst\", schnieft es. „Immer nur die Schokoladigen.\" Es blinzelt eure Helden mit zuckersüßen, hoffnungsvollen Augen an. Frau Honigwabe flüstert: „Traurige Backwaren werden nicht gut. Tröstet es, dann ist es bereit für die Auslage.\""
     },
     {
       "id": "d1fa6fab29bc6b02",
@@ -942,6 +1152,16 @@
       "text": "„Ich nenne dich Stille\", sagt euer Held sanft, „weil du aus leisem Kummer kamst, aber leise Freude werden kannst.\" Der Schatten hört seinen neuen Namen und funkelt stolz. Er tanzt um den Herzbaum, der sich wieder in silberne Blätter kleidet."
     },
     {
+      "id": "d96431e081ca7e31",
+      "lang": "de",
+      "text": "Die Erklärung verheddert sich etwas, doch das Törtchen versteht den Kern und beschließt, einzigartig zu sein, sei genug. Frau Honigwabe nickt anerkennend."
+    },
+    {
+      "id": "da5da9806d1a31f1",
+      "lang": "de",
+      "text": "Alle drei Räume werden still zugleich. Eure Gruppe trifft sich am Fuß der Treppe wieder, überzogen mit Mehl, Zucker und Stolz."
+    },
+    {
       "id": "da6e129a4a76fb6b",
       "lang": "de",
       "text": "Das siebte Stockwerk wird von einem großen Bronzesiegel versperrt, in das drei Gesichter gemeißelt sind — ein brüllender Löwe, eine weise Eule und ein weinender Engel. Eine Stimme dröhnt aus dem Siegel: „Nur eine Tugend öffnet mich. Sprecht jene, die eure Gruppe am wahrsten lebt. Lügt ihr, schlafe ich. Sagt ihr die Wahrheit, erhebe ich mich.\" Das Siegel ist riesig. Es ist nicht wütend — nur sehr alt und sehr gerecht."
@@ -952,14 +1172,29 @@
       "text": "Die Krähe starrt euch nur mit glitzernden Augen an. Dann fliegt sie auf die andere Seite und schaut zurück. Vielleicht will sie euch einen anderen Weg zeigen?"
     },
     {
+      "id": "dd62dc466ff15153",
+      "lang": "de",
+      "text": "Euer Held flüstert ein genaues Mehl-Wasser-Verhältnis, beruhigt den Teig, und er schrumpft zurück in ein höfliches Glas."
+    },
+    {
       "id": "dd7849723b4488f1",
       "lang": "de",
       "text": "Das Lächeln wackelt. Das ist in Ordnung. Auch ein wackeliges Lächeln ist lieb. Der Spiegel verblasst ein wenig und lässt euch vorbei, dankbar für den Versuch."
     },
     {
+      "id": "de6c04a85fbccea0",
+      "lang": "de",
+      "text": "Die Schnecken sind glitschiger als gedacht. Euer Held hat Zuckerguss auf der Nase, doch Frau Honigwabe holt einen größeren Korb und gemeinsam treibt ihr sie in die Ecke."
+    },
+    {
       "id": "dfa481051a19766b",
       "lang": "de",
       "text": "Euer Held geht langsam, ruhig, wie durch hohes Gras. Die Katzen schauen — und teilen sich zu einem Pfad. Als euer Held die Größte passiert, nickt sie mit leisem Respekt."
+    },
+    {
+      "id": "dfb6e9a5e1996ef8",
+      "lang": "de",
+      "text": "Die Worte sind lieb, aber etwas schüchtern. Brückerich erwärmt sich aus Dankbarkeit halb. Besser als nichts."
     },
     {
       "id": "e0164166e5702798",
@@ -982,6 +1217,11 @@
       "text": "„Ja\", sagt euer Held, geht direkt hin und nimmt seine alte, dünne Hand. „Wir wollten deine Freunde werden. Die Welt braucht dich wach, und du brauchst uns, und das machen Freunde.\" Vorgaths Augen füllen sich mit Tränen. Er lächelt zum ersten Mal seit dreihundert Jahren."
     },
     {
+      "id": "e3203bc70f1866d9",
+      "lang": "de",
+      "text": "Die Schrift bleibt sturköpfig klein. Euer Held rät trotzdem auf Honig, und glücklicherweise stimmt das — die Magie erwacht doch noch."
+    },
+    {
       "id": "e3557d122b9b46c6",
       "lang": "de",
       "text": "Euer Held nimmt ein Kind auf den Arm, fasst das zweite bei der Hand und setzt das dritte auf die Schultern. Durch die rauchigen Gänge marschieren sie und singen ein albernes Lied, damit alle mutig bleiben. Die Kinder fühlen sich zum ersten Mal seit Tagen sicher."
@@ -992,9 +1232,19 @@
       "text": "Die Eiche lacht tief, dass ihre Rinde zittert. „Hell wie eine neue Eichel!\" sagt sie und teilt ihre Äste wie einen Vorhang."
     },
     {
+      "id": "e4a145722942681e",
+      "lang": "de",
+      "text": "Ein Ton verrutscht. Der Laib schüttelt den Kopf und beginnt eine andere Melodie. Beim zweiten Versuch klappt es, doch der Laib ist nun etwas mürrisch."
+    },
+    {
       "id": "e5ac9a18c371c08a",
       "lang": "de",
       "text": "Der Handschlag ist zögerlich. Verständlich — sich selbst die Hand geben ist seltsam. Das Spiegelbild winkt stattdessen, und das reicht. Der Weg öffnet sich."
+    },
+    {
+      "id": "e5f83dcc3832737e",
+      "lang": "de",
+      "text": "Im kopfsteingepflasterten Dorf Marzipan, an der Ecke Zimtgasse und Honigstraße, gibt es einen winzigen Laden mit einer gestreiften Markise und einer Türklingel in Form eines Butterstücks. Das Schild draußen sagt „Die Zucker-Bäckerei\", und der Duft aus der Tür reicht, um einer Steinstatue ein Lächeln zu entlocken.\n\nDie Besitzerin ist eine runde, fröhliche Frau namens Frau Honigwabe. Ihre Schürze ist immer mit Mehl bestaubt, ihre Wangen immer rosig. Sie backt die besten Apfeltörtchen im ganzen Königreich, und sie hat ein magisches Rezeptbuch, das ihre Ur-Ur-Großmutter ihr geschenkt hat — ein Buch, das dem Bäcker den nächsten Schritt ins Ohr flüstert.\n\nDoch heute stimmt etwas ganz und gar nicht.\n\nAls eure Helden den Laden betreten, huscht eine Schar Zimtschnecken kichernd zwischen ihren Füßen hindurch. Ein Brotlaib summt in der Ecke ein Lied. Durch die Küchentür hört man etwas sehr Großes und sehr Wütendes Töpfe gegeneinanderschlagen.\n\nFrau Honigwabe eilt hinter der Theke hervor, Mehl im Haar, einen Holzlöffel in jeder Hand. „Oh, dem Himmel sei Dank, Helfer! Mein Rezeptbuch hat Schluckauf, und jetzt ist alles in der Küche lebendig und ein bisschen frech. Das Honigwaben-Herz — das ist der magische Anhänger, der die Bäckerei am Leben hält — wird schwächer. Wenn wir es nicht bis Sonnenuntergang reparieren, wird die Bäckerei zu einem gewöhnlichen Laden, und alle Magie verlässt Marzipan für immer.\"\n\nSie drückt eurem Helden eine kleine, mehlbestäubte Schürze in die Hand. „Wollt ihr mir helfen, die Ausreißer einzusammeln und die verlorene Rezeptseite zu finden? Ich bezahle euch mit frischem Gebäck und Abenteuer!\"\n\nEure Helden schauen sich an. Backwaren-Chaos. Singendes Brot. Ein magisches Herz, das geheilt werden muss. Was gibt es Schöneres für einen Nachmittag?\n\nSie binden sich die Schürzen um. Die Zucker-Bäckerei wartet."
     },
     {
       "id": "e736cc7d0f5598c6",
@@ -1117,6 +1367,11 @@
       "text": "Eine Runde reicht! Euer Held lässt sich ins Gras fallen und keucht. Der Garten streichelt ihn mit einer warmen Brise, auch das ist gute Rast."
     },
     {
+      "id": "01c0e3e303a89944",
+      "lang": "en",
+      "text": "The dough still grumbles, but you wrangle it into a big bowl. Tomorrow's pizza will be glorious."
+    },
+    {
       "id": "0394a1217640facb",
       "lang": "en",
       "text": "On the far side of the canyon waits a troll as tall as a small house. His skin is covered in green moss, and a family of tiny sparrows has built a nest in his left ear. He taps his knobbly club on the ground and blocks the path with a grumpy frown. \"TOLL!\" he grunts in a voice that makes pebbles jump. \"Pay the toll, or sing me a song, or answer a good riddle. Choose quickly, little ones — old Murgaz has been lonely for a hundred years.\""
@@ -1142,6 +1397,11 @@
       "text": "A thorn nips a finger. Your hero says \"ouch!\" and backs away, leaving the bramble mostly tangled."
     },
     {
+      "id": "09c933d0dc581e19",
+      "lang": "en",
+      "text": "Almost! The book gives a kindly shake of its pages and points at a candle on the windowsill. Now you see it. The page returns anyway, gentler than usual."
+    },
+    {
       "id": "0a5ef8afbccad4ba",
       "lang": "en",
       "text": "Each matched pair gives a soft, happy coo — like a newborn dragonling dreaming. Xyryth's voice echoes from deeper in the mountain: \"Thank you, kind travelers. The next door is open.\""
@@ -1160,6 +1420,16 @@
       "id": "0be6d2b7e8872b0d",
       "lang": "en",
       "text": "The owl-face tilts. \"You are thinking, but not that wise. Not yet.\" The seal grudgingly grinds open halfway."
+    },
+    {
+      "id": "0c005547c37c155c",
+      "lang": "en",
+      "text": "Your hero's words are kind but a bit shy. Old Brick still warms up halfway out of appreciation. Better than nothing."
+    },
+    {
+      "id": "0c6121487a2b2202",
+      "lang": "en",
+      "text": "Your hero whispers a measured ratio of flour-to-water, calms the dough, and shrinks it back to a polite glass jar."
     },
     {
       "id": "0f58f1702de94aa0",
@@ -1237,6 +1507,16 @@
       "text": "Your hero almost remembers his name but not quite. Corvus gives a sad little shrug — \"close, child, close\" — and hands over the crown anyway, grateful for the trying."
     },
     {
+      "id": "1d005526a4abcace",
+      "lang": "en",
+      "text": "The reasoning gets tangled, but the tart catches the gist and decides being unique is enough. Mrs. Honeycomb gives a thumbs up."
+    },
+    {
+      "id": "1d2163db9b0a2db7",
+      "lang": "en",
+      "text": "Your hero hums a slow, warm tune. The rolls stop, listen, and then waddle peacefully into their tray, yawning. Mrs. Honeycomb wipes a tear away."
+    },
+    {
       "id": "1d6b8a82f5156934",
       "lang": "en",
       "text": "A narrow doorway is blocked by a little stone keeper shaped like a mouse in a scholar's cap. \"Before the inner chamber, prove your worth,\" he squeaks. \"Choose the kind of strength your company most truly holds. Lie, and the door stays shut. Speak true, and it opens.\""
@@ -1297,6 +1577,16 @@
       "text": "The words come out a little jumbled. The reflection cocks its head. Your hero shrugs and offers a second try — \"You're just tired, that's all.\" That's enough. The mirror lets you pass."
     },
     {
+      "id": "2cb5e6d95c44a953",
+      "lang": "en",
+      "text": "Some chaos lingers, but the bakery is no longer in danger. Mrs. Honeycomb gives each hero a clean apron and a wink."
+    },
+    {
+      "id": "2cf8423c3b8ab92c",
+      "lang": "en",
+      "text": "\"THE SUGARPLUM BAKERY!\" your hero cries, holding the Heart toward the rafters. The whole building vibrates with happy magic. Pastries cheer. The Heart blazes amber."
+    },
+    {
       "id": "2fa0ed60d748f81d",
       "lang": "en",
       "text": "Your hero lifts the latch without asking for anything in return. The little goblin's eyes fill with tears. \"Nobody's ever just helped me before,\" he whispers, then tells you every single secret about the dragon, from her favorite cake to her shyness about her name."
@@ -1327,6 +1617,11 @@
       "text": "Just past the iron doors, a giant crystal wall blocks the way. It plays a slow pattern of four notes, then waits — glowing softly, as if to say: \"Repeat after me.\" The crystal wants to hear you sing the same song back."
     },
     {
+      "id": "32d71e535b24dccf",
+      "lang": "en",
+      "text": "\"Sometimes the very best dessert is the one you save for last,\" your hero says. The tart's tears stop. \"Oh,\" it whispers, deeply impressed. \"I am the savouring tart!\" It puffs up its crust proudly."
+    },
+    {
       "id": "355ecd421764ab22",
       "lang": "en",
       "text": "The candle wobbles and drips. Your hero blows on it by accident and has to relight it from a neighbor torch."
@@ -1337,14 +1632,29 @@
       "text": "Head high, chin out, your hero climbs the stairs like they own them. Not a squeak. Not a sniff. The tower likes this. It whispers \"good\" without making a sound, and the top floor opens for you."
     },
     {
+      "id": "37626d107bc8e079",
+      "lang": "en",
+      "text": "The flue gets stuck halfway. The oven warms unevenly, but the bread comes out almost-perfect — only a slightly toasty bottom."
+    },
+    {
       "id": "376ad30accf547f1",
       "lang": "en",
       "text": "Each stone says one word, and together they spell a riddle. Your hero figures it out: it's a hint for the very last floor! \"Vorgath fears pity but longs for friends.\" Perfect to know."
     },
     {
+      "id": "38080482b5d64cf8",
+      "lang": "en",
+      "text": "On the wooden counter sits a long, golden loaf of bread that is humming a four-note tune to itself. Mrs. Honeycomb whispers: \"If you sing the tune back exactly, it will settle into a slice and stop disturbing the customers. Listen carefully — bread has a short memory.\""
+    },
+    {
       "id": "399b9267d0bf9ca4",
       "lang": "en",
       "text": "Your hero tells her about a grandmother who bakes apple pie on Sundays, and a cat who hides under the rug. The ghost librarian closes her eyes with a smile. \"Oh, that is a beautiful one,\" she sighs, and gives you her little bronze key."
+    },
+    {
+      "id": "3b4ab889834995d2",
+      "lang": "en",
+      "text": "🍯 The Honeycomb Heart shines bright as honey-gold once more! Every pastry settles back into its tray with a contented sigh. Mrs. Honeycomb hugs each of your heroes and stuffs their pockets with warm cinnamon rolls. From this day on, every bakery in Marzipan smells just a little sweeter, because of you."
     },
     {
       "id": "3c899a2b708eab71",
@@ -1392,6 +1702,11 @@
       "text": "Your hero watches the eyes blink — and spots that every third tile keeps its eye closed. \"Those are the safe ones!\" Step, skip, step, skip — the whole party crosses like it's a game of hopscotch."
     },
     {
+      "id": "48d296a18bcfe165",
+      "lang": "en",
+      "text": "In the pantry, a row of glass jars is rattling angrily. The labels have come unstuck — sugar and salt have argued, cinnamon and pepper have switched lids, and the vanilla is hiding behind the flour. Mrs. Honeycomb rolls up her sleeves: \"Match each jar to its twin so I can re-label them. Be gentle — they're proud little jars.\""
+    },
+    {
       "id": "498eec7825c1ce1e",
       "lang": "en",
       "text": "The rhyme doesn't rhyme perfectly on the first try. But the kids giggle so hard at the silly words that they forget to be scared. Sometimes a laugh works even better than a poem."
@@ -1415,6 +1730,16 @@
       "id": "4c6f285d76ffd778",
       "lang": "en",
       "text": "The mouse blinks. \"Clever? Oh dear. A stretch, I think.\" The door grinds open anyway, a tad disappointed."
+    },
+    {
+      "id": "4d6ead6233a50fcd",
+      "lang": "en",
+      "text": "The rolls love your singing so much they keep dancing. Your hero changes the tune to a yawn-y one and slowly they curl up to nap."
+    },
+    {
+      "id": "4d9d3e00700e3f61",
+      "lang": "en",
+      "text": "Your heroes brace the door, throw on three fragrant logs, and within minutes Old Brick is glowing a happy orange. It harrumphs proudly."
     },
     {
       "id": "4db69bccfa81f83f",
@@ -1445,6 +1770,16 @@
       "id": "511012f21b0ca9ab",
       "lang": "en",
       "text": "The fifth floor is the tower's heart. In the center of the stone floor beats an enormous gear-and-spring machine the size of a small house, going tick… tick… tick in a slow, heavy rhythm. Every tick makes the whole tower shudder a tiny bit. This is what keeps Vorgath's magic awake. If you can slow the heart down, the tower gets sleepy, and the top floor becomes easier to reach."
+    },
+    {
+      "id": "521463b3586c5896",
+      "lang": "en",
+      "text": "Your hero finds the head behind a flour sack, gently hums a calming song, and dabs icing as glue. The guard salutes happily."
+    },
+    {
+      "id": "572e327342b500d0",
+      "lang": "en",
+      "text": "In the back of the kitchen squats the bakery's ancient brick oven, named Old Brick by everyone. Today Old Brick is sulking — its door creaks shut every time someone opens it, and it refuses to heat above lukewarm. Mrs. Honeycomb whispers: \"Each of you has a different way with stubborn things. Pick the way that suits your fellowship best.\""
     },
     {
       "id": "57bc296d9a5e839d",
@@ -1512,6 +1847,11 @@
       "text": "Your hero picks up a sharp piece of flint and works slowly and steadily. Snip, snap, snip! The vines fall away one by one. The stag kisses your hero's cheek with his velvet nose and gallops off to tell the forest."
     },
     {
+      "id": "63190f6df73604bc",
+      "lang": "en",
+      "text": "The pose comes out a bit silly, but the tart loves silly. It joins your hero in striking poses until both are laughing too hard to be sad."
+    },
+    {
       "id": "632c57ae2bb128f6",
       "lang": "en",
       "text": "\"Xyryth the Red!\" your hero calls, standing as tall as possible. The dragon's whole body trembles with joy. \"Nobody has said my full name in a hundred years.\" She bows her enormous head until it almost touches your feet. \"Thank you, little friend.\""
@@ -1537,6 +1877,11 @@
       "text": "Vorgath is shy, and \"outside\" is a big word for someone who hasn't moved in three hundred years. But he nods slowly. \"Soon,\" he whispers. \"I'll try soon.\" And with that, the stars above the tower begin to right themselves."
     },
     {
+      "id": "6a486ef11f5b63ae",
+      "lang": "en",
+      "text": "On a small plate, a perfect strawberry tart is sniffling. Tiny tears of berry-juice roll down its golden crust. \"Nobody ever picks me first,\" it sniffs. \"They always pick the chocolate ones.\" It blinks up at your heroes with sugary, hopeful eyes. Mrs. Honeycomb whispers: \"Sad pastries don't bake well. Cheer it up, and it'll be ready for the window display.\""
+    },
+    {
       "id": "6abb2639d20d5c3f",
       "lang": "en",
       "text": "Three glowing doors stand in a row — each marked with one of Xyryth's childhood toys. A little voice (her younger-self echo) asks: \"Would you each play one of my games? I was such a lonely dragonling — I never got to play with friends.\" The party must split into the three rooms and each take one trial."
@@ -1550,6 +1895,11 @@
       "id": "6da80379235339ca",
       "lang": "en",
       "text": "\"Mister Dunn,\" your hero whispers, \"we know you were jealous. Being jealous is a kind of sadness. Alric would have forgiven you.\" A single ghostly tear rolls down Corvus's cheekbone. He nods, hands you the crown himself, and fades into peaceful silver dust."
+    },
+    {
+      "id": "6e3379a524eb1563",
+      "lang": "en",
+      "text": "Your hero leaps like a goalkeeper, basket in hand, and scoops up six rolls in one heroic dive. The other six laugh so hard they fall over and surrender on their own."
     },
     {
       "id": "6ea54de83b5a8549",
@@ -1567,6 +1917,11 @@
       "text": "The mud is deeper than it looks. Your heroes sink to the knees and have to backtrack, plopping out with loud SPLATS."
     },
     {
+      "id": "6f9a97af62454dcf",
+      "lang": "en",
+      "text": "The first thing your heroes notice is that the floor is moving. Twelve plump cinnamon rolls, each one the size of a kitten, are racing in circles around the front-of-shop, leaving little spirals of icing behind them. They are giggling. A grandmother trying to buy bread shrieks and lifts her feet onto a chair. \"Catch them!\" calls Mrs. Honeycomb. \"But gently — they are very ticklish!\""
+    },
+    {
       "id": "6fa668e8c4a3137a",
       "lang": "en",
       "text": "The scary bit is a little too scary. Your hero closes the book quickly, which is very wise. The librarian nods: \"Brave enough to start, brave enough to stop. Well done.\" She opens the way."
@@ -1577,9 +1932,24 @@
       "text": "The hug is a little too quick, and the shadow drifts a step away, shy. But something softens, and one silver leaf pops back onto a branch. Not bad for a first try!"
     },
     {
+      "id": "7065e66ed2c963de",
+      "lang": "en",
+      "text": "A few jars get re-mismatched and grumble loudly. You still get them mostly sorted, but a sneaky pinch of pepper ends up in tomorrow's sugar bowl."
+    },
+    {
       "id": "7102a6c52f83c24b",
       "lang": "en",
       "text": "A quick scan — the hat is on a low branch! The raccoon hugs your hero's knees in thanks."
+    },
+    {
+      "id": "71aeccf04580945e",
+      "lang": "en",
+      "text": "Your heroes hum the four notes back perfectly. The loaf gives a long, satisfied sigh and slumps gently onto a cutting board, ready for slicing."
+    },
+    {
+      "id": "725febe3e2180f02",
+      "lang": "en",
+      "text": "The compliments come out a little awkward, but the tart appreciates the effort and stops sniffling. It still wants a hug, which your hero gives gently."
     },
     {
       "id": "72ad17721a43a753",
@@ -1587,9 +1957,24 @@
       "text": "Your hero spots a row of flat stepping stones just below the bridge. The whole party hops from stone to stone, dry and safe. Easy peasy!"
     },
     {
+      "id": "757dcf06a703d18c",
+      "lang": "en",
+      "text": "🥐 The bakery cools down for a quiet evening. Mrs. Honeycomb pours your heroes some warm milk and promises tomorrow will be sweeter. Magic likes patient bakers."
+    },
+    {
       "id": "762f48c5df833a33",
       "lang": "en",
       "text": "Your hero pulls a huge dusty book off the shelf and reads a riddle inside. They solve it in less than a minute! The librarian claps — clap, clap, clap — silent, because she is a ghost, but she is so happy the candles on her desk jump up and down."
+    },
+    {
+      "id": "76fcc5f7b2a2b47e",
+      "lang": "en",
+      "text": "A bit of frosting gets on the ceiling, but the tier is mostly upright. Bridezilla averted."
+    },
+    {
+      "id": "782f1a3ed7bd5076",
+      "lang": "en",
+      "text": "Your hero dives sliding under the leaning top tier and catches it just in time. Frosting saved."
     },
     {
       "id": "787905ee6e448d4a",
@@ -1617,6 +2002,11 @@
       "text": "The lion-face roars with approval. The seal cracks open like sunrise. \"Then pass, brave hearts — the final floor awaits.\""
     },
     {
+      "id": "7ab32d37e4f8d7c0",
+      "lang": "en",
+      "text": "The words wobble, but the Heart hears the love behind them. It glows softer than full bright but steady, and that's enough."
+    },
+    {
       "id": "7b20285edaad64aa",
       "lang": "en",
       "text": "The mouse claps his tiny paws. \"Then brave through, brave hearts!\" The door swings wide with a courtly bow."
@@ -1635,6 +2025,11 @@
       "id": "7c30ecb534d6ac6b",
       "lang": "en",
       "text": "The story is a little short, but the ghost nods politely. \"Thank you anyway, sweet one,\" she says, and waves you through with a small sigh."
+    },
+    {
+      "id": "7d8bbb7b8e8304c0",
+      "lang": "en",
+      "text": "The riddle dissolves into golden sparkles. The missing page floats down from the rafters and slots itself back into the book with a satisfied flutter."
     },
     {
       "id": "81bd0c93350b99ba",
@@ -1707,9 +2102,24 @@
       "text": "The slab barely moves. Your hero wiggles a finger underneath and finds the key by touch."
     },
     {
+      "id": "89641d00e6296884",
+      "lang": "en",
+      "text": "The door slams on a hero's sleeve. Old Brick eventually warms up out of pity, but the bread takes twice as long."
+    },
+    {
       "id": "8b12ede35c98ab3b",
       "lang": "en",
       "text": "Your hero stands up straight and says in a big friendly voice: \"We are not here to fight! We are here to help the dragon!\" The goblins blink, lower their spears slowly, and whisper among themselves. \"Friends? Okay. Friends.\" They let you pass."
+    },
+    {
+      "id": "8b1a9b30318ba414",
+      "lang": "en",
+      "text": "In the cobblestone village of Marzipan, on the corner of Cinnamon Lane and Honey Street, there is a tiny shop with a striped awning and a doorbell shaped like a butter pat. The sign out front reads \"The Sugarplum Bakery\", and the smell coming out of the door is enough to make a stone statue smile.\n\nThe owner is a round, cheerful woman named Mrs. Honeycomb. Her apron is always dusted with flour and her cheeks are always pink. She bakes the best apple tarts in the whole kingdom, and she has a magical recipe book that her great-great-grandmother gave her — a book that whispers the next instruction to whoever is baking.\n\nBut today, something is very wrong.\n\nAs your heroes step inside, a crowd of cinnamon rolls scampers past their feet, giggling. A loaf of bread is humming a tune to itself in the corner. Through the kitchen door you can hear something very large and very angry banging pots together.\n\nMrs. Honeycomb hurries out from behind the counter, flour in her hair, a wooden spoon in each hand. \"Oh, thank goodness, helpers! My recipe book has the hiccups, and now everything in the kitchen is alive and a little bit naughty. The Honeycomb Heart — that is the magical pendant that powers the bakery — is dimming. If we cannot fix it before sunset, the whole bakery will turn back into an ordinary shop, and all the magic will leave Marzipan forever.\"\n\nShe presses a small flour-dusted apron into your hero's hand. \"Will you help me round up the runaways and find the missing recipe page? I will pay you in fresh-baked treats and adventure!\"\n\nYour heroes look at each other. Pastry chaos. Singing bread. A magical heart that needs healing. What better way to spend an afternoon?\n\nThey tie on their aprons. The Sugarplum Bakery waits."
+    },
+    {
+      "id": "8c042199b7b8b918",
+      "lang": "en",
+      "text": "All three rooms quiet down at once. Your fellowship reunites at the bottom of the stairs, dusted in flour, sugar and pride."
     },
     {
       "id": "8c044567efbab3ec",
@@ -1747,6 +2157,11 @@
       "text": "A tile wobbles under your hero's foot and they hop back just in time. Their heart is racing, but everyone is still safe. Another plan needed!"
     },
     {
+      "id": "94b7e4afff25793c",
+      "lang": "en",
+      "text": "What is the answer?"
+    },
+    {
       "id": "94f73247b3ef1c1b",
       "lang": "en",
       "text": "The bread crumbles too fast — whoops — and the goblins end up with just crumbs. They grumble, but crumbs are still better than nothing. They point the long way up and shuffle off."
@@ -1767,6 +2182,11 @@
       "text": "At the top of the cliff, a cracked courtyard stretches in front of an old broken gate. As soon as you step onto the flagstones, five small goblins pop out from behind barrels and broken statues. They are not the scary kind of goblin — they are the kind that lost their mother in the last snowstorm. Their clothes are too big for them. Their eyes are bright yellow and nervous. They grip little wooden spears and try very hard to look brave. The biggest one steps forward and squeaks: \"No humans past this point! We are very scary! Probably!\""
     },
     {
+      "id": "97a0f9928541c223",
+      "lang": "en",
+      "text": "A note slips. The loaf shakes its head and starts a different tune. You catch it on the second go, but it's a little grumpy now."
+    },
+    {
       "id": "98259405eb095b17",
       "lang": "en",
       "text": "The lion-face rumbles skeptically. \"Brave… somewhat. Not your truest self.\" The seal grinds open only halfway, and you must squeeze through."
@@ -1782,6 +2202,11 @@
       "text": "Your hero sings softly — a song about starlight and sleepy bears. Huge tears roll down the troll's mossy cheeks. \"My mother used to sing that one,\" he sniffles. He steps aside and hums along."
     },
     {
+      "id": "9c29c06a6e156904",
+      "lang": "en",
+      "text": "The rolls eat the trail before following it. Your hero has to start over with sprinkles, which works — but takes a while."
+    },
+    {
       "id": "9c978c5cef7ed6ea",
       "lang": "en",
       "text": "The pebble is a little dull. The goblins sniff it and look disappointed. Still, they accept it out of politeness and wave the party on with a shrug."
@@ -1790,6 +2215,11 @@
       "id": "9cd2be58b1e0b648",
       "lang": "en",
       "text": "\"Dear guardian,\" your hero says softly, \"the prince you have been watching over is not alone anymore. We came to bring his crown back to daylight.\" The huge stone face trembles. A single pebble-tear rolls down. He lies down slowly and smiles as he sleeps."
+    },
+    {
+      "id": "9dbd48a428615ded",
+      "lang": "en",
+      "text": "In the heart of the bakery, on a small velvet cushion, rests the Honeycomb Heart — a hexagonal pendant of golden honeycomb that should glow warm amber. Today it flickers like a candle in a draft. Mrs. Honeycomb is teary. \"It needs three things to mend, and only a hero can give them. A brave act, a clever insight, or a kind word — whatever your fellowship has most of.\""
     },
     {
       "id": "9f25c9b95c10d24f",
@@ -1842,6 +2272,11 @@
       "text": "🔥 Xyryth is your friend now! She flies the children home on her huge warm back, and promises to visit the village every full moon for tea. The children wave from between her horns, laughing."
     },
     {
+      "id": "aad6f91be13ea6ad",
+      "lang": "en",
+      "text": "On the back, in tiny script: \"Mend me with what I am made of.\" Your hero realizes — honey! A drop of honey from Mrs. Honeycomb's own jar. The Heart drinks it in and shines like noon sun."
+    },
+    {
       "id": "aade6fad543863a7",
       "lang": "en",
       "text": "Your hero stands tall, looks Corvus right in the empty eyes, and says clearly: \"We have come for the crown. The prince has slept long enough.\" The teacher blinks. Very slowly, he nods and sets the crown into your hero's open hands."
@@ -1865,6 +2300,11 @@
       "id": "ac2f1567f7dc4de7",
       "lang": "en",
       "text": "The pattern is trickier than it looked. Your hero tries, frowns, tries again. The party tiptoes across the normal way, very carefully."
+    },
+    {
+      "id": "ac32c65e1d72b9f6",
+      "lang": "en",
+      "text": "The shout cracks a little, but the Heart appreciates the courage. It glows steadily, just not blazingly. The day is still saved."
     },
     {
       "id": "ac7ffd91396d66b5",
@@ -1997,9 +2437,19 @@
       "text": "Your voice shakes a little and the story comes out shorter than you hoped. But Xyryth listens with both enormous ears, and she loves every word. \"That was kind,\" she says. \"Tell me another someday?\""
     },
     {
+      "id": "c1eb823ddafdb3e3",
+      "lang": "en",
+      "text": "The magical recipe book sits on a wooden lectern with a single page missing. Where the page should be, a riddle has appeared in shimmering icing letters: \"I am sweet but never grown, I come from bees but am not honey, I melt on your tongue and remember the sun. What am I?\""
+    },
+    {
       "id": "c29b7a2f3af2084d",
       "lang": "en",
       "text": "The crow just stares with her beady eyes. Then she flies over to the other side and peeks back. Maybe she wants you to follow a different path?"
+    },
+    {
+      "id": "c4caa08b550210a1",
+      "lang": "en",
+      "text": "\"Children dream of your apple tarts. Old men remember their mothers when they smell your bread. You are loved more than you know.\" The Heart pulses, blooms golden, and fills the room with the scent of warm cinnamon."
     },
     {
       "id": "c4ced72464c73bfe",
@@ -2010,6 +2460,11 @@
       "id": "c5e60f623901a92e",
       "lang": "en",
       "text": "👑 The little silver crown rides home on a soft red cushion. At the old shrine, the winter candle bursts into flame all by itself. Somewhere very far, a small boy smiles for the first time in four hundred years."
+    },
+    {
+      "id": "c606786c74a70e7f",
+      "lang": "en",
+      "text": "A muffled crash from upstairs. Mrs. Honeycomb gasps: \"Three rooms, three problems, all at once! A wedding cake is collapsing, a sourdough starter has grown to the size of a sheep, and a gingerbread guard has lost his head — literally. Split up! Each of you take one room!\""
     },
     {
       "id": "c83194a54c00deea",
@@ -2077,6 +2532,11 @@
       "text": "Your hero touches the polished mirror-wall and mouths \"thank you\" to the tower itself. The whole staircase lights up warmly for a moment, and carries your party up all by itself, like a friendly elevator."
     },
     {
+      "id": "d4fbc7c84d6a9b55",
+      "lang": "en",
+      "text": "The script is stubbornly tiny. Your hero guesses honey anyway, and luckily that's right — close enough for the magic to stir back to life."
+    },
+    {
       "id": "d59ffb90c050e5dc",
       "lang": "en",
       "text": "✨ The stars snap back into place and twinkle hello. Vorgath comes outside for the first time in three hundred years, holding your hero's hand, blinking at the moonlight like a baby owl. The Red King throws a big welcome-party in his courtyard, and Vorgath dances, awkwardly but very happily, until dawn."
@@ -2087,6 +2547,11 @@
       "text": "Your hero turns one small gear clockwise, then another counter-clockwise, then reads the spring pressure and turns a third. The heart slows from tick-tick-tick to tick… tick… tick… to a whisper."
     },
     {
+      "id": "d6520bb24df2d55c",
+      "lang": "en",
+      "text": "Your hero sees a half-closed flue, opens it carefully, and Old Brick whooshes to a perfect baking temperature. \"Ah, finally a baker who reads my chimney!\" it grumbles fondly."
+    },
+    {
       "id": "d6d139b42b478270",
       "lang": "en",
       "text": "Heave-ho! The slab lifts, revealing a silver key beneath."
@@ -2095,6 +2560,11 @@
       "id": "d7744816c83c3486",
       "lang": "en",
       "text": "There are a lot of ghosts, and your hero gets tired partway through. Still, the ones who got listened to leave peacefully, and the rest wave gratefully as you pass."
+    },
+    {
+      "id": "d9af4a4a89b1152f",
+      "lang": "en",
+      "text": "Each pair finds its twin, the lids click happily into place, and the jars settle into a neat row again, humming a contented little tune."
     },
     {
       "id": "d9eea7b1eef7461a",
@@ -2162,9 +2632,24 @@
       "text": "The stairs are there, but a thick layer of ice has sealed the door for now. Maybe another year. Your hero climbs back out looking sheepish."
     },
     {
+      "id": "e64bbf02d6f0b2c5",
+      "lang": "en",
+      "text": "The head goes on slightly crooked, but the guard insists it's a more dashing angle and stands proudly."
+    },
+    {
+      "id": "e90de3ffd9d2fdb3",
+      "lang": "en",
+      "text": "\"What's wrong, dear oven?\" your hero asks. Old Brick admits no one polished its bricks this month. Your hero gives it a quick polish, and it lights up beaming red, glowing with pride."
+    },
+    {
       "id": "e9ce546543a5479f",
       "lang": "en",
       "text": "The jump is a little too far. Your hero wobbles and hops right back. The bridge is too shaky today — you will have to cross a different way."
+    },
+    {
+      "id": "ebac2ae688e896d1",
+      "lang": "en",
+      "text": "The rolls are slipperier than they look. Your hero ends up with icing on the nose, but Mrs. Honeycomb produces a bigger basket and the team eventually corners them."
     },
     {
       "id": "ec81cdccb87e77b3",
@@ -2222,6 +2707,16 @@
       "text": "The next stretch of path is a long, squelchy meadow. Brown mud bubbles up between the wildflowers, and every step makes a loud SQUISH. A family of lost ladybugs clings to a leaf, scared of slipping in. The party must choose carefully — each approach depends on a different strength. Whichever strength your party is best at will do the trick."
     },
     {
+      "id": "fb1c074076514874",
+      "lang": "en",
+      "text": "\"You are the brightest red I have ever seen, and your crust is so golden it makes my eyes happy.\" The tart blushes, sits up straight, and twirls proudly into the display window."
+    },
+    {
+      "id": "fbdc2b87b85fa7fa",
+      "lang": "en",
+      "text": "Your hero strikes a heroic pose. \"I, brave defender, will guard your honor!\" The tart laughs so hard a strawberry pops off, and laughter heals more than promises ever did."
+    },
+    {
       "id": "fe1d91791fafbb3d",
       "lang": "en",
       "text": "The frogs are napping. They grumble and turn their backs. You have to walk — slowly, carefully, squish by squish."
@@ -2230,6 +2725,11 @@
       "id": "fe7616bc36495ff3",
       "lang": "en",
       "text": "The first floor of the tower is a tall, tall staircase — and as soon as you step onto the first step, you realize your voice is gone. Not hurt, not stolen, just hushed. This floor listens, and anyone who makes a sound falls gently backward through the air, all the way to the ground. The walls are polished like mirrors. The steps are covered in strange patterns that seem to move when you look right at them. Somehow you have to climb all the way up without saying a single word."
+    },
+    {
+      "id": "fff347fb9cf3d22d",
+      "lang": "en",
+      "text": "Your hero squeezes a perfect dotted line of icing leading from the rolls back to their tray. They follow it like ducklings, climbing into place one by one."
     }
   ]
 }
