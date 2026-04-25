@@ -2004,19 +2004,17 @@
     opacity: 1;
   }
 
-  /* Dice-roll animation: a brief spin/pulse to build tension before the
-     number reveals. Keeps everything else static. */
-  @keyframes diceSpin {
-    0%   { transform: rotate(0deg)   scale(1);   filter: brightness(1); }
-    25%  { transform: rotate(-18deg) scale(1.08); filter: brightness(1.15); }
-    50%  { transform: rotate(20deg)  scale(1.12); filter: brightness(1.25); }
-    75%  { transform: rotate(-10deg) scale(1.05); filter: brightness(1.1); }
-    100% { transform: rotate(0deg)   scale(1);   filter: brightness(1); }
-  }
-  .dice-display.rolling {
-    animation: diceSpin 700ms ease-in-out;
-    background: linear-gradient(135deg, var(--gold-bright), var(--gold)) !important;
-    color: var(--wood-dark) !important;
+  .custom-adv-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: linear-gradient(180deg, #c084fc, #7e22ce);
+    color: #fff;
+    border: 1px solid #4a148c;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: 10px; letter-spacing: 1px;
+    text-transform: uppercase;
   }
 
   /* Icon picker — grouped by suggested stat so parents scan faster */
@@ -2839,7 +2837,7 @@
         </div>
         <button class="btn btn-primary" onclick="addActivity()" data-i18n="proclaim">⚔ Proclaim</button>
       </div>
-      <div style="display:grid; grid-template-columns: 1fr 2fr; gap: 12px; margin-top: 8px;">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
         <div>
           <label data-i18n="builds_xp">Builds XP for Stat</label>
           <select id="actStat">
@@ -2849,9 +2847,17 @@
           </select>
         </div>
         <div>
-          <label data-i18n="quest_sigil">Quest Sigil</label>
-          <div class="emoji-picker" id="actEmojiPicker"></div>
+          <label data-i18n="cadence_label">Cadence</label>
+          <select id="actCadence">
+            <option value="once" data-i18n="cadence_once">∞ Whenever (no limit)</option>
+            <option value="daily" data-i18n="cadence_daily">🔄 Daily</option>
+            <option value="weekly" data-i18n="cadence_weekly">📆 Weekly</option>
+          </select>
         </div>
+      </div>
+      <div style="margin-top: 8px;">
+        <label data-i18n="quest_sigil">Quest Sigil</label>
+        <div class="emoji-picker" id="actEmojiPicker"></div>
       </div>
     </div>
     <div class="section">
@@ -2862,6 +2868,7 @@
           <th data-i18n="name">Name</th>
           <th data-i18n="gold">Gold</th>
           <th data-i18n="builds_xp_short">Builds XP</th>
+          <th data-i18n="cadence_label">Cadence</th>
           <th></th>
         </tr></thead>
         <tbody></tbody>
@@ -2971,6 +2978,12 @@
     <div class="section">
       <h2 data-i18n="realm_overview">📊 Realm Overview</h2>
       <div class="stat-grid" id="statGrid"></div>
+    </div>
+    <div class="section">
+      <h2>🎨 <span data-i18n="custom_adv_title">Custom Adventures</span></h2>
+      <p style="color: var(--ink-muted); font-style: italic;" data-i18n="custom_adv_desc">Write your own adventures in JSON — they'll appear in the Adventure picker right next to the built-in ones.</p>
+      <div id="customAdventureList" style="margin: 10px 0;"></div>
+      <button class="btn btn-primary btn-sm" onclick="openCustomAdventureModal()" data-i18n="custom_adv_add">+ Add custom adventure</button>
     </div>
     <div class="section">
       <h2 data-i18n="forbidden_rites">⚠ Forbidden Rites</h2>
@@ -3193,6 +3206,63 @@
   </div>
 </div>
 
+<!-- Custom Adventure Modal — JSON editor with template + validation -->
+<div class="modal-backdrop" id="customAdvModal">
+  <div class="modal" style="max-width: 720px; width: 95vw;">
+    <h3>🎨 <span data-i18n="custom_adv_modal_title">Custom Adventure</span></h3>
+    <p style="color: var(--ink-muted); font-style: italic; margin-bottom: 8px;" data-i18n="custom_adv_modal_desc">
+      Edit the JSON below. Each text field can be a string (used for both languages) or an object like
+      <code>{"en": "Hello", "de": "Hallo"}</code>. Click <strong>Load template</strong> to start fresh.
+    </p>
+    <input type="hidden" id="customAdvOriginalId" />
+    <textarea id="customAdvJson" spellcheck="false"
+      style="width:100%; min-height: 360px; font-family: 'Courier New', monospace; font-size: 12px;
+             background: #1f1208; color: #f0dcb0; border: 2px solid var(--wood-dark);
+             border-radius: 6px; padding: 10px; resize: vertical;"></textarea>
+    <div id="customAdvError" style="color:#ff8080; font-size:13px; min-height:18px; margin-top:6px;"></div>
+    <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:10px; flex-wrap:wrap;">
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-ghost btn-sm" type="button" onclick="loadCustomAdventureTemplate()" data-i18n="custom_adv_template">Load template</button>
+        <button class="btn btn-danger btn-sm" type="button" id="customAdvDeleteBtn" onclick="deleteCustomAdventureFromModal()" style="display:none;" data-i18n="custom_adv_delete">Delete</button>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-ghost" onclick="closeModal('customAdvModal')" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCustomAdventureFromModal()" data-i18n="custom_adv_save">Save adventure</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Allowance Modal — set or clear a kid's weekly auto-allowance -->
+<div class="modal-backdrop" id="allowanceModal">
+  <div class="modal">
+    <h3>🏛 <span data-i18n="allowance_modal_title">Weekly Allowance</span></h3>
+    <p style="color: var(--ink-muted); font-style: italic; margin-bottom: 10px;" data-i18n="allowance_modal_desc">
+      Pay a fixed amount automatically once a week — like classic pocket money.
+    </p>
+    <input type="hidden" id="allowanceKidId" />
+    <label data-i18n="allowance_amount_label">Amount per week</label>
+    <input type="text" inputmode="decimal" id="allowanceAmount" placeholder="5.00" />
+    <label style="margin-top:10px; display:block;" data-i18n="allowance_day_label">Pay every…</label>
+    <select id="allowanceDay">
+      <option value="1" data-i18n="dow_mon">Monday</option>
+      <option value="2" data-i18n="dow_tue">Tuesday</option>
+      <option value="3" data-i18n="dow_wed">Wednesday</option>
+      <option value="4" data-i18n="dow_thu">Thursday</option>
+      <option value="5" data-i18n="dow_fri">Friday</option>
+      <option value="6" data-i18n="dow_sat">Saturday</option>
+      <option value="0" data-i18n="dow_sun">Sunday</option>
+    </select>
+    <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:14px; flex-wrap:wrap;">
+      <button class="btn btn-danger btn-sm" id="allowanceClearBtn" onclick="clearAllowanceFromModal()" style="display:none;" data-i18n="allowance_clear_btn">Stop allowance</button>
+      <div style="display:flex; gap:8px; margin-left:auto;">
+        <button class="btn btn-ghost" onclick="closeModal('allowanceModal')" data-i18n="cancel">Cancel</button>
+        <button class="btn btn-primary" onclick="saveAllowanceFromModal()" data-i18n="save_allowance_btn">Save allowance</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Goal Jar Modal — set or edit a kid's savings goal -->
 <div class="modal-backdrop" id="goalModal">
   <div class="modal">
@@ -3304,6 +3374,42 @@ const TRANSLATIONS = {
     tap_to_add: '+ Tap to add to party',
     in_party: '✓ In the party',
     pity_label: '+1 Pity',
+    cadence_label: 'Cadence',
+    cadence_once: '∞ Whenever (no limit)',
+    cadence_daily: '🔄 Daily',
+    cadence_weekly: '📆 Weekly',
+    allowance_title: 'Weekly Allowance',
+    allowance_desc: 'Pay a fixed amount automatically once a week — like classic pocket money.',
+    allowance_modal_title: 'Weekly Allowance',
+    allowance_modal_desc: 'Pay a fixed amount automatically once a week — like classic pocket money.',
+    allowance_amount_label: 'Amount per week',
+    allowance_day_label: 'Pay every…',
+    allowance_clear_btn: 'Stop allowance',
+    save_allowance_btn: 'Save allowance',
+    allowance_needs_amount: 'Enter a coin amount greater than zero.',
+    allowance_saved: 'Allowance set — paid automatically every week.',
+    allowance_note: 'Weekly allowance',
+    allowance_every: 'every',
+    set_allowance: 'Set weekly allowance',
+    edit_allowance: 'Edit allowance',
+    dow_sun: 'Sunday', dow_mon: 'Monday', dow_tue: 'Tuesday',
+    dow_wed: 'Wednesday', dow_thu: 'Thursday', dow_fri: 'Friday', dow_sat: 'Saturday',
+    custom_adv_title: 'Custom Adventures',
+    custom_adv_desc: "Write your own adventures in JSON — they'll appear in the Adventure picker right next to the built-in ones.",
+    custom_adv_add: '+ Add custom adventure',
+    custom_adv_empty: 'No custom adventures yet.',
+    custom_adv_modal_title: 'Custom Adventure',
+    custom_adv_modal_desc: 'Edit the JSON below. Each text field can be a string (used for both languages) or {"en":..,"de":..}.',
+    custom_adv_template: '↺ Load template',
+    custom_adv_save: 'Save adventure',
+    custom_adv_delete: 'Delete',
+    custom_adv_saved: 'Custom adventure saved!',
+    custom_adv_deleted: 'Custom adventure removed.',
+    custom_adv_delete_confirm: 'Delete this custom adventure permanently?',
+    custom_adv_badge: 'Custom (your own)',
+    custom_short: 'Custom',
+    edit_short: 'Edit',
+    difficulty_label_short: 'Difficulty',
     chronicle: '📖 The Chronicle', all_heroes: 'All Heroes', empty_chronicle: 'The chronicle is yet unwritten',
     council_chamber: '⚙ Council Chamber',
     coinage: 'Coinage', coinage_desc: "The mark of the realm's currency",
@@ -3617,6 +3723,42 @@ const TRANSLATIONS = {
     tap_to_add: '+ Zur Gruppe hinzufügen',
     in_party: '✓ In der Gruppe',
     pity_label: '+1 Trostbonus',
+    cadence_label: 'Wiederholung',
+    cadence_once: '∞ Beliebig (kein Limit)',
+    cadence_daily: '🔄 Täglich',
+    cadence_weekly: '📆 Wöchentlich',
+    allowance_title: 'Wöchentliches Taschengeld',
+    allowance_desc: 'Zahlt automatisch einmal pro Woche einen festen Betrag — klassisches Taschengeld.',
+    allowance_modal_title: 'Wöchentliches Taschengeld',
+    allowance_modal_desc: 'Zahlt automatisch einmal pro Woche einen festen Betrag — klassisches Taschengeld.',
+    allowance_amount_label: 'Betrag pro Woche',
+    allowance_day_label: 'Zahltag…',
+    allowance_clear_btn: 'Taschengeld stoppen',
+    save_allowance_btn: 'Taschengeld speichern',
+    allowance_needs_amount: 'Bitte einen Betrag größer als null eingeben.',
+    allowance_saved: 'Taschengeld eingerichtet — wird wöchentlich automatisch gezahlt.',
+    allowance_note: 'Wöchentliches Taschengeld',
+    allowance_every: 'jeden',
+    set_allowance: 'Taschengeld einrichten',
+    edit_allowance: 'Bearbeiten',
+    dow_sun: 'Sonntag', dow_mon: 'Montag', dow_tue: 'Dienstag',
+    dow_wed: 'Mittwoch', dow_thu: 'Donnerstag', dow_fri: 'Freitag', dow_sat: 'Samstag',
+    custom_adv_title: 'Eigene Abenteuer',
+    custom_adv_desc: 'Schreib deine eigenen Abenteuer in JSON — sie erscheinen direkt neben den eingebauten in der Abenteuer-Auswahl.',
+    custom_adv_add: '+ Eigenes Abenteuer hinzufügen',
+    custom_adv_empty: 'Noch keine eigenen Abenteuer.',
+    custom_adv_modal_title: 'Eigenes Abenteuer',
+    custom_adv_modal_desc: 'Bearbeite das JSON. Jedes Textfeld kann ein String sein (für beide Sprachen) oder {"en":..,"de":..}.',
+    custom_adv_template: '↺ Vorlage laden',
+    custom_adv_save: 'Abenteuer speichern',
+    custom_adv_delete: 'Löschen',
+    custom_adv_saved: 'Eigenes Abenteuer gespeichert!',
+    custom_adv_deleted: 'Eigenes Abenteuer entfernt.',
+    custom_adv_delete_confirm: 'Dieses eigene Abenteuer endgültig löschen?',
+    custom_adv_badge: 'Eigenes Abenteuer',
+    custom_short: 'Eigen',
+    edit_short: 'Bearbeiten',
+    difficulty_label_short: 'Stufe',
     chronicle: '📖 Die Chronik', all_heroes: 'Alle Helden', empty_chronicle: 'Die Chronik ist noch unbeschrieben',
     council_chamber: '⚙ Ratskammer',
     coinage: 'Münzwesen', coinage_desc: 'Das Zeichen der Landeswährung',
@@ -5798,7 +5940,14 @@ function renderKids() {
               <select id="quest-select-${k.id}" onchange="previewQuest('${k.id}')">
                 ${state.activities.map(a => {
                   const st = a.statType || 'brave';
-                  return `<option value="${a.id}">${a.icon} ${escapeHtml(L(a.name))} · ${STAT_META[st].icon} +${fmt(a.amount)}</option>`;
+                  const cad = a.cadence || 'once';
+                  const done = cad !== 'once' && isQuestDoneWithinCadence(k.id, a);
+                  // Visual prefix: ✓ done, 🔄 daily, 📆 weekly, blank for "once"
+                  const prefix = done ? '✓ '
+                    : cad === 'daily'  ? '🔄 '
+                    : cad === 'weekly' ? '📆 '
+                    : '';
+                  return `<option value="${a.id}">${prefix}${a.icon} ${escapeHtml(L(a.name))} · ${STAT_META[st].icon} +${fmt(a.amount)}</option>`;
                 }).join('')}
               </select>
               <button class="quest-done-btn" onclick="earnFromSelect('${k.id}')" aria-label="${escapeHtml(t('done_short'))}">✓ ${escapeHtml(t('done_short'))}</button>
@@ -5877,6 +6026,309 @@ function earn(kidId, actId) {
   }
   // Achievement checks fire after every earn — they're cheap and idempotent.
   checkAchievements(k, 'earn');
+}
+
+// =====================================================================
+// CUSTOM ADVENTURES — parents can write their own adventure JSON and have
+// it appear in the picker alongside the built-ins. Stored as
+// state.customAdventures, merged into ADVENTURES at boot and after every
+// edit so the rest of the engine doesn't need to know about the source.
+// =====================================================================
+function normalizeI18n(s, fallback) {
+  if (s == null) return { en: fallback || '', de: fallback || '' };
+  if (typeof s === 'string') return { en: s, de: s };
+  if (typeof s === 'object' && (s.en || s.de)) {
+    return { en: s.en || s.de || '', de: s.de || s.en || '' };
+  }
+  return { en: fallback || '', de: fallback || '' };
+}
+function normalizeCustomAdventure(raw, idx) {
+  if (!raw || typeof raw !== 'object') throw new Error('Adventure must be a JSON object');
+  const adv = {
+    id: raw.id && String(raw.id).match(/^[a-zA-Z0-9_]+$/) ? raw.id
+        : ('custom_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6)),
+    custom: true,
+    icon: raw.icon || '🎨',
+    difficulty: ['easy','medium','hard','epic'].includes(raw.difficulty) ? raw.difficulty : 'easy',
+    minLevel: typeof raw.minLevel === 'number' ? Math.max(0, raw.minLevel) : 0,
+    maxHp: typeof raw.maxHp === 'number' ? Math.max(2, Math.min(12, raw.maxHp)) : 5,
+    title:   normalizeI18n(raw.title,   'Untitled adventure'),
+    summary: normalizeI18n(raw.summary, ''),
+    intro:   normalizeI18n(raw.intro,   ''),
+    victory: normalizeI18n(raw.victory, 'You did it!'),
+    defeat:  normalizeI18n(raw.defeat,  'Better luck next time.'),
+    scenes:  []
+  };
+  if (!adv.title.en && !adv.title.de) throw new Error('Adventure needs a title');
+  if (!Array.isArray(raw.scenes) || raw.scenes.length === 0)
+    throw new Error('Adventure needs at least one scene');
+  adv.scenes = raw.scenes.map((sc, i) => normalizeCustomScene(sc, i));
+  return adv;
+}
+function normalizeCustomScene(raw, idx) {
+  if (!raw || typeof raw !== 'object') throw new Error(`Scene ${idx + 1} must be an object`);
+  const sc = {
+    type: raw.type || 'choice',
+    title: normalizeI18n(raw.title, `Scene ${idx + 1}`),
+    text:  normalizeI18n(raw.text,  '')
+  };
+  if (sc.type === 'choice') {
+    if (!Array.isArray(raw.options) || raw.options.length === 0)
+      throw new Error(`Scene ${idx + 1}: needs at least one option`);
+    sc.options = raw.options.map((o, j) => {
+      if (!o || typeof o !== 'object') throw new Error(`Scene ${idx+1} option ${j+1}: must be object`);
+      const stat = o.stat;
+      if (!['brave','clever','kind'].includes(stat))
+        throw new Error(`Scene ${idx+1} option ${j+1}: stat must be brave / clever / kind`);
+      return {
+        stat,
+        dc: typeof o.dc === 'number' ? Math.max(2, Math.min(25, o.dc)) : 10,
+        label:   normalizeI18n(o.label,   `Option ${j+1}`),
+        success: normalizeI18n(o.success, 'It worked.'),
+        failure: normalizeI18n(o.failure, "It didn't quite work."),
+        heal: !!o.heal
+      };
+    });
+  } else if (sc.type === 'puzzle') {
+    sc.question = normalizeI18n(raw.question, '');
+    sc.success  = normalizeI18n(raw.success,  'Right answer!');
+    sc.failure  = normalizeI18n(raw.failure,  'Not quite.');
+    if (raw.hint) sc.hint = normalizeI18n(raw.hint, '');
+    if (!Array.isArray(raw.answers) || raw.answers.length < 2)
+      throw new Error(`Scene ${idx+1} (puzzle): needs at least 2 answers`);
+    sc.answers = raw.answers.map(a => ({ label: normalizeI18n(a.label, ''), correct: !!a.correct }));
+    if (!sc.answers.some(a => a.correct))
+      throw new Error(`Scene ${idx+1} (puzzle): one answer must be correct: true`);
+  } else if (sc.type === 'memory' || sc.type === 'sequence' || sc.type === 'statcheck' || sc.type === 'split') {
+    // Pass through with i18n normalisation on the common fields. Power-users
+    // who hand-craft these scene types know the schema.
+    if (raw.success) sc.success = normalizeI18n(raw.success, 'Done!');
+    if (raw.failure) sc.failure = normalizeI18n(raw.failure, 'Oh no.');
+    if (raw.icons)   sc.icons   = raw.icons;
+    if (raw.tiles)   sc.tiles   = raw.tiles;
+    if (raw.length)  sc.length  = raw.length;
+    if (Array.isArray(raw.options)) sc.options = raw.options.map(o => ({
+      stat: o.stat, threshold: o.threshold, label: normalizeI18n(o.label, ''),
+      success: normalizeI18n(o.success, ''), failure: normalizeI18n(o.failure, '')
+    }));
+    if (Array.isArray(raw.tasks)) sc.tasks = raw.tasks.map(o => ({
+      stat: o.stat, dc: o.dc, label: normalizeI18n(o.label, ''),
+      success: normalizeI18n(o.success, ''), failure: normalizeI18n(o.failure, '')
+    }));
+  } else {
+    throw new Error(`Scene ${idx+1}: unknown type "${sc.type}"`);
+  }
+  return sc;
+}
+
+// Re-merges state.customAdventures into the live ADVENTURES list. Called
+// on boot and after every save. ADVENTURES stays a const; we mutate its
+// contents in-place so existing references throughout the engine still
+// resolve to the same array.
+function applyCustomAdventures() {
+  for (let i = ADVENTURES.length - 1; i >= 0; i--) {
+    if (ADVENTURES[i].custom) ADVENTURES.splice(i, 1);
+  }
+  (state.customAdventures || []).forEach(ad => {
+    try { ADVENTURES.push(normalizeCustomAdventure(ad)); }
+    catch (e) { console.warn('[custom-adv] skipping invalid:', e.message); }
+  });
+}
+
+const CUSTOM_ADV_TEMPLATE = {
+  title: 'My Custom Adventure',
+  icon: '🎨',
+  difficulty: 'easy',
+  minLevel: 0,
+  maxHp: 5,
+  summary: 'A short pitch — what is this adventure about?',
+  intro: 'Long ago, in a kingdom of warm cookies, something curious happened…',
+  victory: 'You did it! Everyone cheers.',
+  defeat: 'Maybe next time. The cookies still love you.',
+  scenes: [
+    {
+      title: 'The First Choice',
+      text: 'A small problem stands in your way. How do you solve it?',
+      options: [
+        { stat: 'brave',  dc: 10, label: '💪 Push through it',
+          success: 'You shoulder past with a yelp of triumph.',
+          failure: 'It pushes back. You take a breath and regroup.' },
+        { stat: 'clever', dc: 10, label: '🧠 Think it over',
+          success: 'A clever idea solves it neatly.',
+          failure: 'The idea fizzles. You try something else.' },
+        { stat: 'kind',   dc: 10, label: '💛 Ask for help kindly',
+          success: 'Asking nicely opens the way.',
+          failure: 'Nobody answers. You move on solo.' }
+      ]
+    },
+    {
+      title: 'The Final Stretch',
+      text: 'One last hurdle before the ending.',
+      options: [
+        { stat: 'brave',  dc: 12, label: '💪 Charge boldly',
+          success: 'Boldness wins the day!',
+          failure: 'A bold try — close, but not quite.' },
+        { stat: 'clever', dc: 12, label: '🧠 Spot the trick',
+          success: 'You see the pattern and slip through.',
+          failure: 'The trick was harder than it looked.' },
+        { stat: 'kind',   dc: 12, label: '💛 Show compassion',
+          success: 'Kindness opens the last door.',
+          failure: 'Even kindness has its limits today.' }
+      ]
+    }
+  ]
+};
+
+function openCustomAdventureModal(advId) {
+  const editing = advId ? (state.customAdventures || []).find(a => a.id === advId) : null;
+  document.getElementById('customAdvOriginalId').value = editing ? editing.id : '';
+  document.getElementById('customAdvJson').value = JSON.stringify(editing || CUSTOM_ADV_TEMPLATE, null, 2);
+  document.getElementById('customAdvError').textContent = '';
+  const delBtn = document.getElementById('customAdvDeleteBtn');
+  if (delBtn) delBtn.style.display = editing ? '' : 'none';
+  openModal('customAdvModal');
+}
+function saveCustomAdventureFromModal() {
+  const raw = document.getElementById('customAdvJson').value;
+  const errorEl = document.getElementById('customAdvError');
+  errorEl.textContent = '';
+  let parsed;
+  try { parsed = JSON.parse(raw); }
+  catch (e) { errorEl.textContent = 'JSON parse error: ' + e.message; return; }
+  let adv;
+  try { adv = normalizeCustomAdventure(parsed); }
+  catch (e) { errorEl.textContent = e.message; return; }
+  // Preserve the id when editing so the entry replaces in place.
+  const originalId = document.getElementById('customAdvOriginalId').value;
+  if (originalId) adv.id = originalId;
+  if (!Array.isArray(state.customAdventures)) state.customAdventures = [];
+  const existing = state.customAdventures.findIndex(a => a.id === adv.id);
+  if (existing >= 0) state.customAdventures[existing] = adv;
+  else state.customAdventures.push(adv);
+  save();
+  applyCustomAdventures();
+  closeModal('customAdvModal');
+  renderCustomAdventureList();
+  toast(t('custom_adv_saved'), 'success');
+  playFanfare();
+}
+function deleteCustomAdventureFromModal() {
+  const originalId = document.getElementById('customAdvOriginalId').value;
+  if (!originalId) return;
+  if (!confirm(t('custom_adv_delete_confirm'))) return;
+  state.customAdventures = (state.customAdventures || []).filter(a => a.id !== originalId);
+  save();
+  applyCustomAdventures();
+  closeModal('customAdvModal');
+  renderCustomAdventureList();
+  toast(t('custom_adv_deleted'), 'success');
+}
+function loadCustomAdventureTemplate() {
+  document.getElementById('customAdvJson').value = JSON.stringify(CUSTOM_ADV_TEMPLATE, null, 2);
+  document.getElementById('customAdvError').textContent = '';
+}
+function renderCustomAdventureList() {
+  const list = document.getElementById('customAdventureList');
+  if (!list) return;
+  const items = state.customAdventures || [];
+  if (items.length === 0) {
+    list.innerHTML = `<div style="color: var(--ink-muted); font-style: italic;">${t('custom_adv_empty')}</div>`;
+    return;
+  }
+  list.innerHTML = items.map(ad => {
+    const title = (ad.title && (ad.title.en || ad.title.de)) || '(untitled)';
+    const sceneCount = Array.isArray(ad.scenes) ? ad.scenes.length : 0;
+    return `
+      <div style="display:flex; align-items:center; gap:10px; padding:8px 10px;
+                  border:1px solid var(--wood-dark); border-radius:6px; margin-bottom:6px;
+                  background: rgba(0,0,0,0.15);">
+        <div style="font-size:22px;">${escapeHtml(ad.icon || '🎨')}</div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-family:'MedievalSharp',cursive; color: var(--gold-bright); font-size:15px;">
+            ${escapeHtml(title)}
+          </div>
+          <div style="font-size:12px; color: var(--ink-muted);">
+            ${sceneCount} ${t('scenes_count')} · ${t('difficulty_label_short')}: ${escapeHtml(ad.difficulty || 'easy')}
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="openCustomAdventureModal('${escapeHtml(ad.id)}')">${t('edit_short')}</button>
+      </div>`;
+  }).join('');
+}
+
+// =====================================================================
+// AUTO-ALLOWANCE — per-kid weekly Taschengeld, credited automatically on
+// the chosen weekday. Stored as kid.allowance = { amount, dayOfWeek, lastPaidAt }.
+// dayOfWeek: 0 = Sunday, 1 = Monday, ..., 6 = Saturday.
+// =====================================================================
+function setKidAllowance(kidId, payload) {
+  const k = kidById(kidId);
+  if (!k) return;
+  if (!payload || !payload.amount || payload.amount <= 0) {
+    delete k.allowance;
+  } else {
+    const dow = Math.max(0, Math.min(6, parseInt(payload.dayOfWeek, 10) || 0));
+    const amt = Math.max(0, parseNum(payload.amount) || 0);
+    k.allowance = {
+      amount: Math.round(amt * 100) / 100,
+      dayOfWeek: dow,
+      lastPaidAt: (k.allowance && k.allowance.lastPaidAt) || null
+    };
+  }
+  save();
+  renderKids();
+}
+function ymdLocal(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function checkAutoAllowance() {
+  const today = new Date();
+  const todayDow = today.getDay();
+  const todayYmd = ymdLocal(today);
+  let creditedAny = false;
+  state.kids.forEach(k => {
+    const a = k.allowance;
+    if (!a || !a.amount || a.amount <= 0) return;
+    if (a.dayOfWeek !== todayDow) return;
+    // Already paid today? Done.
+    if (a.lastPaidAt && a.lastPaidAt.startsWith(todayYmd)) return;
+    k.balance += a.amount;
+    k.totalEarned = (k.totalEarned || 0) + a.amount;
+    a.lastPaidAt = today.toISOString();
+    logTx(k.id, 'earn', a.amount, `🏛 ${t('allowance_note')}`);
+    creditedAny = true;
+  });
+  if (creditedAny) {
+    save();
+    try { renderKids(); renderHistoryFilter(); } catch (e) {}
+  }
+}
+function openAllowanceModal(kidId) {
+  const k = kidById(kidId);
+  if (!k) return;
+  document.getElementById('allowanceKidId').value = kidId;
+  document.getElementById('allowanceAmount').value = k.allowance ? formatDecimalLocaleEditable(k.allowance.amount) : '';
+  document.getElementById('allowanceDay').value = k.allowance ? String(k.allowance.dayOfWeek) : '0';
+  const clearBtn = document.getElementById('allowanceClearBtn');
+  if (clearBtn) clearBtn.style.display = k.allowance ? '' : 'none';
+  openModal('allowanceModal');
+  setTimeout(() => document.getElementById('allowanceAmount').focus(), 50);
+}
+function saveAllowanceFromModal() {
+  const kidId = document.getElementById('allowanceKidId').value;
+  const amount = parseNum(document.getElementById('allowanceAmount').value);
+  const dayOfWeek = parseInt(document.getElementById('allowanceDay').value, 10);
+  if (!amount || amount <= 0) { toast(t('allowance_needs_amount'), 'error'); return; }
+  setKidAllowance(kidId, { amount, dayOfWeek });
+  closeModal('allowanceModal');
+  toast(t('allowance_saved'), 'success');
+  playChime();
+}
+function clearAllowanceFromModal() {
+  const kidId = document.getElementById('allowanceKidId').value;
+  setKidAllowance(kidId, null);
+  closeModal('allowanceModal');
+  playChime();
 }
 
 // =====================================================================
@@ -6048,6 +6500,32 @@ function checkAchievements(k, _ev) {
   }
 }
 
+// =====================================================================
+// RECURRING QUESTS — informational schedule on activities. Values:
+//   null      → one-off / no schedule (still selectable any time)
+//   'daily'   → meant to be done every day
+//   'weekly:0'..'weekly:6' → specific weekday (0=Sun..6=Sat)
+// The kid still has to click Done; recurrence is a hint to the parent
+// + a small badge in the dropdown so the kid knows it's a daily.
+// =====================================================================
+function recurrenceLabel(rec) {
+  if (!rec) return '';
+  if (rec === 'daily') return t('recurrence_daily');
+  if (typeof rec === 'string' && rec.startsWith('weekly:')) {
+    const idx = parseInt(rec.slice(7), 10);
+    const days = (state.settings.lang === 'de'
+      ? ['So','Mo','Di','Mi','Do','Fr','Sa']
+      : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']);
+    return `${t('recurrence_weekly')} · ${days[idx] || ''}`.trim();
+  }
+  return '';
+}
+function recurrenceBadgeHtml(rec) {
+  const label = recurrenceLabel(rec);
+  if (!label) return '';
+  return `<span class="recurrence-badge">📅 ${escapeHtml(label)}</span>`;
+}
+
 // --- PAYOUT ---
 function openPayout(kidId) {
   const k = kidById(kidId);
@@ -6142,12 +6620,15 @@ function addActivity() {
   const name = document.getElementById('actName').value.trim();
   const amount = parseNum(document.getElementById('actAmount').value);
   const statType = document.getElementById('actStat').value;
+  const cadenceSel = document.getElementById('actCadence');
+  const cadence = (cadenceSel && cadenceSel.value) || 'once';
   if (!name) { toast('Give the quest a name', 'error'); return; }
   if (!amount || amount <= 0) { toast('Set a valid reward', 'error'); return; }
-  state.activities.push({ id: id(), name, amount, icon: selectedIcon, statType });
+  state.activities.push({ id: id(), name, amount, icon: selectedIcon, statType, cadence });
   save();
   document.getElementById('actName').value = '';
   document.getElementById('actAmount').value = '';
+  if (cadenceSel) cadenceSel.value = 'once';
   renderActivities();
   renderKids();
   toast('Quest proclaimed!', 'success');
@@ -6173,14 +6654,18 @@ function updateActivity(aid, field, value) {
 function renderActivities() {
   const tbody = document.querySelector('#activitiesTable tbody');
   if (state.activities.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(t('no_quests'))}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">${escapeHtml(t('no_quests'))}</td></tr>`;
     return;
   }
   tbody.innerHTML = state.activities.map(a => {
     const st = a.statType || 'brave';
+    const cad = a.cadence || 'once';
     const opts = STAT_KEYS.map(sk => `<option value="${sk}"${sk === st ? ' selected' : ''}>${STAT_META[sk].icon} ${t(sk)}</option>`).join('');
-    // Locale-aware: render the editable amount with the user's decimal
-    // separator (German uses a comma) so it matches what they read.
+    const cadOpts = [
+      ['once',   t('cadence_once')],
+      ['daily',  t('cadence_daily')],
+      ['weekly', t('cadence_weekly')]
+    ].map(([v, label]) => `<option value="${v}"${v === cad ? ' selected' : ''}>${escapeHtml(label)}</option>`).join('');
     const amountStr = formatDecimalLocaleEditable(a.amount);
     return `
     <tr>
@@ -6188,10 +6673,35 @@ function renderActivities() {
       <td><input type="text" value="${escapeHtml(L(a.name))}" onchange="updateActivity('${a.id}','name',this.value)" /></td>
       <td><input type="text" inputmode="decimal" value="${amountStr}" onchange="updateActivity('${a.id}','amount',this.value)" style="max-width:100px;" /></td>
       <td><select onchange="updateActivity('${a.id}','statType',this.value)" style="max-width:140px;">${opts}</select></td>
+      <td><select onchange="updateActivity('${a.id}','cadence',this.value)" style="max-width:170px;">${cadOpts}</select></td>
       <td><button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')" data-i18n="remove">${escapeHtml(t('remove'))}</button></td>
     </tr>
   `;
   }).join('');
+}
+
+// Has the kid completed this activity within the cadence window?
+// "once" cadence is always considered open. Looks back through transactions
+// (which already record the activityId in extra metadata) so this works
+// retroactively even after a schema change.
+function isQuestDoneWithinCadence(kidId, activity) {
+  const cad = activity.cadence || 'once';
+  if (cad === 'once') return false;
+  const now = new Date();
+  const startMs = (() => {
+    if (cad === 'daily') {
+      const d = new Date(now); d.setHours(0,0,0,0); return d.getTime();
+    }
+    if (cad === 'weekly') {
+      // Reuse the Monday-start week the rest of the app uses.
+      const d = weekStartMonday(now); return d.getTime();
+    }
+    return 0;
+  })();
+  return state.transactions.some(tx =>
+    tx.kidId === kidId && tx.type === 'earn' && tx.activityId === activity.id &&
+    new Date(tx.at).getTime() >= startMs
+  );
 }
 
 // --- HISTORY ---
@@ -6516,6 +7026,19 @@ function renderHeroSheet() {
     <div class="inventory-section">
       <h4>🎒 Inventory (${k.inventory.length})</h4>
       <div class="inventory-grid">${invHtml}</div>
+    </div>
+
+    <div class="inventory-section">
+      <h4>🏛 ${t('allowance_title')}</h4>
+      <div style="font-size: 12px; color: var(--ink-muted); font-style: italic; margin-bottom: 8px;">${t('allowance_desc')}</div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        ${k.allowance && k.allowance.amount > 0
+          ? `<div style="font-family:'Cinzel',serif; color: var(--gold-bright); font-size: 14px;">
+               🪙 ${fmt(k.allowance.amount)} · ${t('allowance_every')} ${t('dow_' + ['sun','mon','tue','wed','thu','fri','sat'][k.allowance.dayOfWeek])}
+             </div>
+             <button class="btn btn-ghost btn-sm" onclick="openAllowanceModal('${k.id}')">${t('edit_allowance')}</button>`
+          : `<button class="btn btn-primary btn-sm" onclick="openAllowanceModal('${k.id}')">🏛 ${t('set_allowance')}</button>`}
+      </div>
     </div>
 
     <div class="inventory-section">
@@ -8076,9 +8599,13 @@ function renderAdventureSelect() {
     const lockHtml = locked
       ? `<div class="lock-overlay">🔒 ${t('requires_level')} ${a.minLevel}${!hasParty ? ' ' + t('pick_party_first') : ` · ${t('yours_is')} ${pml}`}</div>`
       : '';
+    const customBadge = a.custom
+      ? `<span class="custom-adv-badge" title="${escapeHtml(t('custom_adv_badge'))}">✏ ${t('custom_short')}</span>`
+      : '';
     return `
     <div class="adventure-option${locked ? ' locked' : ''}" onclick="${click}">
       <span class="adventure-difficulty-badge difficulty-${a.difficulty}">${t('diff_' + a.difficulty)}</span>
+      ${customBadge}
       <h3>${a.icon} ${L(a.title)}</h3>
       <p>${escapeHtml(L(a.summary))}</p>
       <div class="adv-min-level">${a.scenes.length} ${t('scenes_count')} · ${a.maxHp} ⭐ ${t('morale')} · ${yourLevelLine}</div>
@@ -9154,31 +9681,6 @@ function attemptChallenge() {
   const scene = a.scenes[adventureState.sceneIdx];
   const challenge = adventureState.chosenOption;
   if (!challenge) return;
-  // Build tension before the reveal — replace the roll button with a
-  // spinning d20 for ~700ms, then resolve. Skipped under reduced-motion
-  // or under automation (Playwright) so tests don't have to slow down.
-  if (!adventureState._rolling) {
-    const reduce = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-      || navigator.webdriver
-      || /HeadlessChrome|Playwright/.test(navigator.userAgent || '');
-    if (!reduce) {
-      adventureState._rolling = true;
-      const c = document.getElementById('adventureContainer');
-      const btn = c && c.querySelector('button[onclick="attemptChallenge()"]');
-      if (btn) {
-        btn.disabled = true;
-        btn.style.position = 'relative';
-        btn.innerHTML = `<span class="dice-display rolling" style="display:inline-flex; width:46px; height:46px; align-items:center; justify-content:center; font-size:26px; border-radius:8px;">🎲</span>`;
-      }
-      try { playChime(); } catch (e) {}
-      setTimeout(() => {
-        adventureState._rolling = false;
-        attemptChallenge();
-      }, 720);
-      return;
-    }
-  }
-  adventureState._rolling = false;
   const heroes = adventureState.party.map(pid => kidById(pid)).filter(Boolean);
   // Effective DC after Council difficulty setting
   const effectiveDc = dcFor(challenge.dc);
@@ -10281,7 +10783,10 @@ renderClassPicker();
 renderKids();
 renderActivities();
 renderHistoryFilter();
+applyCustomAdventures();
+renderCustomAdventureList();
 checkAutoInterest();
+checkAutoAllowance();
 updateMusicBtn();
 updateNarratorBtn();
 // Pre-load TTS voices
