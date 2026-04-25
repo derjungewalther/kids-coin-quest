@@ -674,6 +674,162 @@
     background: rgba(62,40,23,0.12);
   }
 
+  /* R3-S2 — Pfad-Spiel (maze) */
+  .maze-game { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+  .maze-status {
+    text-align: center; font-family: 'MedievalSharp', cursive;
+    color: var(--gold-bright); font-size: 14px;
+  }
+  .maze-grid {
+    display: grid; gap: 4px;
+    background: rgba(62,40,23,0.25);
+    border: 3px solid var(--wood);
+    border-radius: 12px;
+    padding: 6px;
+    max-width: 380px; margin: 0 auto;
+    aspect-ratio: 1;
+    width: 100%;
+  }
+  .maze-cell {
+    background: rgba(244,211,94,0.05);
+    border: 1px solid rgba(244,211,94,0.15);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    cursor: default;
+    aspect-ratio: 1;
+    transition: background 120ms, border-color 120ms;
+  }
+  .maze-cell.adjacent {
+    background: rgba(244,211,94,0.15);
+    border-color: rgba(244,211,94,0.45);
+    cursor: pointer;
+  }
+  .maze-cell.adjacent:hover { background: rgba(244,211,94,0.28); }
+  .maze-cell.hero { background: rgba(244,211,94,0.22); border-color: var(--gold-bright); }
+  .maze-cell.goal { background: rgba(125,211,164,0.18); border-color: #2d6a4f; }
+  .maze-cell.obstacle { background: rgba(178,90,40,0.12); border-color: rgba(178,90,40,0.35); }
+  .maze-cell.maze-bump { animation: mazeBump 280ms ease-out; }
+  @keyframes mazeBump {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-4px); }
+    75%      { transform: translateX(4px); }
+  }
+  .maze-hero { animation: mazeHeroPulse 1.4s ease-in-out infinite alternate; }
+  @keyframes mazeHeroPulse {
+    from { transform: scale(0.95); }
+    to   { transform: scale(1.05); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .maze-hero, .maze-cell.maze-bump { animation: none; }
+  }
+
+  /* R3-S2 — Rhythmus-Spiel */
+  .rhythm-game { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+  .rhythm-status, .rhythm-banner {
+    text-align: center; font-family: 'MedievalSharp', cursive;
+    color: var(--gold-bright); font-size: 14px;
+  }
+  .rhythm-banner { font-style: italic; min-height: 18px; }
+  .rhythm-pads {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; padding: 10px 0;
+  }
+  .rhythm-pad {
+    aspect-ratio: 1;
+    border: 4px solid var(--rhythm-color, #c8a44a);
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(244,211,94,0.05), rgba(62,40,23,0.18));
+    color: var(--parchment);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 100ms, box-shadow 120ms, background 120ms;
+  }
+  .rhythm-pad:hover { transform: translateY(-2px); }
+  .rhythm-pad.lit {
+    transform: scale(1.08);
+    background: var(--rhythm-color, #c8a44a);
+    box-shadow: 0 0 20px var(--rhythm-color, #c8a44a);
+  }
+  .rhythm-pad-icon { font-size: 42px; line-height: 1; }
+  .rhythm-actions { display: flex; justify-content: center; }
+  @media (prefers-reduced-motion: reduce) {
+    .rhythm-pad.lit { transform: none; }
+  }
+
+  /* R3-S2 — Suche-Spiel (spot the difference) */
+  .spot-game { display: flex; flex-direction: column; gap: 10px; }
+  .spot-status, .spot-hint-line {
+    text-align: center; font-family: 'MedievalSharp', cursive;
+    color: var(--gold-bright); font-size: 13px;
+  }
+  .spot-hint-line { font-style: italic; opacity: 0.85; }
+  .spot-panels {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .spot-panel {
+    position: relative;
+    aspect-ratio: 1;
+    border: 3px solid var(--wood);
+    border-radius: 12px;
+    background:
+      linear-gradient(180deg, #79bbe6 0%, #79bbe6 55%, #2d6a4f 55%, #2d6a4f 100%);
+    overflow: hidden;
+  }
+  .spot-panel.right { cursor: crosshair; }
+  .spot-prop {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+  @media (max-width: 480px) { .spot-prop { font-size: 22px; } }
+  .spot-diff-left { filter: drop-shadow(0 0 4px rgba(244,211,94,0.5)); }
+  .spot-found-marker {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 36px; line-height: 1;
+    color: #f6c344;
+    pointer-events: none;
+    animation: spotFoundPop 380ms ease-out;
+  }
+  @keyframes spotFoundPop {
+    0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+    60% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+  .spot-hint-marker {
+    position: absolute;
+    width: 36px; height: 36px;
+    transform: translate(-50%, -50%);
+    border: 3px solid #f6c344;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: spotHintPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes spotHintPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(244,211,94,0.6); }
+    50%      { box-shadow: 0 0 0 12px rgba(244,211,94,0); }
+  }
+  .spot-wrong-marker {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    color: #c25a1a; font-size: 28px; font-weight: 700;
+    pointer-events: none;
+    animation: spotWrongShake 600ms ease-out forwards;
+  }
+  @keyframes spotWrongShake {
+    0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+    20%, 60% { transform: translate(-50%, -50%) scale(1) rotate(-12deg); opacity: 1; }
+    40%, 80% { transform: translate(-50%, -50%) scale(1) rotate(12deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .spot-found-marker, .spot-hint-marker, .spot-wrong-marker { animation: none; }
+  }
+
   /* Stat-check scene (no dice) */
   .statcheck-options { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
   .statcheck-option {
@@ -4466,15 +4622,24 @@ const TRANSLATIONS = {
     // R3-S2 — minigame scaffolds + UI labels
     minigame_coming_soon: '🚧 This puzzle isn\'t ready yet — your party slips through with a wink.',
     minigame_memory_legacy: 'Memory game loaded.',
-    minigame_maze_scaffold: 'Steer your way through the reeds.',
-    minigame_rhythm_scaffold: 'Catch the rhythm of the cast.',
-    minigame_spot_scaffold: 'Spot what\'s missing on the right.',
-    attempt_path: 'Attempt the path',
-    play_pattern: 'Play the pattern',
-    spot_differences: 'Mark the differences',
     count_was: 'It was',
     round_label: 'Round',
     correct_label: 'Correct',
+    // Maze
+    maze_moves_label: 'Moves',
+    maze_bumps_label: 'Bumps',
+    // Rhythm
+    rhythm_start_btn: '▶ Listen',
+    rhythm_banner_ready: 'Tap Listen — Sebastian will play the pattern.',
+    rhythm_banner_listen: '👂 Listen carefully…',
+    rhythm_banner_play: '🥁 Your turn — repeat the pattern.',
+    rhythm_banner_again: 'Round complete! Get ready for the next…',
+    rhythm_banner_done: 'Almost! The wind carried a beat away.',
+    rhythm_banner_perfect: '🎵 Perfect rhythm!',
+    // Spot
+    spot_progress_label: 'Found',
+    spot_wrongs_label: 'Misses',
+    spot_hint_line: 'Tap on the right picture where something is missing.',
     achievement_unlocked: 'Achievement',
     achievements_title: 'Achievements',
     achievements_desc: 'Trophies your hero has earned along the way.',
@@ -4934,15 +5099,24 @@ const TRANSLATIONS = {
     // R3-S2 — Mini-Spiel-Gerüste + UI-Labels
     minigame_coming_soon: '🚧 Dieses Rätsel ist noch nicht fertig — eure Gruppe schlüpft mit einem Augenzwinkern hindurch.',
     minigame_memory_legacy: 'Gedächtnisspiel geladen.',
-    minigame_maze_scaffold: 'Steuere deinen Weg durchs Schilf.',
-    minigame_rhythm_scaffold: 'Fang den Rhythmus des Wurfs.',
-    minigame_spot_scaffold: 'Find heraus, was rechts fehlt.',
-    attempt_path: 'Pfad versuchen',
-    play_pattern: 'Muster spielen',
-    spot_differences: 'Unterschiede markieren',
     count_was: 'Es waren',
     round_label: 'Runde',
     correct_label: 'Richtig',
+    // Maze
+    maze_moves_label: 'Züge',
+    maze_bumps_label: 'Stöße',
+    // Rhythm
+    rhythm_start_btn: '▶ Anhören',
+    rhythm_banner_ready: 'Tippe Anhören — Sebastian spielt das Muster vor.',
+    rhythm_banner_listen: '👂 Hör genau zu…',
+    rhythm_banner_play: '🥁 Du bist dran — wiederhol das Muster.',
+    rhythm_banner_again: 'Runde geschafft! Bereit für die nächste…',
+    rhythm_banner_done: 'Fast! Der Wind hat einen Schlag weggetragen.',
+    rhythm_banner_perfect: '🎵 Perfekter Rhythmus!',
+    // Spot
+    spot_progress_label: 'Gefunden',
+    spot_wrongs_label: 'Daneben',
+    spot_hint_line: 'Tippe rechts dorthin, wo etwas fehlt.',
     achievement_unlocked: 'Erfolg',
     achievements_title: 'Erfolge',
     achievements_desc: 'Trophäen, die dein Held gesammelt hat.',
@@ -13144,49 +13318,403 @@ function createCountGame() {
   };
 }
 
-// ---- Maze, Rhythm, Spot — functional but minimal scaffolds. ----
-// Each presents a "Tap to win" path so the contract is exercised end
-// to end; full templates are queued for follow-up commits.
+// ---- Pfad-Spiel (maze) ----
+// 5×5 (or N×M) grid, hero at start, goal at opposite corner. Tap an
+// adjacent empty cell to move. Obstacles block (each bump = 1 error).
+// Reach goal within moveLimit = win.
 function createMazeGame() {
+  let st;
+  let onFinishCb;
   return {
     mount(container, config, onFinish, opts) {
-      const slot = document.getElementById('minigamePuzzleSlot');
-      slot.innerHTML = `
-        <div class="minigame-scaffold">
-          <div class="adventure-narrative">${escapeHtml(t('minigame_maze_scaffold'))}</div>
-          <button class="btn btn-primary" onclick="window.__mgScaffoldFinish()">${escapeHtml(t('attempt_path'))}</button>
-        </div>`;
-      window.__mgScaffoldFinish = () => onFinish({ success: true, score: 0.7, errors: 0 });
+      onFinishCb = onFinish;
+      const cfg = config || {};
+      const diff = (opts && opts.difficulty) || 'knappe';
+      const w = cfg.width || (diff === 'sproessling' ? 4 : diff === 'ritter' ? 6 : 5);
+      const h = cfg.height || w;
+      const start = cfg.start || [0, h - 1];
+      const goal  = cfg.goal  || [w - 1, 0];
+      const obstacles = (cfg.obstacles || []).map(o => ({ x: o.pos[0], y: o.pos[1], icon: o.icon || '🪨', kind: o.kind || 'rock' }));
+      const moveLimit = cfg.moveLimit || (diff === 'sproessling' ? 10 : diff === 'ritter' ? 16 : 14);
+      const heroIcon = cfg.hero || '🛶';
+      st = {
+        w, h, start: { x: start[0], y: start[1] },
+        goal: { x: goal[0], y: goal[1] },
+        pos: { x: start[0], y: start[1] },
+        obstacles, obstacleSet: new Set(obstacles.map(o => `${o.x},${o.y}`)),
+        moves: 0, moveLimit,
+        errors: 0, heroIcon,
+        done: false, win: false
+      };
+      render();
     },
-    unmount() {}, replay() {}
+    unmount() { st = null; }, replay() {}
   };
+  function render() {
+    const slot = document.getElementById('minigamePuzzleSlot');
+    if (!slot || !st) return;
+    const cells = [];
+    for (let y = 0; y < st.h; y++) {
+      for (let x = 0; x < st.w; x++) {
+        const isHero = (st.pos.x === x && st.pos.y === y);
+        const isGoal = (st.goal.x === x && st.goal.y === y);
+        const obs = st.obstacles.find(o => o.x === x && o.y === y);
+        const dx = Math.abs(st.pos.x - x), dy = Math.abs(st.pos.y - y);
+        const adjacent = !st.done && (dx + dy === 1);
+        let inner = '';
+        let cls = 'maze-cell';
+        if (isHero) { inner = `<span class="maze-hero">${st.heroIcon}</span>`; cls += ' hero'; }
+        else if (isGoal) { inner = `<span class="maze-goal">🎯</span>`; cls += ' goal'; }
+        else if (obs) { inner = `<span class="maze-obs">${obs.icon}</span>`; cls += ' obstacle'; }
+        if (adjacent) cls += ' adjacent';
+        const click = adjacent ? `onclick="window.__mgMazeStep(${x},${y})"` : '';
+        cells.push(`<div class="${cls}" ${click} role="button" tabindex="${adjacent ? 0 : -1}" aria-label="${x},${y}">${inner}</div>`);
+      }
+    }
+    slot.innerHTML = `
+      <div class="maze-game">
+        <div class="maze-status">${t('maze_moves_label')}: ${st.moves}/${st.moveLimit}${st.errors ? ` · ${t('maze_bumps_label')}: ${st.errors}` : ''}</div>
+        <div class="maze-grid" style="grid-template-columns: repeat(${st.w}, 1fr);">${cells.join('')}</div>
+      </div>`;
+  }
+  window.__mgMazeStep = (x, y) => {
+    if (!st || st.done) return;
+    const dx = Math.abs(st.pos.x - x), dy = Math.abs(st.pos.y - y);
+    if (dx + dy !== 1) return;
+    if (st.obstacleSet.has(`${x},${y}`)) {
+      st.errors++;
+      st.moves++;
+      // Visual nudge — bump animation, no position change.
+      render();
+      const cell = document.querySelectorAll('.maze-cell')[y * st.w + x];
+      if (cell) {
+        cell.classList.add('maze-bump');
+        setTimeout(() => cell && cell.classList.remove('maze-bump'), 300);
+      }
+      if (st.moves >= st.moveLimit) finishMaze(false);
+      return;
+    }
+    st.pos = { x, y };
+    st.moves++;
+    playChime();
+    render();
+    if (x === st.goal.x && y === st.goal.y) finishMaze(true);
+    else if (st.moves >= st.moveLimit) finishMaze(false);
+  };
+  function finishMaze(win) {
+    st.done = true; st.win = win;
+    const score = win
+      ? Math.max(0.3, Math.min(1, (st.moveLimit - st.errors * 2) / st.moveLimit))
+      : Math.max(0, 0.3 - st.errors * 0.05);
+    if (win) playFanfare(); else playChime();
+    setTimeout(() => onFinishCb && onFinishCb({ success: win, score, errors: st.errors }), 600);
+  }
 }
+
+// ---- Rhythmus-Spiel (rhythm) ----
+// 3 drums. Narrator plays a 3-4 note pattern (visual highlight + audio).
+// Player repeats by tapping. 2 rounds; both correct = win.
 function createRhythmGame() {
+  let st;
+  let onFinishCb;
+  let actx;
   return {
-    mount(container, config, onFinish) {
-      const slot = document.getElementById('minigamePuzzleSlot');
-      slot.innerHTML = `
-        <div class="minigame-scaffold">
-          <div class="adventure-narrative">${escapeHtml(t('minigame_rhythm_scaffold'))}</div>
-          <button class="btn btn-primary" onclick="window.__mgScaffoldFinish()">${escapeHtml(t('play_pattern'))}</button>
-        </div>`;
-      window.__mgScaffoldFinish = () => onFinish({ success: true, score: 0.7, errors: 0 });
+    mount(container, config, onFinish, opts) {
+      onFinishCb = onFinish;
+      const cfg = config || {};
+      const diff = (opts && opts.difficulty) || 'knappe';
+      const patternLen = cfg.patternLength || (diff === 'sproessling' ? 3 : diff === 'ritter' ? 5 : 4);
+      const rounds = cfg.rounds || 2;
+      const drums = (cfg.drums && cfg.drums.length === 3) ? cfg.drums : [
+        { id: 'low',  freq: 140, color: '#5b7a8c', icon: '🥁' },
+        { id: 'mid',  freq: 240, color: '#7ba05b', icon: '🪘' },
+        { id: 'high', freq: 380, color: '#c8a44a', icon: '🔔' }
+      ];
+      st = {
+        drums, patternLen, rounds, roundIdx: 0,
+        pattern: null, playerSeq: [], wins: 0, errors: 0,
+        phase: 'ready', // 'ready' | 'demo' | 'play' | 'between' | 'done'
+        litIdx: -1
+      };
+      render();
     },
-    unmount() {}, replay() {}
+    unmount() {
+      st = null;
+      if (actx) { try { actx.close(); } catch (e) {} actx = null; }
+    },
+    replay() {}
+  };
+  function ensureCtx() {
+    if (!actx) {
+      try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { actx = null; }
+    }
+    return actx;
+  }
+  function playDrum(idx) {
+    const drum = st.drums[idx];
+    if (!drum) return;
+    const ctx = ensureCtx();
+    if (!ctx || (state.settings && state.settings.muted)) return;
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = drum.freq;
+      const now = ctx.currentTime;
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now); osc.stop(now + 0.32);
+    } catch (e) {}
+  }
+  function flashPad(idx) {
+    st.litIdx = idx;
+    render();
+    setTimeout(() => {
+      if (!st) return;
+      st.litIdx = -1;
+      render();
+    }, 220);
+  }
+  function pickPattern() {
+    const out = [];
+    for (let i = 0; i < st.patternLen; i++) {
+      out.push(Math.floor(Math.random() * st.drums.length));
+    }
+    return out;
+  }
+  function startRound() {
+    st.pattern = pickPattern();
+    st.playerSeq = [];
+    st.phase = 'demo';
+    render();
+    // Schedule playback.
+    let i = 0;
+    const step = () => {
+      if (!st || st.phase !== 'demo') return;
+      if (i >= st.pattern.length) {
+        st.phase = 'play';
+        render();
+        return;
+      }
+      const idx = st.pattern[i++];
+      playDrum(idx);
+      flashPad(idx);
+      setTimeout(step, 520);
+    };
+    setTimeout(step, 400);
+  }
+  function render() {
+    const slot = document.getElementById('minigamePuzzleSlot');
+    if (!slot || !st) return;
+    const padsHtml = st.drums.map((d, i) => {
+      const lit = (st.litIdx === i) ? ' lit' : '';
+      const click = (st.phase === 'play' && !st.done) ? `onclick="window.__mgRhythmTap(${i})"` : '';
+      const aria = (st.phase === 'play') ? 'true' : 'false';
+      return `<button class="rhythm-pad${lit}" style="--rhythm-color: ${d.color};" ${click} aria-pressed="${aria}" aria-label="drum ${i + 1}">
+        <span class="rhythm-pad-icon">${d.icon || '🥁'}</span>
+      </button>`;
+    }).join('');
+    let bannerKey = 'rhythm_banner_ready';
+    if (st.phase === 'demo') bannerKey = 'rhythm_banner_listen';
+    else if (st.phase === 'play') bannerKey = 'rhythm_banner_play';
+    else if (st.phase === 'between') bannerKey = 'rhythm_banner_again';
+    else if (st.phase === 'done') bannerKey = st.wins >= st.rounds ? 'rhythm_banner_perfect' : 'rhythm_banner_done';
+    const startBtn = st.phase === 'ready'
+      ? `<button class="btn btn-primary" onclick="window.__mgRhythmStart()">${escapeHtml(t('rhythm_start_btn'))}</button>`
+      : '';
+    const progress = `${t('round_label')} ${Math.min(st.roundIdx + 1, st.rounds)}/${st.rounds} · ${t('correct_label')}: ${st.wins}`;
+    slot.innerHTML = `
+      <div class="rhythm-game">
+        <div class="rhythm-status">${escapeHtml(progress)}</div>
+        <div class="rhythm-banner">${escapeHtml(t(bannerKey))}</div>
+        <div class="rhythm-pads">${padsHtml}</div>
+        <div class="rhythm-actions">${startBtn}</div>
+      </div>`;
+  }
+  window.__mgRhythmStart = () => { if (st) startRound(); };
+  window.__mgRhythmTap = (idx) => {
+    if (!st || st.phase !== 'play') return;
+    playDrum(idx);
+    flashPad(idx);
+    st.playerSeq.push(idx);
+    const expected = st.pattern[st.playerSeq.length - 1];
+    if (idx !== expected) {
+      st.errors++;
+      // Wrong note — mark round failed but let kid finish for closure.
+      st.playerSeq.length = st.pattern.length; // skip ahead to round-end check
+    }
+    if (st.playerSeq.length >= st.pattern.length) {
+      const correct = st.pattern.every((v, i) => st.playerSeq[i] === v);
+      if (correct) st.wins++;
+      st.roundIdx++;
+      if (st.roundIdx >= st.rounds) {
+        st.phase = 'done';
+        const score = Math.max(0, Math.min(1, st.wins / st.rounds));
+        const success = st.wins >= st.rounds; // both rounds correct
+        render();
+        if (success) playFanfare(); else playChime();
+        setTimeout(() => onFinishCb && onFinishCb({ success, score, errors: st.errors }), 900);
+      } else {
+        st.phase = 'between';
+        render();
+        setTimeout(() => { if (st) startRound(); }, 900);
+      }
+    }
   };
 }
+
+// ---- Suche-Spiel (find the difference) ----
+// Two side-by-side stylised dock scenes. Both share a base set of
+// emoji "props" at percentage coords. The right panel hides 3 of
+// those props (the `differences` from config). Player taps in the
+// right-panel rectangle that brackets each missing prop to find it.
+//
+// Default scene: dock + Sebastian + traveler, with angle/eimer/hut
+// as the typical missing items so the Fischer Sebastian scene has
+// content even without external SVG assets.
 function createSpotGame() {
+  let st;
+  let onFinishCb;
   return {
-    mount(container, config, onFinish) {
-      const slot = document.getElementById('minigamePuzzleSlot');
-      slot.innerHTML = `
-        <div class="minigame-scaffold">
-          <div class="adventure-narrative">${escapeHtml(t('minigame_spot_scaffold'))}</div>
-          <button class="btn btn-primary" onclick="window.__mgScaffoldFinish()">${escapeHtml(t('spot_differences'))}</button>
-        </div>`;
-      window.__mgScaffoldFinish = () => onFinish({ success: true, score: 0.7, errors: 0 });
+    mount(container, config, onFinish, opts) {
+      onFinishCb = onFinish;
+      const cfg = config || {};
+      // Base props always rendered on BOTH panels — these are the
+      // anchors/decoys so the scene reads as a real picture.
+      const baseProps = cfg.baseProps || [
+        { id: 'sky', icon: '☁',  x: 18, y: 12 },
+        { id: 'sun', icon: '🌞', x: 78, y: 14 },
+        { id: 'wave1', icon: '🌊', x: 12, y: 80 },
+        { id: 'wave2', icon: '🌊', x: 50, y: 84 },
+        { id: 'wave3', icon: '🌊', x: 86, y: 78 },
+        { id: 'fisher',   icon: '🧑‍🦳', x: 35, y: 60 },
+        { id: 'traveler', icon: '🚶', x: 62, y: 58 },
+        { id: 'dock',     icon: '🪵', x: 50, y: 70 },
+        { id: 'reed',     icon: '🌿', x: 8,  y: 65 },
+        { id: 'duck',     icon: '🦆', x: 70, y: 90 }
+      ];
+      // The diff items render on the LEFT panel only. Each diff
+      // entry's rightAreaPct is the click-zone on the RIGHT panel
+      // where the player has to tap to mark it found.
+      const diffs = (cfg.differences || [
+        { id: 'fehlende-angel',  icon: '🎣', leftPos: [22, 48], rightAreaPct: [0.18, 0.42, 0.10, 0.14] },
+        { id: 'fehlender-eimer', icon: '🪣', leftPos: [56, 66], rightAreaPct: [0.52, 0.62, 0.10, 0.12] },
+        { id: 'fehlender-hut',   icon: '🎩', leftPos: [70, 22], rightAreaPct: [0.66, 0.18, 0.10, 0.10] }
+      ]).map(d => {
+        // Backfill leftPos from rightAreaPct centre when missing.
+        if (!d.leftPos && d.rightAreaPct) {
+          const r = d.rightAreaPct;
+          d.leftPos = [Math.round((r[0] + r[2] / 2) * 100), Math.round((r[1] + r[3] / 2) * 100)];
+        }
+        if (!d.icon) d.icon = '✨';
+        d.found = false;
+        return d;
+      });
+      st = {
+        baseProps, diffs,
+        wrongs: 0,
+        startedAt: Date.now(),
+        hintAfterMs: cfg.hintAfterMs || 30000,
+        hintTimer: null,
+        hintIdx: -1,
+        done: false
+      };
+      render();
+      armHint();
     },
-    unmount() {}, replay() {}
+    unmount() {
+      if (!st) return;
+      if (st.hintTimer) clearTimeout(st.hintTimer);
+      st = null;
+    },
+    replay() {}
+  };
+  function armHint() {
+    if (!st) return;
+    if (st.hintTimer) clearTimeout(st.hintTimer);
+    st.hintTimer = setTimeout(() => {
+      if (!st || st.done) return;
+      const remaining = st.diffs.findIndex(d => !d.found);
+      if (remaining >= 0) {
+        st.hintIdx = remaining;
+        render();
+        setTimeout(() => { if (st) { st.hintIdx = -1; render(); } }, 1400);
+      }
+    }, st.hintAfterMs);
+  }
+  function panelHtml(side) {
+    const props = st.baseProps.map(p => `<div class="spot-prop" style="left:${p.x}%; top:${p.y}%;">${p.icon}</div>`).join('');
+    const diffMarkers = side === 'left'
+      ? st.diffs.map(d => `<div class="spot-prop spot-diff-left" style="left:${d.leftPos[0]}%; top:${d.leftPos[1]}%;">${d.icon}</div>`).join('')
+      : st.diffs.filter(d => d.found).map(d => {
+          const r = d.rightAreaPct;
+          const cx = (r[0] + r[2] / 2) * 100, cy = (r[1] + r[3] / 2) * 100;
+          return `<div class="spot-found-marker" style="left:${cx}%; top:${cy}%;" aria-label="found">⭕</div>`;
+        }).join('');
+    const hintMarker = (side === 'right' && st.hintIdx >= 0)
+      ? (() => {
+          const d = st.diffs[st.hintIdx]; if (!d) return '';
+          const r = d.rightAreaPct; const cx = (r[0] + r[2] / 2) * 100, cy = (r[1] + r[3] / 2) * 100;
+          return `<div class="spot-hint-marker" style="left:${cx}%; top:${cy}%;"></div>`;
+        })()
+      : '';
+    const click = side === 'right' && !st.done
+      ? `onclick="window.__mgSpotTap(event, this)"` : '';
+    return `<div class="spot-panel${side === 'right' ? ' right' : ''}" data-side="${side}" ${click}>${props}${diffMarkers}${hintMarker}</div>`;
+  }
+  function render() {
+    const slot = document.getElementById('minigamePuzzleSlot');
+    if (!slot || !st) return;
+    const found = st.diffs.filter(d => d.found).length;
+    slot.innerHTML = `
+      <div class="spot-game">
+        <div class="spot-status">${t('spot_progress_label')}: ${found}/${st.diffs.length}${st.wrongs ? ` · ${t('spot_wrongs_label')}: ${st.wrongs}` : ''}</div>
+        <div class="spot-panels">
+          ${panelHtml('left')}
+          ${panelHtml('right')}
+        </div>
+        <div class="spot-hint-line">${escapeHtml(t('spot_hint_line'))}</div>
+      </div>`;
+  }
+  window.__mgSpotTap = (ev, el) => {
+    if (!st || st.done) return;
+    const rect = el.getBoundingClientRect();
+    const fx = (ev.clientX - rect.left) / rect.width;
+    const fy = (ev.clientY - rect.top) / rect.height;
+    let hit = null;
+    for (const d of st.diffs) {
+      if (d.found) continue;
+      const r = d.rightAreaPct;
+      if (fx >= r[0] && fx <= r[0] + r[2] && fy >= r[1] && fy <= r[1] + r[3]) { hit = d; break; }
+    }
+    if (hit) {
+      hit.found = true;
+      playCoin();
+      armHint();
+      render();
+      const remaining = st.diffs.filter(d => !d.found).length;
+      if (remaining === 0) {
+        st.done = true;
+        playFanfare();
+        const elapsed = Date.now() - st.startedAt;
+        const score = Math.max(0.3, Math.min(1, 1 - st.wrongs * 0.1 - Math.max(0, elapsed - 20000) / 60000));
+        setTimeout(() => onFinishCb && onFinishCb({ success: true, score, errors: st.wrongs }), 700);
+      }
+    } else {
+      st.wrongs++;
+      // No penalty — just a tiny shake at the tap site to acknowledge.
+      const marker = document.createElement('div');
+      marker.className = 'spot-wrong-marker';
+      marker.style.left = (fx * 100) + '%';
+      marker.style.top = (fy * 100) + '%';
+      marker.textContent = '✕';
+      el.appendChild(marker);
+      setTimeout(() => { try { marker.remove(); } catch (e) {} }, 700);
+      render(); // refresh status counter
+      // status overwrote the panel; re-attach the wrong-marker is gone now,
+      // which is fine — the kid only sees it for the brief flash.
+    }
   };
 }
 
