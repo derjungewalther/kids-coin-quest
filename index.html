@@ -1223,11 +1223,16 @@
 
   .empty {
     text-align: center; padding: 40px;
-    color: var(--ink-muted);
+    /* Empty-state copy used to render in the dark wood-muted token,
+       which sits at ~#5a3a20 on the page's near-black backdrop and
+       reads as basically invisible. Bumped to a soft parchment so
+       the welcome text actually invites action. */
+    color: #c8b88a;
     font-family: 'MedievalSharp', cursive;
     font-style: italic;
+    line-height: 1.6;
   }
-  .empty-icon { font-size: 56px; margin-bottom: 12px; opacity: 0.6; }
+  .empty-icon { font-size: 56px; margin-bottom: 12px; opacity: 0.85; }
 
   .history-item {
     display: flex; justify-content: space-between; align-items: center;
@@ -1572,43 +1577,74 @@
     .reward-burst { animation: none; }
   }
   .reward-tier-line {
-    font-family: 'Cinzel', serif; color: var(--gold-bright);
-    font-size: 22px; margin: 12px 0 4px;
+    font-family: 'Cinzel', serif;
+    color: #8c6b1a;
+    font-weight: 700;
+    font-size: 22px; margin: 12px 0 6px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.4);
   }
   .reward-body {
-    font-family: 'Lora', serif; color: var(--parchment);
-    font-size: 14px; line-height: 1.5;
+    font-family: 'Lora', serif;
+    /* The reward modal sits on a cream/parchment background — needs
+       a dark text colour, not the dark-mode `--parchment` token. */
+    color: #3e2817;
+    font-size: 14px; line-height: 1.55;
     margin: 8px 0 16px;
   }
 
-  /* R3-S4 — Heldenweihe (recruitment ritual) modal */
+  /* R3-S4 — Heldenweihe (recruitment ritual) modal.
+     Reworked Apr-2026 visual pass: deeper background so the gold
+     title actually contrasts; stars opacity pulled down so they
+     don't compete with the title; ::before "halo" trimmed. */
   .ritual-modal {
     max-width: 540px;
     position: relative;
     overflow: hidden;
-    background: radial-gradient(ellipse at top, rgba(244,211,94,0.12), transparent 60%), var(--parchment-bg, #2a1f12);
+    background:
+      radial-gradient(ellipse at top, rgba(244,211,94,0.06), transparent 55%),
+      linear-gradient(180deg, #1d160e 0%, #14110a 100%);
+    border: 2px solid var(--gold-dark, #8c6b1a);
+    box-shadow:
+      inset 0 0 0 1px rgba(244,211,94,0.18),
+      0 12px 36px rgba(0,0,0,0.55);
+  }
+  /* Suppress the decorative parchment-style inner border on the dark
+     ritual modal — it draws as a black line over the gold motif. */
+  .ritual-modal::before {
+    border-color: rgba(244,211,94,0.35) !important;
   }
   .ritual-stars {
     position: absolute; inset: 0;
     pointer-events: none;
     background-image:
-      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.85), transparent 50%),
-      radial-gradient(1px 1px at 65% 18%, rgba(255,236,170,0.7), transparent 50%),
-      radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.55), transparent 50%),
-      radial-gradient(1px 1px at 35% 75%, rgba(255,236,170,0.6), transparent 50%),
-      radial-gradient(1px 1px at 10% 85%, rgba(255,255,255,0.7), transparent 50%);
-    opacity: 0.7;
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.6), transparent 50%),
+      radial-gradient(1px 1px at 65% 18%, rgba(255,236,170,0.5), transparent 50%),
+      radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.4), transparent 50%),
+      radial-gradient(1px 1px at 35% 75%, rgba(255,236,170,0.45), transparent 50%),
+      radial-gradient(1px 1px at 10% 85%, rgba(255,255,255,0.5), transparent 50%);
+    opacity: 0.45;
     animation: ritualStars 6s ease-in-out infinite alternate;
   }
-  @keyframes ritualStars { from { opacity: 0.45; } to { opacity: 0.85; } }
+  @keyframes ritualStars { from { opacity: 0.3; } to { opacity: 0.55; } }
   @media (prefers-reduced-motion: reduce) { .ritual-stars { animation: none; } }
   .ritual-body { position: relative; z-index: 1; }
+  /* Higher-specificity override for .modal h3 — the base modal styling
+     paints headings in dark wood with a gold-bottom-border, which is
+     invisible inside the dark ritual modal. */
+  .ritual-modal h3.ritual-step-title,
   .ritual-step-title {
-    font-family: 'Cinzel', serif; color: var(--gold-bright);
-    font-size: 22px; text-align: center; margin: 0 0 12px;
+    font-family: 'Cinzel', serif;
+    color: #ffe089;
+    font-weight: 700;
+    font-size: 24px; text-align: center; margin: 0 0 14px;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.6), 0 0 16px rgba(244,211,94,0.25);
+    border-bottom: none;
+    padding-bottom: 0;
   }
   .ritual-line {
-    font-family: 'Lora', serif; color: var(--parchment);
+    font-family: 'Lora', serif; color: #f3e3b2;
     font-size: 15px; line-height: 1.55;
     margin: 0 0 10px; text-align: center;
     opacity: 0; transform: translateY(6px);
@@ -1628,30 +1664,34 @@
     .ritual-class-grid { grid-template-columns: 1fr; }
   }
   .ritual-class-card {
-    border: 2px solid var(--parchment-darker);
+    border: 2px solid rgba(244,211,94,0.35);
     border-radius: 10px;
-    padding: 12px 8px;
+    padding: 14px 10px;
     text-align: center;
     cursor: pointer;
-    background: rgba(62,40,23,0.18);
+    background: rgba(40,28,14,0.55);
     transition: transform 120ms, border-color 120ms, background 120ms;
-    color: var(--parchment);
+    color: #f3e3b2;
   }
-  .ritual-class-card:hover { transform: translateY(-2px); }
+  .ritual-class-card:hover {
+    transform: translateY(-2px);
+    background: rgba(60,42,20,0.65);
+  }
   .ritual-class-card.selected {
     border-color: var(--legendary-color, #f6c344);
-    background: rgba(244,211,94,0.12);
-    box-shadow: 0 0 0 3px rgba(244,211,94,0.25);
+    background: rgba(244,211,94,0.16);
+    box-shadow: 0 0 0 3px rgba(244,211,94,0.3);
   }
-  .ritual-class-emoji { font-size: 38px; line-height: 1; margin-bottom: 4px; }
+  .ritual-class-emoji { font-size: 40px; line-height: 1; margin-bottom: 6px; }
   .ritual-class-name {
-    font-family: 'Cinzel', serif; font-size: 14px;
-    color: var(--legendary-color, var(--gold-bright));
+    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;
+    color: var(--legendary-color, #ffd866);
     letter-spacing: 0.5px;
   }
   .ritual-class-tag {
-    font-size: 12px; color: var(--ink-muted);
-    margin-top: 4px; line-height: 1.35;
+    font-size: 12px;
+    color: #d9c89a;
+    margin-top: 6px; line-height: 1.4;
   }
   .ritual-name-chips {
     display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
@@ -1691,6 +1731,21 @@
     margin-top: 14px; padding-top: 12px;
     border-top: 1px dashed rgba(244,211,94,0.3);
   }
+  /* Ghost buttons in the ritual modal need higher contrast — the
+     default `.btn-ghost` styling assumes a parchment background. */
+  .ritual-modal .btn-ghost {
+    color: #f3e3b2;
+    border-color: rgba(244,211,94,0.55);
+    background: rgba(244,211,94,0.06);
+  }
+  .ritual-modal .btn-ghost:hover {
+    color: #ffd866;
+    border-color: #ffd866;
+    background: rgba(244,211,94,0.12);
+  }
+  .ritual-modal .btn-ghost:disabled {
+    opacity: 0.5;
+  }
   .ritual-welcome-portrait {
     text-align: center;
     margin: 10px 0;
@@ -1709,30 +1764,43 @@
     .ritual-welcome-portrait .avatar-svg-box { box-shadow: 0 0 0 1px var(--legendary-color, #f6c344); }
     .ritual-welcome-portrait .legendary-emoji { filter: none; }
   }
-  /* Legendary mentor card variant on the Helden tab — animated gradient
-     border keyed off --legendary-color set inline per-class. */
+  /* Legendary mentor card variant on the Helden tab — solid parchment
+     background (same as kid cards) with a class-coloured outer glow
+     ring. Replaces the earlier conic-gradient ::before approach which
+     bled through the card body and obscured the avatar + text. */
   .kid-card[data-legendary="true"] {
     position: relative;
-    background: linear-gradient(180deg, rgba(244,211,94,0.05) 0%, rgba(62,40,23,0.18) 100%);
+    /* Inherits the regular kid-card parchment from .kid-card; just
+       layer a class-tinted blush on top so the eye knows it's special. */
+    background:
+      linear-gradient(180deg, rgba(244,211,94,0.08) 0%, rgba(255,255,255,0) 30%),
+      linear-gradient(180deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+    border-color: var(--legendary-color, #c8a44a) !important;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.18),
+      0 0 0 2px var(--legendary-color, #c8a44a),
+      0 0 22px -4px var(--legendary-color, #c8a44a),
+      0 6px 18px rgba(0,0,0,0.4);
+    animation: legendaryPulse 3.6s ease-in-out infinite;
   }
-  .kid-card[data-legendary="true"]::before {
-    content: '';
-    position: absolute; inset: -2px;
-    border-radius: inherit;
-    background: conic-gradient(
-      from 0deg,
-      var(--legendary-color, #c8a44a) 0%,
-      transparent 25%,
-      var(--legendary-color, #c8a44a) 50%,
-      transparent 75%,
-      var(--legendary-color, #c8a44a) 100%
-    );
-    z-index: -1;
-    animation: legendaryRotate 4s linear infinite;
+  @keyframes legendaryPulse {
+    0%, 100% {
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.18),
+        0 0 0 2px var(--legendary-color, #c8a44a),
+        0 0 22px -4px var(--legendary-color, #c8a44a),
+        0 6px 18px rgba(0,0,0,0.4);
+    }
+    50% {
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.22),
+        0 0 0 2px var(--legendary-color, #c8a44a),
+        0 0 36px -2px var(--legendary-color, #c8a44a),
+        0 8px 22px rgba(0,0,0,0.45);
+    }
   }
-  @keyframes legendaryRotate { to { transform: rotate(1turn); } }
   @media (prefers-reduced-motion: reduce) {
-    .kid-card[data-legendary="true"]::before { animation: none; }
+    .kid-card[data-legendary="true"] { animation: none; }
   }
   .legendary-class-pill {
     display: inline-block;
@@ -6426,7 +6494,86 @@ function renderSceneBackground(adv, sceneIdx) {
   if (adv.id === 'dragon') return renderDragonBg(v);
   if (adv.id === 'tower')  return renderTowerBg(v);
   if (adv.id === 'bakery') return renderBakeryBg(v);
-  return '';
+  if (adv.id === 'fischer-sebastian') return renderFischerSebastianBg(v);
+  // Generic fallback for any custom or future adventure: a soft
+  // twilight gradient with a few stars so the canvas doesn't read
+  // as a broken/empty void behind the hero portraits.
+  return `
+    <defs>
+      <linearGradient id="generic-sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"   stop-color="#3a2f4a"/>
+        <stop offset="0.55" stop-color="#5a4a3c"/>
+        <stop offset="1"   stop-color="#3e2817"/>
+      </linearGradient>
+    </defs>
+    <rect width="600" height="300" fill="url(#generic-sky)"/>
+    <circle cx="80"  cy="50"  r="1.4" fill="#fff7d6" opacity="0.85"/>
+    <circle cx="160" cy="32"  r="1.0" fill="#fff7d6" opacity="0.7"/>
+    <circle cx="270" cy="60"  r="1.3" fill="#fff7d6" opacity="0.8"/>
+    <circle cx="380" cy="40"  r="1.2" fill="#fff7d6" opacity="0.75"/>
+    <circle cx="500" cy="70"  r="1.1" fill="#fff7d6" opacity="0.7"/>
+    <ellipse cx="300" cy="290" rx="320" ry="22" fill="rgba(0,0,0,0.35)"/>
+  `;
+}
+
+// Lakeside dock at dawn — fischer-sebastian's canonical setting.
+// Soft layered sky → still water → wooden dock plank in front. Two
+// reed clumps frame the scene; the hero portraits land on top of the
+// dock plank thanks to the same y=175 placement renderSceneIllustration
+// uses for every adventure.
+function renderFischerSebastianBg(variant) {
+  return `
+    <defs>
+      <linearGradient id="fs-sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0"   stop-color="#bcd6e4"/>
+        <stop offset="0.55" stop-color="#dfb98a"/>
+        <stop offset="1"   stop-color="#a37452"/>
+      </linearGradient>
+      <linearGradient id="fs-water" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#5b7a8c"/>
+        <stop offset="1" stop-color="#2e4654"/>
+      </linearGradient>
+      <linearGradient id="fs-plank" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#9b6f47"/>
+        <stop offset="1" stop-color="#5a3a20"/>
+      </linearGradient>
+    </defs>
+    <rect width="600" height="170" fill="url(#fs-sky)"/>
+    <rect y="170" width="600" height="80" fill="url(#fs-water)"/>
+    <!-- Sun / moon depending on variant -->
+    <circle cx="470" cy="80" r="34" fill="#fff5c4" opacity="0.85"/>
+    <circle cx="470" cy="80" r="46" fill="#fff5c4" opacity="0.18"/>
+    <!-- Distant hills -->
+    <path d="M0 170 Q90 140 180 162 Q260 150 340 168 Q430 140 520 160 Q580 150 600 168 L600 175 L0 175 Z"
+          fill="#5e8b5a" opacity="0.55"/>
+    <!-- Water glints -->
+    <path d="M40 200 Q70 198 100 200 M140 215 Q170 213 200 215 M260 205 Q290 203 320 205 M380 220 Q410 218 440 220 M480 207 Q510 205 540 207"
+          stroke="#c8d8e2" stroke-width="1.2" fill="none" opacity="0.5"/>
+    <!-- Wooden dock plank that the heroes stand on -->
+    <rect y="245" width="600" height="55" fill="url(#fs-plank)"/>
+    <line x1="0" y1="252" x2="600" y2="252" stroke="#3e2817" stroke-width="1" opacity="0.4"/>
+    <line x1="0" y1="270" x2="600" y2="270" stroke="#3e2817" stroke-width="0.8" opacity="0.3"/>
+    <line x1="0" y1="288" x2="600" y2="288" stroke="#3e2817" stroke-width="1" opacity="0.4"/>
+    <!-- Reed clumps left + right -->
+    <g transform="translate(20,210)">
+      <line x1="0" y1="40" x2="-2" y2="0"  stroke="#3e6e3a" stroke-width="1.5"/>
+      <line x1="6" y1="40" x2="4"  y2="-4" stroke="#3e6e3a" stroke-width="1.5"/>
+      <line x1="12" y1="40" x2="14" y2="2" stroke="#3e6e3a" stroke-width="1.5"/>
+      <line x1="18" y1="40" x2="20" y2="-2" stroke="#3e6e3a" stroke-width="1.5"/>
+    </g>
+    <g transform="translate(560,212)">
+      <line x1="0" y1="36" x2="-2" y2="2"  stroke="#3e6e3a" stroke-width="1.5"/>
+      <line x1="6" y1="36" x2="8"  y2="-2" stroke="#3e6e3a" stroke-width="1.5"/>
+      <line x1="14" y1="36" x2="14" y2="0" stroke="#3e6e3a" stroke-width="1.5"/>
+      <line x1="20" y1="36" x2="22" y2="-3" stroke="#3e6e3a" stroke-width="1.5"/>
+      <line x1="26" y1="36" x2="28" y2="2"  stroke="#3e6e3a" stroke-width="1.5"/>
+    </g>
+    <!-- A single low boat moored to the right (variant tweak) -->
+    <g transform="translate(420,225)">
+      <path d="M0 0 Q30 12 70 0 L62 12 L8 12 Z" fill="#7a4a26" stroke="#3e2817" stroke-width="1"/>
+      <line x1="35" y1="0" x2="35" y2="-15" stroke="#3e2817" stroke-width="1.5"/>
+    </g>
+  `;
 }
 
 // Warm cobblestone-village bakery interior — cream walls, wooden counter,
