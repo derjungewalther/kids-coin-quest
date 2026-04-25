@@ -66,7 +66,7 @@ test.describe('Quest completion', () => {
     expect(txt).toMatch(/.+/);
     const before = await page.evaluate((id) => window.kidById(id).balance, kidId);
     // Click the matching ⚔ Complete button (next to the select)
-    await page.locator(`.kid-card:has(${selector}) .btn-primary`).click();
+    await page.locator(`.kid-card:has(${selector}) .quest-done-btn`).click();
     const after = await page.evaluate((id) => ({ balance: window.kidById(id).balance, xp: window.kidById(id).xp }), kidId);
     expect(after.balance).toBeGreaterThan(before);
     // at least one of brave/clever/kind XP should have gone up
@@ -85,7 +85,7 @@ test.describe('Quest completion', () => {
     const selector = `#quest-select-${kidId}`;
     // the "Study scrolls" quest (amount 2) — adds 2 clever → crosses level threshold
     await page.locator(selector).selectOption({ index: 1 });
-    await page.locator(`.kid-card:has(${selector}) .btn-primary`).click();
+    await page.locator(`.kid-card:has(${selector}) .quest-done-btn`).click();
     await expect(page.locator('#toast')).toContainText(/leveled up/i, { timeout: 3000 });
   });
 });
@@ -228,7 +228,7 @@ test.describe('Chronicle', () => {
     // Complete a quest to generate a transaction
     const selector = `#quest-select-${kidId}`;
     await page.locator(selector).selectOption({ index: 1 });
-    await page.locator(`.kid-card:has(${selector}) .btn-primary`).click();
+    await page.locator(`.kid-card:has(${selector}) .quest-done-btn`).click();
     const beforeRevoke = await page.evaluate((id) => ({
       balance: window.kidById(id).balance,
       xp: window.kidById(id).xp,

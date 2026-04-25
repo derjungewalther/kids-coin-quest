@@ -943,15 +943,19 @@
   .toast.success { border-color: var(--emerald); color: #7fcc97; }
   .toast.error { border-color: var(--blood); color: #ff8080; }
 
-  /* PWA install chip — bottom-left, out of the way of the bottom-right toast. */
+  /* PWA install chip — top-right of viewport, dismissable. Used to sit
+     bottom-left where it overlapped the green Withdraw button on hero
+     cards on phones. The dismiss × inside the chip lets users get it out
+     of the way once they've seen it. */
   .pwa-install-chip {
-    position: fixed; left: 16px; bottom: 16px;
+    position: fixed; right: 14px; top: 12px;
     z-index: 150;
+    display: inline-flex; align-items: center; gap: 8px;
     background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 100%);
     color: var(--wood-dark);
     border: 2px solid var(--gold-dark);
     border-radius: 999px;
-    padding: 10px 16px;
+    padding: 8px 6px 8px 14px;
     font-family: 'Cinzel', serif;
     font-weight: 700;
     font-size: 13px;
@@ -960,14 +964,76 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 0 16px rgba(244,211,94,0.4);
     transition: transform 0.15s, box-shadow 0.15s;
   }
+  .pwa-install-chip-label { cursor: pointer; }
+  .pwa-install-chip-dismiss {
+    background: rgba(31,18,8,0.18);
+    color: var(--wood-dark);
+    border: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pwa-install-chip-dismiss:hover { background: rgba(31,18,8,0.32); }
   .pwa-install-chip:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(0,0,0,0.55), 0 0 22px rgba(244,211,94,0.55);
   }
-  .pwa-install-chip:active { transform: translateY(0); }
   @media (max-width: 480px) {
-    .pwa-install-chip { left: 10px; bottom: 10px; font-size: 12px; padding: 8px 14px; }
+    .pwa-install-chip { right: 8px; top: 8px; font-size: 11px; padding: 6px 4px 6px 12px; }
   }
+
+  /* Header toggle buttons — visibly dim when "off" so users don't
+     mistake the muted icon for the action label. */
+  .music-btn.toggle-off { opacity: 0.55; }
+  .music-btn.toggle-on  { opacity: 1; box-shadow: 0 0 8px rgba(244,211,94,0.35); }
+
+  /* Quest "Done!" complete button — wider with explicit text + checkmark
+     so kids tell it apart from the small ✕ delete-hero button. */
+  .quest-done-btn {
+    background: linear-gradient(180deg, #7dd3a4 0%, var(--emerald) 100%);
+    color: #fff;
+    border: 2px solid #1a3d2a;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 14px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #1a3d2a, 0 4px 8px rgba(0,0,0,0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+    white-space: nowrap;
+  }
+  .quest-done-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 #1a3d2a, 0 6px 12px rgba(0,0,0,0.4);
+  }
+  .quest-done-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #1a3d2a, 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .quest-picker { display: flex; gap: 8px; align-items: stretch; }
+  .quest-picker select { flex: 1; min-width: 0; }
+
+  /* Mobile tab overflow — under 600px the 6 header tabs got clipped. Now
+     the tab strip scrolls horizontally with a subtle fade on the right
+     so users see there's more. */
+  @media (max-width: 600px) {
+    .tabs {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      mask-image: linear-gradient(90deg, #000 0, #000 90%, transparent 100%);
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tabs .tab { flex: 0 0 auto; }
+  }
+
+  /* Slightly higher contrast on muted text so faint hints stay legible
+     against the dark gold-on-black backgrounds (WCAG AA push). */
+  :root { --ink-muted: #6f4f33; }
 
   /* ======================= GOAL JAR + STREAK (hero card) ======================= */
   .streak-badge {
@@ -2686,38 +2752,44 @@
   <!-- QUESTS VIEW -->
   <div class="view" id="view-activities">
     <div class="section">
-      <h2>📜 Quest Board</h2>
-      <p style="color: var(--ink-muted); font-style: italic;">Proclaim the tasks thy heroes may undertake to earn gold coin.</p>
+      <h2 data-i18n="quest_board">📜 Quest Board</h2>
+      <p style="color: var(--ink-muted); font-style: italic;" data-i18n="quest_board_desc">Proclaim the tasks thy heroes may undertake to earn gold coin.</p>
       <div class="form-row">
         <div>
-          <label>Quest Name</label>
-          <input type="text" id="actName" placeholder="e.g. Slay the dust dragons" />
+          <label data-i18n="quest_name">Quest Name</label>
+          <input type="text" id="actName" data-i18n-placeholder="quest_name_ph" placeholder="e.g. Slay the dust dragons" />
         </div>
         <div>
-          <label>Gold Reward</label>
-          <input type="number" lang="en" id="actAmount" step="0.01" min="0" placeholder="1.00" />
+          <label data-i18n="gold_reward">Gold Reward</label>
+          <input type="text" inputmode="decimal" id="actAmount" placeholder="1.00" />
         </div>
-        <button class="btn btn-primary" onclick="addActivity()">⚔ Proclaim</button>
+        <button class="btn btn-primary" onclick="addActivity()" data-i18n="proclaim">⚔ Proclaim</button>
       </div>
       <div style="display:grid; grid-template-columns: 1fr 2fr; gap: 12px; margin-top: 8px;">
         <div>
-          <label>Builds XP for Stat</label>
+          <label data-i18n="builds_xp">Builds XP for Stat</label>
           <select id="actStat">
-            <option value="brave" selected>💪 Brave</option>
-            <option value="clever">🧠 Clever</option>
-            <option value="kind">💛 Kind</option>
+            <option value="brave" data-i18n="brave" selected>💪 Brave</option>
+            <option value="clever" data-i18n="clever">🧠 Clever</option>
+            <option value="kind" data-i18n="kind">💛 Kind</option>
           </select>
         </div>
         <div>
-          <label>Quest Sigil</label>
+          <label data-i18n="quest_sigil">Quest Sigil</label>
           <div class="emoji-picker" id="actEmojiPicker"></div>
         </div>
       </div>
     </div>
     <div class="section">
-      <h2>📋 Active Quests</h2>
+      <h2 data-i18n="active_quests">📋 Active Quests</h2>
       <table id="activitiesTable">
-        <thead><tr><th>Sigil</th><th>Name</th><th>Gold</th><th>Builds XP</th><th></th></tr></thead>
+        <thead><tr>
+          <th data-i18n="sigil">Sigil</th>
+          <th data-i18n="name">Name</th>
+          <th data-i18n="gold">Gold</th>
+          <th data-i18n="builds_xp_short">Builds XP</th>
+          <th></th>
+        </tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -2731,9 +2803,9 @@
   <!-- CHRONICLE VIEW -->
   <div class="view" id="view-history">
     <div class="section">
-      <h2>📖 The Chronicle</h2>
+      <h2 data-i18n="chronicle">📖 The Chronicle</h2>
       <select id="historyFilter" style="max-width: 260px; margin-bottom: 12px;" onchange="renderHistory()">
-        <option value="all">All Heroes</option>
+        <option value="all" data-i18n="all_heroes">All Heroes</option>
       </select>
       <div id="historyList"></div>
     </div>
@@ -2742,11 +2814,11 @@
   <!-- COUNCIL VIEW -->
   <div class="view" id="view-settings">
     <div class="section">
-      <h2>⚙ Council Chamber</h2>
+      <h2 data-i18n="council_chamber">⚙ Council Chamber</h2>
       <div class="settings-row">
         <div>
-          <div class="label-title">Coinage</div>
-          <div class="label-sub">The mark of the realm's currency</div>
+          <div class="label-title" data-i18n="coinage">Coinage</div>
+          <div class="label-sub" data-i18n="coinage_desc">The mark of the realm's currency</div>
         </div>
         <div class="control">
           <input type="text" id="setCurrency" maxlength="3" />
@@ -2754,33 +2826,33 @@
       </div>
       <div class="settings-row">
         <div>
-          <div class="label-title">Treasury Interest (%)</div>
-          <div class="label-sub">Annual return paid on vault balance</div>
+          <div class="label-title" data-i18n="treasury_interest">Treasury Interest (%)</div>
+          <div class="label-sub" data-i18n="treasury_interest_desc">Annual return paid on vault balance</div>
         </div>
         <div class="control">
-          <input type="number" lang="en" id="setInterestRate" step="0.1" min="0" max="100" />
+          <input type="text" inputmode="decimal" id="setInterestRate" />
         </div>
       </div>
       <div class="settings-row">
         <div>
-          <div class="label-title">Interest Cadence</div>
-          <div class="label-sub">How oft the coffers yield</div>
+          <div class="label-title" data-i18n="interest_cadence">Interest Cadence</div>
+          <div class="label-sub" data-i18n="interest_cadence_desc">How oft the coffers yield</div>
         </div>
         <div class="control">
           <select id="setInterestFreq" style="width: 150px;">
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
+            <option value="daily" data-i18n="freq_daily">Daily</option>
+            <option value="weekly" data-i18n="freq_weekly">Weekly</option>
+            <option value="monthly" data-i18n="freq_monthly">Monthly</option>
           </select>
         </div>
       </div>
       <div class="settings-row">
         <div>
-          <div class="label-title">Max Adventure Treasure</div>
-          <div class="label-sub">Per hero · scaled by success & luck</div>
+          <div class="label-title" data-i18n="max_treasure">Max Adventure Treasure</div>
+          <div class="label-sub" data-i18n="max_treasure_desc">Per hero · scaled by success & luck</div>
         </div>
         <div class="control">
-          <input type="number" lang="en" id="setMaxTreasure" step="1" min="0" />
+          <input type="text" inputmode="decimal" id="setMaxTreasure" />
         </div>
       </div>
       <div class="settings-row">
@@ -2789,7 +2861,7 @@
           <div class="label-sub" data-i18n="paid_per_week_desc">After this many adventures, further weekly adventures give only items (no coins). Resets every Monday. 0 = never pay coins.</div>
         </div>
         <div class="control">
-          <input type="number" lang="en" id="setPaidPerWeek" step="1" min="0" max="99" aria-label="Paid adventures per week" />
+          <input type="text" inputmode="numeric" id="setPaidPerWeek" aria-label="Paid adventures per week" />
         </div>
       </div>
       <div class="settings-row">
@@ -2813,22 +2885,22 @@
         <div class="control">
           <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
             <input type="checkbox" id="setITried" style="width:18px; height:18px;"/>
-            <span style="font-family:'Cinzel',serif;">on</span>
+            <span style="font-family:'Cinzel',serif;" data-i18n="on_label">on</span>
           </label>
         </div>
       </div>
       <div style="margin-top: 16px;">
-        <button class="btn btn-primary" onclick="saveSettings()">💾 Decree Settings</button>
-        <button class="btn btn-accent" onclick="applyInterestNow()">🏦 Bestow Interest Now</button>
+        <button class="btn btn-primary" onclick="saveSettings()" data-i18n="decree_settings">💾 Decree Settings</button>
+        <button class="btn btn-accent" onclick="applyInterestNow()" data-i18n="bestow_interest">🏦 Bestow Interest Now</button>
       </div>
     </div>
     <div class="section">
-      <h2>📊 Realm Overview</h2>
+      <h2 data-i18n="realm_overview">📊 Realm Overview</h2>
       <div class="stat-grid" id="statGrid"></div>
     </div>
     <div class="section">
-      <h2>⚠ Forbidden Rites</h2>
-      <button class="btn btn-danger" onclick="resetAll()">🔥 Purge All Records</button>
+      <h2 data-i18n="forbidden_rites">⚠ Forbidden Rites</h2>
+      <button class="btn btn-danger" onclick="openPurgeModal()" data-i18n="purge_all">🔥 Purge All Records</button>
     </div>
     <div class="section" id="accountSection" style="display:none;">
       <h2>👤 <span data-i18n="account_title">Account</span></h2>
@@ -2881,11 +2953,11 @@
     <div class="emoji-picker" id="avatarPicker"></div>
 
     <label style="margin-top: 12px;">Starting Gold (optional)</label>
-    <input type="number" lang="en" id="newKidStart" step="0.01" min="0" value="0" />
+    <input type="text" inputmode="decimal" id="newKidStart" value="0" />
 
     <div style="display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end;">
-      <button class="btn btn-ghost" onclick="closeModal('addKidModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="addKid()">⚔ Begin Quest</button>
+      <button class="btn btn-ghost" onclick="closeModal('addKidModal')" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-primary" onclick="addKid()" data-i18n="recruit_btn">⚔ Recruit</button>
     </div>
   </div>
 </div>
@@ -3071,6 +3143,22 @@
   </div>
 </div>
 
+<!-- Purge-all-records Modal (typed confirmation) -->
+<div class="modal-backdrop" id="purgeModal">
+  <div class="modal">
+    <h3>🔥 <span data-i18n="purge_title">Purge All Records</span></h3>
+    <p style="color: #ff8080; font-style: italic; margin-bottom: 10px;" data-i18n="purge_warn">
+      This permanently erases every hero, quest, transaction and setting on this device. Cloud data is also deleted if you are signed in. This cannot be undone.
+    </p>
+    <label data-i18n="purge_confirm_label">Type PURGE to confirm</label>
+    <input type="text" id="purgeConfirm" oninput="onPurgeConfirmInput()" placeholder="PURGE" autocomplete="off" />
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+      <button class="btn btn-ghost" onclick="closeModal('purgeModal')" data-i18n="cancel">Cancel</button>
+      <button class="btn btn-danger" id="purgeSubmit" onclick="submitPurge()" disabled data-i18n="purge_btn">Purge everything</button>
+    </div>
+  </div>
+</div>
+
 <!-- Delete-account Modal (requires typing DELETE to enable the button) -->
 <div class="modal-backdrop" id="deleteAccountModal">
   <div class="modal">
@@ -3118,9 +3206,27 @@ const TRANSLATIONS = {
     no_heroes_msg: 'No heroes walk these halls yet. Click <strong>Recruit New Hero</strong> to begin thy tale!',
     quest_board: '📜 Quest Board', quest_board_desc: 'Proclaim the tasks thy heroes may undertake to earn gold coin.',
     quest_name: 'Quest Name', quest_name_ph: 'e.g. Slay the dust dragons',
-    gold_reward: 'Gold Reward', proclaim: '⚔ Proclaim', builds_xp: 'Builds XP for Stat', quest_sigil: 'Quest Sigil',
+    gold_reward: 'Gold Reward', proclaim: '⚔ Proclaim', builds_xp: 'Builds XP for Stat',
+    builds_xp_short: 'Builds XP', quest_sigil: 'Quest Sigil',
     active_quests: '📋 Active Quests', sigil: 'Sigil', name: 'Name', gold: 'Gold', no_quests: 'No quests proclaimed',
     remove: 'Remove',
+    recruit_btn: '⚔ Recruit',
+    on_label: 'on',
+    max_treasure: 'Max Adventure Treasure',
+    max_treasure_desc: 'Per hero · scaled by success & luck',
+    choose_party: '🗺 Choose Thy Party',
+    choose_party_desc: 'Select the heroes who will venture forth together. The weakest hero sets the party\'s rank.',
+    party_size: 'Party size',
+    done_short: 'Done!',
+    purge_title: 'Purge All Records',
+    purge_warn: 'This permanently erases every hero, quest, transaction and setting on this device. Cloud data is also deleted if you are signed in. This cannot be undone.',
+    purge_confirm_label: 'Type PURGE to confirm',
+    purge_btn: 'Purge everything',
+    purge_done: 'All records purged.',
+    discard_adventure_confirm: 'Discard this adventure-in-progress? Heroes will lose their morale and any loot already gathered.',
+    install_app: '⬇ Install app',
+    install_ios: '⬇ Add to Home Screen',
+    install_ios_hint: 'To install: tap the Share icon, then "Add to Home Screen".',
     chronicle: '📖 The Chronicle', all_heroes: 'All Heroes', empty_chronicle: 'The chronicle is yet unwritten',
     council_chamber: '⚙ Council Chamber',
     coinage: 'Coinage', coinage_desc: "The mark of the realm's currency",
@@ -3410,9 +3516,27 @@ const TRANSLATIONS = {
     no_heroes_msg: 'Noch wandeln keine Helden durch diese Hallen. Klicke <strong>Neuen Helden anwerben</strong>, um deine Geschichte zu beginnen!',
     quest_board: '📜 Auftragstafel', quest_board_desc: 'Verkünde die Aufgaben, die deine Helden erfüllen dürfen, um Goldmünzen zu verdienen.',
     quest_name: 'Name des Auftrags', quest_name_ph: 'z.B. Staubdrachen erlegen',
-    gold_reward: 'Goldbelohnung', proclaim: '⚔ Verkünden', builds_xp: 'Baut EP auf für Attribut', quest_sigil: 'Auftragszeichen',
+    gold_reward: 'Goldbelohnung', proclaim: '⚔ Verkünden', builds_xp: 'Baut EP auf für Attribut',
+    builds_xp_short: 'EP für', quest_sigil: 'Auftragszeichen',
     active_quests: '📋 Aktive Aufträge', sigil: 'Zeichen', name: 'Name', gold: 'Gold', no_quests: 'Noch keine Aufträge verkündet',
     remove: 'Entfernen',
+    recruit_btn: '⚔ Anwerben',
+    on_label: 'an',
+    max_treasure: 'Max Abenteuer-Schatz',
+    max_treasure_desc: 'Pro Held · skaliert mit Erfolg & Glück',
+    choose_party: '🗺 Wähle deine Gruppe',
+    choose_party_desc: 'Wähle die Helden, die gemeinsam losziehen. Der schwächste Held setzt den Rang der Gruppe.',
+    party_size: 'Gruppengröße',
+    done_short: 'Fertig!',
+    purge_title: 'Alle Daten löschen',
+    purge_warn: 'Das löscht endgültig alle Helden, Aufträge, Transaktionen und Einstellungen auf diesem Gerät. Cloud-Daten werden ebenfalls gelöscht, falls angemeldet. Nicht rückgängig zu machen.',
+    purge_confirm_label: 'Tippe LÖSCHEN zum Bestätigen',
+    purge_btn: 'Alles löschen',
+    purge_done: 'Alle Daten gelöscht.',
+    discard_adventure_confirm: 'Dieses laufende Abenteuer verwerfen? Die Helden verlieren ihre Moral und bereits erbeuteten Schatz.',
+    install_app: '⬇ App installieren',
+    install_ios: '⬇ Zum Home-Bildschirm',
+    install_ios_hint: 'Zum Installieren: Teilen-Symbol antippen und „Zum Home-Bildschirm" wählen.',
     chronicle: '📖 Die Chronik', all_heroes: 'Alle Helden', empty_chronicle: 'Die Chronik ist noch unbeschrieben',
     council_chamber: '⚙ Ratskammer',
     coinage: 'Münzwesen', coinage_desc: 'Das Zeichen der Landeswährung',
@@ -3733,6 +3857,8 @@ function toggleLang() {
   stopNarration();
   renderKids();
   renderActivities();
+  if (typeof renderInstallChip === 'function') renderInstallChip();
+  if (typeof renderHistoryFilter === 'function') renderHistoryFilter();
   try { renderHistory(); } catch(e) {}
   renderHistoryFilter();
   try { renderStats(); } catch(e) {}
@@ -3884,6 +4010,11 @@ function toggleNarrator() {
 function updateNarratorBtn() {
   const btn = document.getElementById('narratorBtn');
   if (!btn) return;
+  // Single muted icon for OFF, an explicit speaker for ON, plus a class so
+  // the button visibly dims when off — easier to read at a glance than
+  // relying on emoji alone.
+  btn.classList.toggle('toggle-on',  state.settings.narratorOn);
+  btn.classList.toggle('toggle-off', !state.settings.narratorOn);
   btn.innerHTML = (state.settings.narratorOn ? '🗣 ' : '🔇 ') + '<span data-i18n="narrator">' + t('narrator') + '</span>';
 }
 const AVATARS = ['⚔️','🏹','🧙‍♂️','🧝‍♀️','🛡️','👑','🗡️','🪄','🐉','🦄','🐺','🦅','🦁','🐲','🧚','🧛','🧞','🧟','⚡','🌟'];
@@ -4867,9 +4998,26 @@ function renderSceneIllustration(adv, sceneIdx) {
   const spacing = Math.min(90, 420 / count);
   const totalW = spacing * count;
   const startX = (600 - totalW) / 2 + spacing / 2;
+  // If a hero has uploaded a portrait, render that as the in-scene avatar
+  // so the kid sees themselves on the adventure, not a generic blocky
+  // figure. Falls back to the procedural character SVG otherwise.
   const heroSvgs = heroes.map((h, i) => {
     const x = startX + i * spacing - 40;
     const y = 175;
+    if (h.portrait) {
+      const cls = CLASSES.find(c => c.id === h.class) || CLASSES[0];
+      return `
+        <g transform="translate(${x}, ${y})">
+          <circle cx="40" cy="40" r="42" fill="rgba(0,0,0,0.4)"/>
+          <clipPath id="clip-portrait-${escapeHtml(h.id)}">
+            <circle cx="40" cy="40" r="38"/>
+          </clipPath>
+          <image href="${escapeHtml(h.portrait)}" x="2" y="2" width="76" height="76"
+                 preserveAspectRatio="xMidYMid slice"
+                 clip-path="url(#clip-portrait-${escapeHtml(h.id)})"/>
+          <circle cx="40" cy="40" r="38" fill="none" stroke="${cls.icon ? '#f4d35e' : '#8b6914'}" stroke-width="2.5"/>
+        </g>`;
+    }
     return renderCharacterSVG(h, false, { x, y, size: 80 });
   }).join('');
   return `<div class="scene-illustration"><svg viewBox="0 0 600 300" preserveAspectRatio="xMidYMid slice" class="scene-illustration-svg">${bg}${heroSvgs}</svg></div>`;
@@ -5180,7 +5328,22 @@ function load() {
 }
 
 function id() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
-function fmt(n) { return state.settings.currency + (Math.round(n * 100) / 100).toFixed(2); }
+// Currency display, locale-aware decimal separator. German uses comma; the
+// previous fixed dot felt wrong next to other German numbers in the UI.
+function fmt(n) {
+  const lang = (state.settings && state.settings.lang) || 'en';
+  const sep = lang === 'de' ? ',' : '.';
+  return state.settings.currency + (Math.round(n * 100) / 100).toFixed(2).replace('.', sep);
+}
+// Like fmt() but without the currency prefix and without trailing zeroes,
+// for editable inputs where "0,5" reads better than "0,50".
+function formatDecimalLocaleEditable(n) {
+  const lang = (state.settings && state.settings.lang) || 'en';
+  const sep = lang === 'de' ? ',' : '.';
+  if (n == null || isNaN(n)) return '';
+  const fixed = (Math.round(n * 100) / 100).toString();
+  return fixed.replace('.', sep);
+}
 
 function toast(msg, type = '') {
   const t = document.getElementById('toast');
@@ -5291,7 +5454,7 @@ function switchTab(view) {
   if (tabEl) tabEl.classList.add('active');
   const viewEl = document.getElementById('view-' + view);
   if (viewEl) viewEl.classList.add('active');
-  if (view === 'history') renderHistory();
+  if (view === 'history') { renderHistoryFilter(); renderHistory(); }
   if (view === 'settings') renderStats();
   if (view === 'adventure') renderAdventure();
   if (view === 'parents') renderParentDashboard();
@@ -5523,7 +5686,7 @@ function renderKids() {
                   return `<option value="${a.id}">${a.icon} ${escapeHtml(L(a.name))} · ${STAT_META[st].icon} +${fmt(a.amount)}</option>`;
                 }).join('')}
               </select>
-              <button class="btn btn-primary" onclick="earnFromSelect('${k.id}')">⚔</button>
+              <button class="quest-done-btn" onclick="earnFromSelect('${k.id}')" aria-label="${escapeHtml(t('done_short'))}">✓ ${escapeHtml(t('done_short'))}</button>
             </div>
             <div class="quest-preview" id="quest-preview-${k.id}"></div>`
         }
@@ -5870,19 +6033,22 @@ function updateActivity(aid, field, value) {
 function renderActivities() {
   const tbody = document.querySelector('#activitiesTable tbody');
   if (state.activities.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" class="empty">No quests proclaimed</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(t('no_quests'))}</td></tr>`;
     return;
   }
   tbody.innerHTML = state.activities.map(a => {
     const st = a.statType || 'brave';
-    const opts = STAT_KEYS.map(sk => `<option value="${sk}"${sk === st ? ' selected' : ''}>${STAT_META[sk].icon} ${STAT_META[sk].label}</option>`).join('');
+    const opts = STAT_KEYS.map(sk => `<option value="${sk}"${sk === st ? ' selected' : ''}>${STAT_META[sk].icon} ${t(sk)}</option>`).join('');
+    // Locale-aware: render the editable amount with the user's decimal
+    // separator (German uses a comma) so it matches what they read.
+    const amountStr = formatDecimalLocaleEditable(a.amount);
     return `
     <tr>
       <td style="font-size:24px;">${a.icon}</td>
       <td><input type="text" value="${escapeHtml(L(a.name))}" onchange="updateActivity('${a.id}','name',this.value)" /></td>
-      <td><input type="number" lang="en" step="0.01" min="0" value="${a.amount}" onchange="updateActivity('${a.id}','amount',this.value)" style="max-width:100px;" /></td>
+      <td><input type="text" inputmode="decimal" value="${amountStr}" onchange="updateActivity('${a.id}','amount',this.value)" style="max-width:100px;" /></td>
       <td><select onchange="updateActivity('${a.id}','statType',this.value)" style="max-width:140px;">${opts}</select></td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')">Remove</button></td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')" data-i18n="remove">${escapeHtml(t('remove'))}</button></td>
     </tr>
   `;
   }).join('');
@@ -5935,7 +6101,7 @@ function revokeTransaction(txId) {
 function renderHistoryFilter() {
   const sel = document.getElementById('historyFilter');
   const current = sel.value;
-  sel.innerHTML = '<option value="all">All Heroes</option>' +
+  sel.innerHTML = `<option value="all">${escapeHtml(t('all_heroes'))}</option>` +
     state.kids.map(k => `<option value="${k.id}">${k.avatar} ${escapeHtml(k.name)}</option>`).join('');
   sel.value = current;
 }
@@ -5944,9 +6110,9 @@ function renderHistory() {
   const filter = document.getElementById('historyFilter').value;
   const list = document.getElementById('historyList');
   let txs = state.transactions;
-  if (filter !== 'all') txs = txs.filter(t => t.kidId === filter);
+  if (filter !== 'all') txs = txs.filter(tx => tx.kidId === filter);
   if (txs.length === 0) {
-    list.innerHTML = '<div class="empty"><div class="empty-icon">📖</div><div>The chronicle is yet unwritten</div></div>';
+    list.innerHTML = `<div class="empty"><div class="empty-icon">📖</div><div>${escapeHtml(t('empty_chronicle'))}</div></div>`;
     return;
   }
   list.innerHTML = txs.map(t => {
@@ -6056,12 +6222,30 @@ function renderStats() {
   `;
 }
 
-function resetAll() {
-  if (!pinVerified) { requirePin(() => resetAll(), 'pin_required'); return; }
-  if (!confirm('Purge every hero, quest, and record from the realm? This deed is FINAL.')) return;
-  localStorage.removeItem('piggyBankState');
-  location.reload();
+function openPurgeModal() {
+  if (!pinVerified) { requirePin(() => openPurgeModal(), 'pin_required'); return; }
+  const input = document.getElementById('purgeConfirm');
+  if (input) input.value = '';
+  const btn = document.getElementById('purgeSubmit');
+  if (btn) btn.disabled = true;
+  openModal('purgeModal');
+  setTimeout(() => input && input.focus(), 50);
 }
+function onPurgeConfirmInput() {
+  const input = document.getElementById('purgeConfirm');
+  const btn = document.getElementById('purgeSubmit');
+  if (!input || !btn) return;
+  // Locale-aware confirmation: "PURGE" works for everyone, "LÖSCHEN" for DE.
+  const v = (input.value || '').trim().toUpperCase();
+  btn.disabled = !(v === 'PURGE' || v === 'LÖSCHEN' || v === 'LOESCHEN');
+}
+function submitPurge() {
+  localStorage.removeItem('piggyBankState');
+  toast(t('purge_done'), 'success');
+  setTimeout(() => location.reload(), 600);
+}
+// Backwards-compatible: any cached buttons calling resetAll() still work.
+function resetAll() { openPurgeModal(); }
 
 // =================== HERO SHEET ===================
 let openSheetKidId = null;
@@ -7766,15 +7950,15 @@ function renderAdventureSelect() {
     ${resumeHtml}
     ${paidBanner}
     <div class="section">
-      <h2>🗺 Choose Thy Party</h2>
-      <p style="font-style: italic; color: var(--ink-muted);">Select the heroes who will venture forth together. The weakest hero sets the party\'s rank.</p>
+      <h2>${t('choose_party')}</h2>
+      <p style="font-style: italic; color: var(--ink-muted);">${t('choose_party_desc')}</p>
       <div class="adventure-hero-picker">${heroes}</div>
       <div style="margin-top: 10px; color: var(--ink-muted); font-size: 13px;">${t('party_order_hint')}</div>
       <div class="party-order-strip" id="partyOrderStrip">${renderPartyOrderChips()}</div>
-      <div style="margin-top: 4px; color: var(--ink-muted); font-size: 13px;">Party size: ${adventureState.party.length}${adventureState.party.length > 0 ? ` · party level: ${pml}` : ''}</div>
+      <div style="margin-top: 4px; color: var(--ink-muted); font-size: 13px;">${t('party_size')}: ${adventureState.party.length}${adventureState.party.length > 0 ? ` · ${t('party_level')}: ${pml}` : ''}</div>
     </div>
     <div class="section">
-      <h2>📜 Choose Thy Quest</h2>
+      <h2>${t('choose_quest')}</h2>
       <div class="adventure-list">${advs}</div>
     </div>`;
 }
@@ -7935,7 +8119,7 @@ function resumeSavedAdventure() {
 
 function discardSavedAdventure() {
   if (!pinVerified) { requirePin(() => discardSavedAdventure(), 'pin_required'); return; }
-  if (!confirm(t('discard_saved_confirm'))) return;
+  if (!confirm(t('discard_adventure_confirm'))) return;
   state.savedAdventure = null;
   save();
   renderAdventure();
@@ -9293,7 +9477,9 @@ function toggleMusic() {
 function updateMusicBtn() {
   const btn = document.getElementById('musicBtn');
   if (!btn) return;
-  btn.innerHTML = (state.settings.musicOn ? '🎵 ' : '🔇 ') + '<span data-i18n="music">' + t('music') + '</span>';
+  btn.classList.toggle('toggle-on',  state.settings.musicOn);
+  btn.classList.toggle('toggle-off', !state.settings.musicOn);
+  btn.innerHTML = (state.settings.musicOn ? '🔊 ' : '🔇 ') + '<span data-i18n="music">' + t('music') + '</span>';
 }
 
 // --- SFX ---
@@ -10002,23 +10188,27 @@ function isIosSafari() {
 function renderInstallChip() {
   let chip = document.getElementById('pwaInstallChip');
   if (isStandalone()) { if (chip) chip.remove(); return; }
+  // The user may have explicitly dismissed the chip (this session). Don't
+  // re-show until they reload — they know it's there.
+  if (window.__pwaChipDismissed) { if (chip) chip.remove(); return; }
   const show = !!deferredInstallPrompt || isIosSafari();
   if (!show) { if (chip) chip.remove(); return; }
   if (!chip) {
-    chip = document.createElement('button');
+    chip = document.createElement('div');
     chip.id = 'pwaInstallChip';
-    chip.type = 'button';
     chip.className = 'pwa-install-chip';
-    chip.onclick = triggerInstallPrompt;
     document.body.appendChild(chip);
   }
-  const lang = (typeof state !== 'undefined' && state && state.settings && state.settings.lang) || 'en';
-  const labels = {
-    en: { install: '⬇ Install app', ios: '⬇ Add to Home Screen' },
-    de: { install: '⬇ App installieren', ios: '⬇ Zum Home-Bildschirm' }
+  const labelText = isIosSafari() ? t('install_ios') : t('install_app');
+  chip.innerHTML = `
+    <span class="pwa-install-chip-label" role="button" tabindex="0">${escapeHtml(labelText)}</span>
+    <button class="pwa-install-chip-dismiss" type="button" aria-label="Dismiss">×</button>`;
+  chip.querySelector('.pwa-install-chip-label').onclick = triggerInstallPrompt;
+  chip.querySelector('.pwa-install-chip-dismiss').onclick = (e) => {
+    e.stopPropagation();
+    window.__pwaChipDismissed = true;
+    chip.remove();
   };
-  const L_ = labels[lang] || labels.en;
-  chip.textContent = isIosSafari() ? L_.ios : L_.install;
 }
 
 async function triggerInstallPrompt() {
@@ -10030,10 +10220,7 @@ async function triggerInstallPrompt() {
     return;
   }
   if (isIosSafari()) {
-    const lang = (state && state.settings && state.settings.lang) || 'en';
-    const msg = lang === 'de'
-      ? 'Zum Installieren: Teilen-Symbol antippen und „Zum Home-Bildschirm" wählen.'
-      : 'To install: tap the Share icon, then "Add to Home Screen".';
+    const msg = t('install_ios_hint');
     if (typeof toast === 'function') toast(msg); else alert(msg);
   }
 }
