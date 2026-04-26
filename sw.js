@@ -1,7 +1,17 @@
 // Kids Coin Quest — service worker
 // Bump CACHE_VERSION whenever index.html ships a change you want users to see
 // immediately after reload. Old caches are purged on activate.
-const CACHE_VERSION = 'kcq-v6';
+const CACHE_VERSION = 'kcq-v7';
+
+// `index.html` and `/` always need a fresh check so users pick up
+// new app code immediately. Everything else (assets, scripts, fonts)
+// is served stale-while-revalidate: instant from cache, refreshed in
+// the background. This eliminates the prior network-first behaviour
+// where every same-origin request roundtripped to the network even
+// when a cached copy existed — that was the root cause of the
+// "every asset fetched 3-4× per page load" performance bug.
+const HTML_PATHS = ['./', './index.html'];
+
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -15,8 +25,12 @@ const CORE_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
+  // Pre-warm the cache so the first offline visit doesn't show a blank
+  // screen. We only fetch each asset once — the cache.addAll path is
+  // separate from the fetch event handler below.
   event.waitUntil(
-    caches.open(CACHE_VERSION).then((cache) => cache.addAll(CORE_ASSETS))
+    caches.open(CACHE_VERSION)
+      .then((cache) => cache.addAll(CORE_ASSETS))
       .then(() => self.skipWaiting())
   );
 });
@@ -29,8 +43,6 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Network-first for same-origin GETs: always try fresh, fall back to cache offline.
-// Cross-origin (Google Fonts, etc.) is left to the browser's default.
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
@@ -38,19 +50,48 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
 
   // Audio is now served by jsDelivr (cross-origin, falls into the
-  // origin-skip clause above). The old kcq-v5 cache may still hold local
-  // mp3s; the activate handler purges that cache on upgrade.
+  // origin-skip clause above). Old kcq-v5/v6 caches may still hold
+  // local mp3s; the activate handler purges them on upgrade.
 
-  event.respondWith(
-    fetch(req)
+  // HTML/document paths: network-first so a deploy is visible on the
+  // next reload. Cache fallback covers offline.
+  const isHtml = HTML_PATHS.some(p => url.pathname === p || url.pathname.endsWith('/index.html'));
+  if (isHtml) {
+    event.respondWith(networkFirst(req));
+    return;
+  }
+
+  // Everything else: stale-while-revalidate. Serve cache immediately,
+  // refresh in background. This reduces double-fetches from 2× to 1×
+  // (cache hit) for warm reloads, and keeps offline working.
+  event.respondWith(staleWhileRevalidate(req));
+});
+
+function networkFirst(req) {
+  return fetch(req)
+    .then((res) => {
+      if (res && res.ok && res.type === 'basic') {
+        const copy = res.clone();
+        caches.open(CACHE_VERSION).then((cache) => cache.put(req, copy));
+      }
+      return res;
+    })
+    .catch(() => caches.match(req).then((cached) => cached || caches.match('./index.html')));
+}
+
+function staleWhileRevalidate(req) {
+  return caches.match(req).then((cached) => {
+    const networkFetch = fetch(req)
       .then((res) => {
-        // Only cache successful, basic (same-origin) responses.
         if (res && res.ok && res.type === 'basic') {
           const copy = res.clone();
           caches.open(CACHE_VERSION).then((cache) => cache.put(req, copy));
         }
         return res;
       })
-      .catch(() => caches.match(req).then((cached) => cached || caches.match('./index.html')))
-  );
-});
+      .catch(() => cached);    // offline → keep serving stale
+    // If we have a cached copy, return it instantly. The networkFetch
+    // promise updates the cache for the next request.
+    return cached || networkFetch;
+  });
+}

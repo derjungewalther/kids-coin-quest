@@ -40,7 +40,21 @@
 [[headers]]
   for = "/*.svg"
   [headers.values]
-    Cache-Control = "public, max-age=86400"
+    # Bumped from 1 day to 30 days so the icon.svg referenced from
+    # multiple <link> tags lands in the browser disk cache after the
+    # first hit. Without this the second link probe (apple-touch-icon)
+    # was re-fetching even on warm reloads.
+    Cache-Control = "public, max-age=2592000, immutable"
+
+# Browsers + bots probe /favicon.ico by default even when we declare
+# an SVG icon via <link>. Redirect to the SVG so the probe doesn't
+# 404 (which pollutes server logs and skips the icon entirely on
+# clients that hit /favicon.ico without HTML parsing first).
+[[redirects]]
+  from = "/favicon.ico"
+  to   = "/icon.svg"
+  status = 200
+  force = true
 
 # --- Security headers --------------------------------------------------------
 # Kept minimal on purpose. A real CSP comes later, once we've confirmed the

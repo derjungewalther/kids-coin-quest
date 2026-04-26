@@ -8,6 +8,12 @@
 <meta name="theme-color" content="#d4af37" />
 <link rel="manifest" href="./manifest.json" />
 <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+<!-- Explicit shortcut icon stops legacy browsers + bots from probing
+     /favicon.ico (which would 404). We point the .ico path at the
+     SVG; Netlify serves it with image/svg+xml so any client that
+     fetches /favicon.ico still gets a valid icon, just SVG instead
+     of true ICO. -->
+<link rel="shortcut icon" href="./icon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="./icon.svg" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -1989,24 +1995,31 @@
     border: 1px solid var(--emerald);
     border-style: solid;
   }
-  /* Empty-state Sparziel button — bumped to high-contrast gold on dark
-     bg with a dashed gold border. Drops the faded italic that was hard
-     to read at first glance on parchment cards (R2-P1-06). */
+  /* Empty-state Sparziel button — sits on the parchment kid-card
+     surface, so it needs DARK text. The earlier R2-P1-06 fix changed
+     the colour to gold-bright assuming it'd land on the dark goal-
+     strip overlay, but rgba(62,40,23,0.35) at 35% opacity barely
+     darkens the parchment (resolves to ~#a5895a tan) — gold-on-tan
+     was still failing WCAG AA at 1.6:1.
+     This pass makes the empty state a proper outlined button on
+     parchment: dark wood text on a soft parchment fill, gold dashed
+     border, matching the visual weight of the populated goal strip. */
   .goal-strip-empty {
     text-align: center;
-    color: var(--gold-bright);
+    color: var(--wood-dark);
     font-family: 'Cinzel', serif;
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.5px;
     padding: 11px 14px;
     border-style: dashed;
-    border-color: var(--gold);
-    background: rgba(244,211,94,0.08);
+    border-color: var(--gold-dark);
+    background: rgba(244,211,94,0.18);
   }
   .goal-strip-empty:hover {
-    background: rgba(244,211,94,0.18);
-    color: #fff5c4;
+    background: rgba(244,211,94,0.32);
+    color: #3e2817;
+    border-color: var(--gold-bright);
   }
   .goal-strip-line {
     display: flex;
