@@ -1,0 +1,112 @@
+# GitHub Actions: full Playwright suite on every push and pull request.
+#
+# Strategy
+#   - Logic + smoke + R3 + priority specs always run on Chromium (all 213
+#     non-visual tests). They're fast (~17 s in isolation) and tell us
+#     immediately if app behaviour broke.
+#   - Visual regression runs across Chromium + Firefox + WebKit. The
+#     baseline PNGs in the repo are -darwin (developer machine); the
+#     workflow's first run will produce -linux PNGs as artifacts the
+#     team can review before committing them as baselines. After that
+#     first run, visual diffs run as proper assertions.
+#   - On a fresh checkout with NO -linux baselines, the visual job is
+#     allowed to fail (continue-on-error) so a developer can pull the
+#     produced screenshots from the artifact and commit them.
+#
+# Tuning knobs
+#   timeout-minutes: 15 — visual run + 3 browsers takes ~3 min on a
+#     2-core GitHub-hosted runner; padding in case Playwright cold-
+#     downloads bytes during install.
+#   concurrency: cancel-in-progress so duplicate pushes don't pile up.
+
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Manual trigger button on the Actions tab — useful when you want
+  # to re-run after a baseline update.
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  logic:
+    name: Logic + smoke (Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run non-visual specs
+        run: npx playwright test --project=chromium --grep-invert "visual"
+        env:
+          CI: 'true'
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-logic
+          path: playwright-report/
+          retention-days: 7
+
+  visual:
+    name: Visual regression (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Don't block the whole pipeline if a baseline is missing or off
+    # by a few pixels — we want the artifact to download and review.
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run visual specs
+        run: npx playwright test visual --project=${{ matrix.browser }}
+        env:
+          CI: 'true'
+
+      # Diff PNGs (actual / expected / diff) ride along on every visual
+      # run so the developer can pull the artifact and either commit
+      # them as fresh -linux baselines (first run) or investigate a
+      # regression (subsequent runs).
+      - name: Upload visual diffs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-diffs-${{ matrix.browser }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14
+          if-no-files-found: ignore

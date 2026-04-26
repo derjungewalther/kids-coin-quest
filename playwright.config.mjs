@@ -28,6 +28,22 @@ export default defineConfig({
   },
 
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } }
+    // Chromium runs the full suite — logic + visual + smoke + R3 specs.
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    // Firefox + WebKit only run the visual.spec — they exist to catch
+    // browser-specific layout regressions (font metrics, gradient
+    // rendering, flex/grid quirks). Running every logic test in 3
+    // browsers triples runtime without catching new issues; visual
+    // diffs are where cross-browser drift actually shows up.
+    {
+      name: 'firefox',
+      testMatch: /visual\.spec\.mjs/,
+      use: { ...devices['Desktop Firefox'] }
+    },
+    {
+      name: 'webkit',
+      testMatch: /visual\.spec\.mjs/,
+      use: { ...devices['Desktop Safari'] }
+    }
   ]
 });

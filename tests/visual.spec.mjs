@@ -914,6 +914,144 @@ test.describe('Visual capture · desktop 1280×900', () => {
     await captureFullPage(page, '86-edge-empty-chronicle');
   });
 
+  // =====================================================================
+  // ROUND 3 — finer-grained surfaces
+  // =====================================================================
+
+  test('90 hero sheet · achievements grid (mostly unlocked)', async ({ page }) => {
+    // Hero sheet has an internal max-height with scroll. Stretch the
+    // viewport so all sections (attributes / inventory / achievements
+    // / cosmetics) fit without scrolling and the fullPage shot covers
+    // the entire modal.
+    await page.setViewportSize({ width: 1280, height: 1700 });
+    const kidId = await seedHero(page, { name: 'Champ', userName: 'champ', balance: 250, totalEarned: 300 });
+    await page.evaluate((id) => {
+      const k = window.kidById(id);
+      k.xp = { brave: 60, clever: 60, kind: 60 };
+      k.achievements = ['first_quest','level_5','level_10','coins_50','coins_200','goal_reached','streak_3','streak_7'];
+      k.goal = { name: 'Castle', target: 200, achievedAt: new Date().toISOString() };
+      window.save();
+      window.openHeroSheet(id);
+    }, kidId);
+    await captureFullPage(page, '90-hero-sheet-achievements-full');
+  });
+
+  test('91 hero sheet · inventory all 4 slots equipped', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'Geared', userName: 'geared', class: 'warrior' });
+    await page.evaluate((id) => {
+      const k = window.kidById(id);
+      // Pick one item per slot (hat / armor / weapon / accessory) and
+      // equip each so the sheet shows every slot filled with its rarity
+      // border + icon.
+      const slots = ['hat', 'armor', 'weapon', 'accessory'];
+      for (const slot of slots) {
+        const it = (window.ITEMS || []).find(x => x.slot === slot);
+        if (!it) continue;
+        window.giveItemToKid(id, it);
+        const inst = (k.inventory || []).find(i => i.itemId === it.id);
+        if (inst) k.equipment[slot] = inst.instanceId || inst.id;
+      }
+      window.save();
+      window.openHeroSheet(id);
+    }, kidId);
+    await captureFullPage(page, '91-hero-sheet-all-slots');
+  });
+
+  test('92 adventure result · treasure detail (triumph)', async ({ page }) => {
+    // Same setup as the end-screen captures but cropped/zoomed to the
+    // treasure block. We can't really crop, but the end-screen at
+    // triumph already centers the treasure callout nicely. This is a
+    // duplicate-ish state captured at a different morale tier (full)
+    // so we can compare layout drift specifically on the loot row.
+    const kidId = await seedHero(page, { name: 'Treasure', userName: 'treasure', balance: 0, totalEarned: 0 });
+    await page.evaluate((id) => {
+      window.adventureState.party = [id];
+      window.adventureState.adventureId = 'fischer-sebastian';
+      window.adventureState.sceneIdx = 7;
+      window.adventureState.maxHp = 6;
+      window.adventureState.hp = 6;
+      window.adventureState.log = Array.from({ length: 8 }, (_, i) => ({
+        sceneTitle: 'S' + (i+1), heroId: id, success: true,
+        type: 'minigame', score: 1, errors: 0, durationMs: 1000,
+        loot: i === 4 ? 'wand_oak' : null
+      }));
+      window.adventureState.treasureRewards = null;
+      const advTab = document.querySelector('.tab[data-view="adventure"]');
+      if (advTab) advTab.click();
+      window.endAdventure(true);
+    }, kidId);
+    await captureFullPage(page, '92-adventure-treasure-detail');
+  });
+
+  test('93 hero sheet · empty equipment slots', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'Bare', userName: 'bare', class: 'magician' });
+    await page.evaluate((id) => window.openHeroSheet(id), kidId);
+    await captureFullPage(page, '93-hero-sheet-empty-slots');
+  });
+
+  test('94 quest dropdown open on hero card', async ({ page }) => {
+    await seedHero(page, { name: 'Pick', userName: 'pickkid' });
+    await page.evaluate(() => window.renderKids());
+    // Programmatically open the <select>'s dropdown is browser-blocked,
+    // but selecting an option populates the preview text under the
+    // dropdown. That's the more interesting visual — verify the
+    // preview line renders.
+    const sel = page.locator('#quest-select-' + (await page.evaluate(() => window.state.kids[0].id)));
+    await sel.selectOption({ index: 1 });
+    await captureFullPage(page, '94-quest-preview');
+  });
+
+  test('95 hero sheet · with cosmetics equipped (kid hero)', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'Fancy', userName: 'fancy', class: 'magician' });
+    await page.evaluate((id) => {
+      const k = window.kidById(id);
+      k.cosmetics = { hat: 'crown_gold', cape: 'cape_red', pet: 'pet_owl' };
+      window.state.cosmeticInventory = [
+        { id: 'crown_gold', slot: 'hat', icon: '👑' },
+        { id: 'cape_red', slot: 'cape', icon: '🧣' },
+        { id: 'pet_owl', slot: 'pet', icon: '🦉' }
+      ];
+      window.save();
+      window.openHeroSheet(id);
+    }, kidId);
+    await captureFullPage(page, '95-hero-sheet-cosmetics');
+  });
+
+  test('96 settings · audio + language toggles', async ({ page }) => {
+    await seedHero(page, { userName: 'audKid' });
+    await setPin(page, '1234');
+    await page.evaluate(() => {
+      window.pinVerified = true;
+      window.state.settings.musicOn = true;
+      window.state.settings.muted = false;
+      window.save();
+      window.switchTab('settings');
+    });
+    await captureFullPage(page, '96-settings-audio-lang');
+  });
+
+  test('97 chronicle · long history with all event types', async ({ page }) => {
+    const kidId = await seedHero(page, { name: 'Many', userName: 'manyk', balance: 50, totalEarned: 100 });
+    await page.evaluate((id) => {
+      const tx = (e, payload, amt = 1, type = 'earn', note = '') =>
+        window.logTx(id, type, amt, note, { event: e, payload });
+      tx('quest', { questIcon: '📜', questName: 'Brush teeth', xp: 1, stat: 'brave' }, 1);
+      tx('quest', { questIcon: '📚', questName: 'Read book', xp: 2, stat: 'clever' }, 2);
+      tx('royal_endowment', {}, 5);
+      tx('allowance', {}, 5);
+      tx('interest', { rate: 5, freq: 'monthly' }, 0.5);
+      tx('adventure_treasure', { adventureId: 'fischer-sebastian', itemIcon: '🪶', itemName: 'Wing Feather' }, 8);
+      tx('adventure_gift', { adventureId: 'bakery', itemIcon: '🥐', itemName: 'Croissant' }, 0);
+      tx('adventure_consolation', { adventureId: 'grove' }, 1);
+      tx('donation', { to: 'Library' }, -1, 'donate', '❤ Library');
+      tx('withdrawal', { reason: 'Ice cream' }, -2, 'payout', 'Ice cream');
+      tx('legendary_recruited', { heroName: 'Mira', legendaryClass: 'licht', streakDays: 30 }, 0);
+      tx('legendary_ability_used', { class: 'licht', sceneId: 'fs-1' }, 0);
+    }, kidId);
+    await page.locator('.tab[data-view="history"]').click();
+    await captureFullPage(page, '97-chronicle-all-events');
+  });
+
   test('87 edge · 4-mentor cap state on heroes view', async ({ page }) => {
     await seedHero(page, { name: 'Aria', userName: 'aria-cap' });
     await page.evaluate(() => {
