@@ -30,7 +30,10 @@ test.describe('Recruit a hero', () => {
     await page.locator('#addKidModal .btn-primary').click();
     await expect(page.locator('.kid-card')).toHaveCount(1);
     await expect(page.locator('.kid-card .kid-name')).toContainText(/Lily Brave/);
-    await expect(page.locator('.kid-card .kid-user')).toContainText(/@lilybrave/);
+    // BUG-18 — @username no longer rendered on the kid card. The
+    // handle is still stored on state for stable references.
+    const stored = await page.evaluate(() => window.state.kids[0].userName);
+    expect(stored).toBe('lilybrave');
   });
 
   test('rejects a duplicate username', async ({ page }) => {
@@ -167,7 +170,9 @@ test.describe('Hero sheet', () => {
     await page.locator('#renameHeroUsername').fill('newname');
     await page.locator('#renameHeroModal .btn-primary').click();
     await expect(page.locator('.kid-name').first()).toContainText(/NewName/);
-    await expect(page.locator('.kid-user').first()).toContainText(/@newname/);
+    // BUG-18 — @handle no longer shown on cards. Verify state instead.
+    const stored = await page.evaluate(() => window.state.kids[0].userName);
+    expect(stored).toBe('newname');
   });
 });
 

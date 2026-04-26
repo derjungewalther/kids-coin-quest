@@ -2072,31 +2072,44 @@
     gap: 8px;
     margin-top: 10px;
   }
+  /* BUG-13 fix — Achievement tiles sit on parchment surfaces (the
+     hero sheet's .inventory-section). The earlier styling used
+     gold-bright text on a 30%-dark-wood overlay, which resolves to
+     pale-yellow-on-tan ≈ 1.7:1 and fails WCAG AA. Switched to
+     dark-wood text on a slightly stronger parchment fill so locked
+     and unlocked tiles both read clearly without relying on opacity
+     alone. */
   .achievement-tile {
     text-align: center;
     padding: 10px 8px;
-    border: 2px solid var(--wood);
+    border: 2px solid var(--parchment-darker);
     border-radius: 8px;
-    background: rgba(62,40,23,0.3);
+    background: var(--parchment);
     transition: transform 0.15s;
+    color: var(--wood-dark);
   }
   .achievement-tile.unlocked {
     border-color: var(--gold-dark);
-    background: linear-gradient(180deg, rgba(244,211,94,0.15), rgba(139,105,20,0.18));
+    background: linear-gradient(180deg, rgba(244,211,94,0.4), rgba(212,175,55,0.25));
   }
-  .achievement-tile.locked { opacity: 0.4; filter: grayscale(0.7); }
+  .achievement-tile.locked {
+    opacity: 0.55;
+    filter: grayscale(0.6);
+    background: var(--parchment-dark);
+  }
   .achievement-tile-icon { font-size: 24px; }
   .achievement-tile-label {
     font-family: 'Cinzel', serif;
     font-size: 11px;
-    color: var(--gold-bright);
+    color: var(--wood-dark);
     margin-top: 4px;
     letter-spacing: 0.4px;
+    font-weight: 700;
   }
   .achievement-tile-desc {
     font-family: 'Lora', serif;
     font-size: 10px;
-    color: var(--parchment);
+    color: var(--wood);
     opacity: 0.7;
     margin-top: 2px;
     line-height: 1.3;
@@ -2692,6 +2705,21 @@
     position: relative;
   }
   .inv-item:hover { transform: translateY(-2px); border-color: var(--gold-dark); }
+  /* BUG-15 — stack count badge (×N) when the kid has multiples of the
+     same item. Sits opposite the EQUIPPED badge so they don't clash. */
+  .inv-item .stack-badge {
+    position: absolute;
+    top: -6px; right: -6px;
+    background: var(--wood-dark);
+    color: var(--gold-bright);
+    border: 2px solid var(--gold-dark);
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 700;
+    line-height: 1.4;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
   .inv-item.equipped {
     background: linear-gradient(135deg, rgba(244,211,94,0.4), rgba(212,175,55,0.2));
     border-color: var(--gold-dark);
@@ -4100,14 +4128,19 @@
 </main>
 
 <!-- Add Kid Modal -->
-<div class="modal-backdrop" id="addKidModal">
+<div class="modal-backdrop" id="addKidModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <h3>⚔ Recruit a New Hero</h3>
     <label>Hero Name</label>
     <input type="text" id="newKidName" placeholder="e.g. Sir Lily the Brave" />
 
-    <label style="margin-top: 12px;">Username (unique handle)</label>
-    <input type="text" id="newKidUserName" placeholder="e.g. lilybrave42" />
+    <!-- BUG-18: the `@username` was confusing as a primary recruit
+         field. Now optional + auto-filled. The label flags it as
+         not-required so most parents leave it blank; addKid()
+         slugifies the display name when empty. The kid-card no
+         longer shows @username at all. -->
+    <label style="margin-top: 12px;" data-i18n="username_optional_label">Username (optional — auto-generated)</label>
+    <input type="text" id="newKidUserName" placeholder="" autocomplete="off" />
 
     <label style="margin-top: 14px;">Choose Thy Class</label>
     <div class="class-picker" id="classPicker"></div>
@@ -4128,7 +4161,7 @@
 </div>
 
 <!-- Parent PIN Setup Modal -->
-<div class="modal-backdrop pin-backdrop" id="pinSetupModal">
+<div class="modal-backdrop pin-backdrop" id="pinSetupModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal pin-modal">
     <h3 data-i18n="pin_setup_title">👋 Set a Parent PIN</h3>
     <p data-i18n="pin_setup_desc" style="color: var(--ink-muted); font-style: italic;">Hey parents! Set a 4-digit PIN to protect settings.</p>
@@ -4144,7 +4177,7 @@
 </div>
 
 <!-- Parent PIN Entry Modal -->
-<div class="modal-backdrop pin-backdrop" id="pinEntryModal">
+<div class="modal-backdrop pin-backdrop" id="pinEntryModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal pin-modal">
     <h3>🔒 <span data-i18n="pin_entry_title">Parents Only</span></h3>
     <p id="pinEntryPrompt" style="color: var(--ink-muted); font-style: italic;"></p>
@@ -4171,12 +4204,12 @@
 </div>
 
 <!-- Hero Sheet Modal -->
-<div class="modal-backdrop" id="heroSheetModal">
+<div class="modal-backdrop" id="heroSheetModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal hero-sheet-modal" id="heroSheetContent"></div>
 </div>
 
 <!-- Delete Hero Confirmation Modal -->
-<div class="modal-backdrop" id="deleteHeroModal">
+<div class="modal-backdrop" id="deleteHeroModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal" style="max-width: 440px;">
     <h3>⚠ <span data-i18n="delete_hero_title">Remove Hero?</span></h3>
     <p style="color: var(--ink); font-style: italic;">
@@ -4194,7 +4227,7 @@
 </div>
 
 <!-- Rename Hero Modal -->
-<div class="modal-backdrop" id="renameHeroModal">
+<div class="modal-backdrop" id="renameHeroModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <h3>✎ Rename Hero</h3>
     <label>Hero Name</label>
@@ -4211,7 +4244,7 @@
 <input type="file" id="portraitFileInput" accept="image/*" style="display:none;" />
 
 <!-- Payout Modal -->
-<div class="modal-backdrop" id="payoutModal">
+<div class="modal-backdrop" id="payoutModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <h3>💰 Withdraw From Vault</h3>
     <p id="payoutKidInfo" style="color: var(--ink-muted); font-family: 'MedievalSharp', cursive;"></p>
@@ -4227,7 +4260,7 @@
 </div>
 
 <!-- Donate Modal -->
-<div class="modal-backdrop" id="donateModal">
+<div class="modal-backdrop" id="donateModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <h3>❤ Alms for the Needy</h3>
     <p id="donateKidInfo" style="color: var(--ink-muted); font-family: 'MedievalSharp', cursive;"></p>
@@ -4243,7 +4276,7 @@
 </div>
 
 <!-- Sign-in / Sign-up Modal (password + Google SSO) -->
-<div class="modal-backdrop" id="signInModal">
+<div class="modal-backdrop" id="signInModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <h3 id="signInModalTitle">👤 <span data-i18n="sign_in_title">Sign in</span></h3>
     <p id="signInModalDesc" style="color: var(--ink-muted); font-style: italic; margin-bottom: 12px;" data-i18n="sign_in_desc">
@@ -4285,7 +4318,7 @@
 </div>
 
 <!-- Custom Adventure Modal — JSON editor with template + validation -->
-<div class="modal-backdrop" id="customAdvModal">
+<div class="modal-backdrop" id="customAdvModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal" style="max-width: 720px; width: 95vw;">
     <h3>🎨 <span data-i18n="custom_adv_modal_title">Custom Adventure</span></h3>
     <p style="color: var(--ink-muted); font-style: italic; margin-bottom: 8px;" data-i18n="custom_adv_modal_desc">
@@ -4312,7 +4345,7 @@
 </div>
 
 <!-- Allowance Modal — set or clear a kid's weekly auto-allowance -->
-<div class="modal-backdrop" id="allowanceModal">
+<div class="modal-backdrop" id="allowanceModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <h3>🏛 <span data-i18n="allowance_modal_title">Weekly Allowance</span></h3>
     <p style="color: var(--ink-muted); font-style: italic; margin-bottom: 10px;" data-i18n="allowance_modal_desc">
@@ -4342,7 +4375,7 @@
 </div>
 
 <!-- Goal Jar Modal — set or edit a kid's savings goal -->
-<div class="modal-backdrop" id="goalModal">
+<div class="modal-backdrop" id="goalModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <h3>🎯 <span data-i18n="goal_modal_title">Savings Goal</span></h3>
     <p style="color: var(--ink-muted); font-style: italic; margin-bottom: 10px;" data-i18n="goal_modal_desc">
@@ -4366,7 +4399,7 @@
 </div>
 
 <!-- Streak Detail Modal -->
-<div class="modal-backdrop" id="streakDetailModal">
+<div class="modal-backdrop" id="streakDetailModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal streak-modal">
     <h3>🔥 <span data-i18n="streak_title">Streak</span></h3>
     <div id="streakDetailBody"></div>
@@ -4377,14 +4410,14 @@
 </div>
 
 <!-- Streak Reward Modal (celebrates a tier-3/7/30 unlock) -->
-<div class="modal-backdrop" id="rewardModal">
+<div class="modal-backdrop" id="rewardModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal reward-modal">
     <div id="rewardBody"></div>
   </div>
 </div>
 
 <!-- R3-S4 — Heldenweihe (legendary recruitment ritual) -->
-<div class="modal-backdrop" id="recruitmentRitualModal">
+<div class="modal-backdrop" id="recruitmentRitualModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal ritual-modal">
     <div class="ritual-stars" aria-hidden="true"></div>
     <div id="ritualBody"></div>
@@ -4392,7 +4425,7 @@
 </div>
 
 <!-- R3-S4 — Erdheld:in pre-adventure prompt -->
-<div class="modal-backdrop" id="erdePromptModal">
+<div class="modal-backdrop" id="erdePromptModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <h3 id="erdePromptTitle">🌳 <span data-i18n="legendary_class_erde">Erdheld:in</span></h3>
     <p id="erdePromptBody" style="margin: 12px 0 18px;"></p>
@@ -4404,7 +4437,7 @@
 </div>
 
 <!-- Purge-all-records Modal (typed confirmation) -->
-<div class="modal-backdrop" id="purgeModal">
+<div class="modal-backdrop" id="purgeModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <h3>🔥 <span data-i18n="purge_title">Purge All Records</span></h3>
     <p style="color: #ff8080; font-style: italic; margin-bottom: 10px;" data-i18n="purge_warn">
@@ -4420,7 +4453,7 @@
 </div>
 
 <!-- Delete-account Modal (requires typing DELETE to enable the button) -->
-<div class="modal-backdrop" id="deleteAccountModal">
+<div class="modal-backdrop" id="deleteAccountModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <h3>⚠ <span data-i18n="delete_account_title">Delete my account</span></h3>
     <p style="color: #ff8080; font-style: italic; margin-bottom: 10px;" data-i18n="delete_account_warn">
@@ -4436,7 +4469,7 @@
 </div>
 
 <!-- Password-reset Modal (shown when returning from a recovery link) -->
-<div class="modal-backdrop" id="resetPasswordModal">
+<div class="modal-backdrop" id="resetPasswordModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal">
     <h3>🔑 <span data-i18n="reset_password_title">Set a new password</span></h3>
     <p style="color: var(--ink-muted); font-style: italic; margin-bottom: 10px;" data-i18n="reset_password_desc">
@@ -4769,6 +4802,19 @@ const TRANSLATIONS = {
     legendary_companion_row: 'Legendary Companion',
     legendary_recruited_at: 'Recruited',
     name_taken_error: 'A hero with this name is already in your family. Pick a unique one.',
+    unequip_label: 'Unequip',
+    empty_label: 'empty',
+    equipped_label: 'EQUIPPED',
+    inventory_empty: 'No items yet — venture forth on an adventure to earn loot!',
+    hero_sheet_caption: 'Wear gear, gather treasures. Tap an item to equip it.',
+    upload_photo_btn: 'Upload photo',
+    reroll_btn: 'New look',
+    use_character_btn: 'Use storybook hero',
+    portrait_pixel_caption: 'Your photo is stylized into a pixel-art portrait.',
+    discard_item_confirm: 'Discard {name}? It will be lost.',
+    this_item_label: 'this item',
+    cosmetics_progress_hint: 'Streak: {current} / {target} days · {remaining} to the next piece',
+    username_optional_label: 'Handle (optional — auto-generated from name)',
     legendary_companion_desc: 'A mentor walks beside the kids. Optional — adventures play the same without one.',
     legendary_undeletable: 'Legendary heroes cannot be removed',
     legendary_cap_reached: 'Legendary roster is full',
@@ -4918,7 +4964,7 @@ const TRANSLATIONS = {
     view_sheet: 'View character sheet',
     upload_photo: '📷 Upload Photo', use_character: 'Use Character', reroll: '🎲 Reroll',
     upload_desc_photo: 'Your photo is stylized into a pixel-art portrait.',
-    upload_desc_char: 'A random indie-RPG hero — equipped gear appears on the body.',
+    upload_desc_char: 'A storybook hero — your equipped gear shows up on their outfit.',
     attributes: 'Attributes', inventory_label: '🎒 Inventory',
     no_items_yet: 'No items yet — venture forth on an adventure to earn loot!',
     equipped_badge: 'EQUIPPED', discard: 'Discard', close: 'Close',
@@ -5248,6 +5294,19 @@ const TRANSLATIONS = {
     legendary_companion_row: 'Legendärer Begleiter',
     legendary_recruited_at: 'Angeworben',
     name_taken_error: 'Ein Held mit diesem Namen ist schon in deiner Familie. Wähle einen anderen.',
+    unequip_label: 'Ablegen',
+    empty_label: 'leer',
+    equipped_label: 'GETRAGEN',
+    inventory_empty: 'Noch keine Schätze — zieh in ein Abenteuer, um Beute zu sammeln!',
+    hero_sheet_caption: 'Trage Ausrüstung, sammle Schätze. Tippe einen Gegenstand zum Anlegen.',
+    upload_photo_btn: 'Foto hochladen',
+    reroll_btn: 'Neues Aussehen',
+    use_character_btn: 'Märchenheld nutzen',
+    portrait_pixel_caption: 'Dein Foto wird zu einem Pixelart-Porträt.',
+    discard_item_confirm: '{name} wegwerfen? Geht für immer verloren.',
+    this_item_label: 'diesen Gegenstand',
+    cosmetics_progress_hint: 'Strähne: {current} / {target} Tage · noch {remaining} bis zum nächsten Stück',
+    username_optional_label: 'Kürzel (optional — wird aus dem Namen erzeugt)',
     legendary_companion_desc: 'Ein Mentor schreitet neben den Kindern. Optional — Abenteuer laufen auch ohne genauso.',
     legendary_undeletable: 'Legendäre Helden können nicht entfernt werden',
     legendary_cap_reached: 'Die legendäre Truppe ist voll',
@@ -5397,7 +5456,7 @@ const TRANSLATIONS = {
     view_sheet: 'Charakterblatt ansehen',
     upload_photo: '📷 Foto hochladen', use_character: 'Charakter nutzen', reroll: '🎲 Neu würfeln',
     upload_desc_photo: 'Dein Foto wird zu einem Pixel-Art-Bildnis stilisiert.',
-    upload_desc_char: 'Ein zufälliger Indie-RPG-Held — ausgerüstete Gegenstände erscheinen am Körper.',
+    upload_desc_char: 'Ein Märchenheld — die getragene Ausrüstung erscheint an seinem Outfit.',
     attributes: 'Attribute', inventory_label: '🎒 Gepäck',
     no_items_yet: 'Noch keine Gegenstände — brecht zu einem Abenteuer auf, um Beute zu verdienen!',
     equipped_badge: 'GETRAGEN', discard: 'Ablegen', close: 'Schließen',
@@ -5830,11 +5889,14 @@ function rankName(kid) {
   return t('rank_legend');
 }
 
+// SLOTS labels are bilingual `{ en, de }` so the hero sheet can render
+// localized "HUT/RÜSTUNG/WAFFE/ZUBEHÖR" instead of hardcoded English
+// (BUG-14). The `label` field is read via L() at render time.
 const SLOTS = [
-  { id: 'hat',       label: 'Hat',       placeholder: '🎩' },
-  { id: 'armor',     label: 'Armor',     placeholder: '👕' },
-  { id: 'weapon',    label: 'Weapon',    placeholder: '⚔' },
-  { id: 'accessory', label: 'Accessory', placeholder: '💫' }
+  { id: 'hat',       label: { en: 'Hat',       de: 'Hut'        }, placeholder: '🎩' },
+  { id: 'armor',     label: { en: 'Armor',     de: 'Rüstung'    }, placeholder: '👕' },
+  { id: 'weapon',    label: { en: 'Weapon',    de: 'Waffe'      }, placeholder: '⚔'  },
+  { id: 'accessory', label: { en: 'Accessory', de: 'Zubehör'    }, placeholder: '💫' }
 ];
 const SLOT_MIGRATION = { helmet: 'hat', chest: 'armor', mainHand: 'weapon', ring: 'accessory' };
 
@@ -5843,25 +5905,29 @@ const SLOT_MIGRATION = { helmet: 'hat', chest: 'armor', mainHand: 'weapon', ring
 const RARITY_BONUS = { common: 1, rare: 1, legendary: 2 };
 const RARITY_STARS = { common: '⭐', rare: '⭐⭐', legendary: '⭐⭐⭐' };
 
+// ITEM names are bilingual { en, de } so the hero sheet, chronicle, and
+// loot toasts read the user's locale (BUG-14). Read via L(item.name).
+// Legacy strings would have failed L()'s typeof check, so the migration
+// in load() upgrades any plain-string `name` to a bilingual object.
 const ITEMS = [
   // Hats (3)
-  { id: 'feathered_cap',     name: 'Feathered Cap',      slot: 'hat',       icon: '🎩', rarity: 'common',    stat: 'brave'  },
-  { id: 'thinking_crown',    name: 'Thinking Crown',     slot: 'hat',       icon: '🎓', rarity: 'rare',      stat: 'clever' },
-  { id: 'crown_friendship',  name: 'Crown of Friendship',slot: 'hat',       icon: '👑', rarity: 'legendary', stat: 'kind'   },
+  { id: 'feathered_cap',     name: { en: 'Feathered Cap',      de: 'Federhut'           }, slot: 'hat',       icon: '🎩', rarity: 'common',    stat: 'brave'  },
+  { id: 'thinking_crown',    name: { en: 'Thinking Crown',     de: 'Denkerkrone'        }, slot: 'hat',       icon: '🎓', rarity: 'rare',      stat: 'clever' },
+  { id: 'crown_friendship',  name: { en: 'Crown of Friendship',de: 'Freundschaftskrone' }, slot: 'hat',       icon: '👑', rarity: 'legendary', stat: 'kind'   },
   // Armor (3)
-  { id: 'sturdy_vest',       name: 'Sturdy Vest',        slot: 'armor',     icon: '🦺', rarity: 'common',    stat: 'brave'  },
-  { id: 'wizard_robes',      name: 'Wizard Robes',       slot: 'armor',     icon: '🥋', rarity: 'rare',      stat: 'clever' },
-  { id: 'cozy_cloak',        name: 'Cozy Cloak',         slot: 'armor',     icon: '🧣', rarity: 'legendary', stat: 'kind'   },
+  { id: 'sturdy_vest',       name: { en: 'Sturdy Vest',        de: 'Robuste Weste'      }, slot: 'armor',     icon: '🦺', rarity: 'common',    stat: 'brave'  },
+  { id: 'wizard_robes',      name: { en: 'Wizard Robes',       de: 'Zaubererrobe'       }, slot: 'armor',     icon: '🥋', rarity: 'rare',      stat: 'clever' },
+  { id: 'cozy_cloak',        name: { en: 'Cozy Cloak',         de: 'Kuscheliger Umhang' }, slot: 'armor',     icon: '🧣', rarity: 'legendary', stat: 'kind'   },
   // Weapons (3)
-  { id: 'wooden_sword',      name: 'Wooden Sword',       slot: 'weapon',    icon: '🗡️', rarity: 'common',    stat: 'brave'  },
-  { id: 'magic_wand',        name: 'Magic Wand',         slot: 'weapon',    icon: '🪄', rarity: 'rare',      stat: 'clever' },
-  { id: 'healing_staff',     name: 'Healing Staff',      slot: 'weapon',    icon: '💛', rarity: 'legendary', stat: 'kind'   },
+  { id: 'wooden_sword',      name: { en: 'Wooden Sword',       de: 'Holzschwert'        }, slot: 'weapon',    icon: '🗡️', rarity: 'common',    stat: 'brave'  },
+  { id: 'magic_wand',        name: { en: 'Magic Wand',         de: 'Zauberstab'         }, slot: 'weapon',    icon: '🪄', rarity: 'rare',      stat: 'clever' },
+  { id: 'healing_staff',     name: { en: 'Healing Staff',      de: 'Heilstab'           }, slot: 'weapon',    icon: '💛', rarity: 'legendary', stat: 'kind'   },
   // Accessories (3)
-  { id: 'lucky_ring',        name: 'Lucky Ring',         slot: 'accessory', icon: '💍', rarity: 'common',    stat: 'brave'  },
-  { id: 'crystal_pendant',   name: 'Crystal Pendant',    slot: 'accessory', icon: '💎', rarity: 'rare',      stat: 'clever' },
-  { id: 'heart_locket',      name: 'Heart Locket',       slot: 'accessory', icon: '💖', rarity: 'legendary', stat: 'kind'   },
+  { id: 'lucky_ring',        name: { en: 'Lucky Ring',         de: 'Glücksring'         }, slot: 'accessory', icon: '💍', rarity: 'common',    stat: 'brave'  },
+  { id: 'crystal_pendant',   name: { en: 'Crystal Pendant',    de: 'Kristallanhänger'   }, slot: 'accessory', icon: '💎', rarity: 'rare',      stat: 'clever' },
+  { id: 'heart_locket',      name: { en: 'Heart Locket',       de: 'Herzmedaillon'      }, slot: 'accessory', icon: '💖', rarity: 'legendary', stat: 'kind'   },
   // Mystery (migration fallback, no bonus)
-  { id: 'mystery_trinket',   name: 'Mystery Trinket',    slot: 'accessory', icon: '🎁', rarity: 'common',    stat: null     }
+  { id: 'mystery_trinket',   name: { en: 'Mystery Trinket',    de: 'Geheimnisvolles Schmuckstück' }, slot: 'accessory', icon: '🎁', rarity: 'common', stat: null }
 ];
 
 // Map old item IDs to new (by slot+stat+rarity match or nearest)
@@ -7558,8 +7624,59 @@ function closeMobileNav() {
 })();
 
 // --- MODALS ---
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+// BUG-22 fix — track the element that had focus when each modal
+// opened, so closeModal can restore it. Map keyed by modal id.
+const __modalOpenerFocus = new Map();
+
+function openModal(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  // BUG-22: remember the trigger so we can restore focus on close.
+  try {
+    if (document.activeElement && !__modalOpenerFocus.has(id)) {
+      __modalOpenerFocus.set(id, document.activeElement);
+    }
+  } catch (e) {}
+  m.classList.add('open');
+  // BUG-22: a11y — the modal was hidden from AT until now.
+  m.setAttribute('aria-hidden', 'false');
+  // Move keyboard focus to the first focusable element so screen
+  // readers + Tab navigation start inside the modal, and Escape
+  // closes it (BUG-20).
+  setTimeout(() => {
+    const focusable = m.querySelector(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable) try { focusable.focus(); } catch (e) {}
+  }, 30);
+}
+function closeModal(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.classList.remove('open');
+  m.setAttribute('aria-hidden', 'true');
+  // BUG-22: restore focus to the element that opened the modal.
+  const opener = __modalOpenerFocus.get(id);
+  __modalOpenerFocus.delete(id);
+  if (opener && typeof opener.focus === 'function' && document.body.contains(opener)) {
+    try { opener.focus(); } catch (e) {}
+  }
+}
+
+// BUG-20 fix — global Escape handler closes the topmost open modal.
+// We pick the LAST .modal-backdrop.open in DOM order, which is also
+// the topmost in stacking order since modals share the same z-index
+// and rely on insertion order to layer correctly.
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  const openModals = Array.from(document.querySelectorAll('.modal-backdrop.open'));
+  if (openModals.length === 0) return;
+  const top = openModals[openModals.length - 1];
+  if (top && top.id) {
+    closeModal(top.id);
+    e.preventDefault();
+  }
+});
 document.querySelectorAll('.modal-backdrop').forEach(m => {
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
 });
@@ -7625,14 +7742,41 @@ function renderClassPicker() {
   });
 }
 
+// BUG-18 — slug a display name into a stable username. Lowercases,
+// strips non-alphanum, collapses to ≤20 chars, and adds -2/-3/...
+// suffix on collision. Used on recruit so families don't see the
+// @handle concept anymore.
+function slugifyUserName(name) {
+  const base = String(name || '')
+    .toLowerCase()
+    .normalize('NFD')                    // decompose accents
+    .replace(/[̀-ͯ]/g, '')     // strip combining marks
+    .replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, '')
+    .slice(0, 16)                        // leave room for "-N" suffix
+    || 'hero';
+  if (!usernameTaken(base)) return base;
+  for (let i = 2; i < 100; i++) {
+    const candidate = `${base}${i}`.slice(0, 20);
+    if (!usernameTaken(candidate)) return candidate;
+  }
+  // Last resort — random suffix.
+  return (base + Date.now().toString(36).slice(-4)).slice(0, 20);
+}
+
 function addKid() {
   const name = document.getElementById('newKidName').value.trim();
-  const userName = document.getElementById('newKidUserName').value.trim();
+  // BUG-18: auto-generate username from display name when the hidden
+  // field is empty (default flow). Falls back to whatever the field
+  // contains for tests / advanced manual entry.
+  let userName = document.getElementById('newKidUserName').value.trim();
+  if (!userName) userName = slugifyUserName(name);
   const startRaw = document.getElementById('newKidStart').value;
   // Accept both 0,5 and 0.5 — some browsers render DE locale number inputs with a comma.
   const start = parseFloat(String(startRaw).replace(',', '.')) || 0;
   if (!name) { toast('A hero needs a name!', 'error'); return; }
-  if (!userName) { toast('A unique username is required!', 'error'); return; }
+  // Username validation only matters for the rare manual-input path.
+  // Auto-generated names always pass these checks by construction.
   if (!/^[a-zA-Z0-9_]{2,20}$/.test(userName)) { toast('Username: 2–20 letters, numbers, or underscores', 'error'); return; }
   if (usernameTaken(userName)) { toast('That username is already claimed', 'error'); return; }
   // BUG-08: also reject duplicate display names (case-insensitive).
@@ -7841,7 +7985,10 @@ function renderKids() {
           <div class="avatar">${avatarInner}<span class="kid-avatar-badge" aria-hidden="true">${kidEmoji(k)}</span></div>
           <div style="flex:1; min-width:0;">
             <h3 class="kid-name">${escapeHtml(k.name)} <span class="level-badge">Lv ${heroLevel(k)}</span> ${k.legendary ? `<span class="legendary-badge" title="${escapeHtml(t('legendary_badge_label'))}">⭐ ${t('legendary_badge_label')}</span>` : ''} ${streakHtml}</h3>
-            ${(!hasPinSet() || pinVerified) ? `<div class="kid-user">@${escapeHtml(k.userName || 'hero')}</div>` : ''}
+            ${''/* BUG-18: @username hidden from kid-card. Username stays
+                   internally as a stable identifier (cloud sync,
+                   adventureState.party, dedupe) but kids never see
+                   it on their own profile. */}
             <div class="kid-class">${cls.icon} ${className(cls)} · ${rankName(k)}</div>
           </div>
         </div>
@@ -9797,10 +9944,12 @@ function renderHeroSheet() {
     const it = inst ? itemById(inst.itemId) : null;
     const rar = it ? ` rarity-${it.rarity}` : '';
     const filled = it ? ' filled' : '';
+    const itName = it ? L(it.name) : '';
+    const slotLabel = L(slotDef.label);
     const inner = it
-      ? `<span class="item-icon" title="${escapeHtml(it.name)}">${it.icon}</span>`
+      ? `<span class="item-icon" title="${escapeHtml(itName)}">${it.icon}</span>`
       : `<span class="placeholder">${slotDef.placeholder}</span>`;
-    return `<div class="eq-slot${filled}${rar}" onclick="unequip('${slotId}')" title="${it ? 'Unequip ' + escapeHtml(it.name) : slotDef.label + ' (empty)'}">${inner}<span class="slot-label">${slotDef.label}</span></div>`;
+    return `<div class="eq-slot${filled}${rar}" onclick="unequip('${slotId}')" title="${it ? t('unequip_label') + ' ' + escapeHtml(itName) : slotLabel + ' (' + t('empty_label') + ')'}">${inner}<span class="slot-label">${escapeHtml(slotLabel)}</span></div>`;
   };
 
   const statsHtml = STAT_KEYS.map(sk => {
@@ -9839,12 +9988,41 @@ function renderHeroSheet() {
   `;
   }).join('');
 
-  const invHtml = k.inventory.length === 0
-    ? '<div class="empty" style="padding:20px;">No items yet — venture forth on an adventure to earn loot!</div>'
-    : k.inventory.map(inst => {
+  // BUG-15 — group identical itemIds. Show one tile per item type
+  // with a ×N stack badge when the kid has multiples. Each group
+  // represents the FIRST instance (so unequip / equip flow still
+  // works with that instance's id); the count is decorative.
+  const stackedInventory = (() => {
+    const byItemId = new Map();
+    for (const inst of (k.inventory || [])) {
+      const it = itemById(inst.itemId);
+      if (!it) continue;
+      const equipped = Object.values(k.equipment).includes(inst.instanceId);
+      const existing = byItemId.get(inst.itemId);
+      if (existing) {
+        existing.__stackCount++;
+        // If a later instance is the equipped one, prefer it as the
+        // group representative so the equip badge stays accurate.
+        if (equipped && !existing.__equipped) {
+          existing.instanceId = inst.instanceId;
+          existing.__equipped = true;
+        }
+      } else {
+        byItemId.set(inst.itemId, {
+          ...inst,
+          __stackCount: 1,
+          __equipped: equipped
+        });
+      }
+    }
+    return Array.from(byItemId.values());
+  })();
+  const invHtml = stackedInventory.length === 0
+    ? `<div class="empty" style="padding:20px;">${escapeHtml(t('inventory_empty'))}</div>`
+    : stackedInventory.map(inst => {
         const it = itemById(inst.itemId);
         if (!it) return '';
-        const equipped = Object.values(k.equipment).includes(inst.instanceId);
+        const equipped = inst.__equipped;
         const bonus = it.stat ? (RARITY_BONUS[it.rarity] || 0) : 0;
         const statIcon = it.stat && STAT_META[it.stat] ? STAT_META[it.stat].icon : '';
         const stars = RARITY_STARS[it.rarity] || '⭐';
@@ -9853,12 +10031,19 @@ function renderHeroSheet() {
         const hintLine = isTrinket
           ? `<div style="font-family:'MedievalSharp',cursive; font-size: 11px; color: var(--royal); margin-top: 2px; font-style: italic;">${t('mystery_trinket_hint')}</div>`
           : (bonusDisplay ? `<div style="font-size: 14px; margin-top: 2px;">${bonusDisplay}</div>` : '');
-        const title = it.stat ? `${it.name} — +${bonus} ${t(it.stat)}` : (isTrinket ? `${it.name} — ${t('mystery_trinket_hint')}` : it.name);
+        const itName = L(it.name);
+        const title = it.stat ? `${itName} — +${bonus} ${t(it.stat)}` : (isTrinket ? `${itName} — ${t('mystery_trinket_hint')}` : itName);
+        // BUG-15 fix: stack identical items via the count we computed in
+        // the slot-grouping pass below (stackedInstances). The badge
+        // shows ×N when the kid has more than one of the same item.
+        const stackCount = inst.__stackCount || 1;
+        const stackBadge = stackCount > 1 ? `<div class="stack-badge">×${stackCount}</div>` : '';
         return `
           <div class="inv-item${equipped ? ' equipped' : ''} rarity-${it.rarity}" onclick="equipInstance('${inst.instanceId}')" title="${escapeHtml(title)}">
-            ${equipped ? '<div class="eq-badge">EQUIPPED</div>' : ''}
+            ${equipped ? `<div class="eq-badge">${escapeHtml(t('equipped_label'))}</div>` : ''}
+            ${stackBadge}
             <div class="icon">${it.icon}</div>
-            <div class="name">${escapeHtml(it.name)}</div>
+            <div class="name">${escapeHtml(itName)}</div>
             <div class="rarity-stars ${it.rarity}">${stars}</div>
             ${hintLine}
             <button class="btn btn-danger btn-sm" style="margin-top:6px; padding: 3px 6px; font-size:10px;" onclick="event.stopPropagation(); discardItem('${inst.instanceId}')">${t('discard')}</button>
@@ -9871,7 +10056,7 @@ function renderHeroSheet() {
         <h3>${escapeHtml(k.name)} <button class="btn btn-ghost btn-sm" onclick="openRenameHero('${k.id}')" style="font-size:11px; padding: 3px 8px; margin-left: 6px; vertical-align: middle;" title="Rename hero">✎</button></h3>
         <div class="sub">@${escapeHtml(k.userName)} · ${cls.icon} ${className(cls)}</div>
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="closeModal('heroSheetModal')">Close</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('heroSheetModal')">${escapeHtml(t('close_btn'))}</button>
     </div>
 
     <div class="equipment-board">
@@ -9879,16 +10064,16 @@ function renderHeroSheet() {
       <div class="eq-center">
         <div class="portrait-frame">${portraitHtml}</div>
         <div class="portrait-actions">
-          <button class="btn btn-primary btn-sm" onclick="triggerPortraitUpload()">📷 Upload Photo</button>
+          <button class="btn btn-primary btn-sm" onclick="triggerPortraitUpload()">📷 ${escapeHtml(t('upload_photo_btn'))}</button>
           ${k.portrait
-            ? `<button class="btn btn-ghost btn-sm" onclick="clearPortrait()">Use Character</button>`
-            : `<button class="btn btn-ghost btn-sm" onclick="rerollFeatures()">🎲 Reroll</button>`}
+            ? `<button class="btn btn-ghost btn-sm" onclick="clearPortrait()">${escapeHtml(t('use_character_btn'))}</button>`
+            : `<button class="btn btn-ghost btn-sm" onclick="rerollFeatures()">🎲 ${escapeHtml(t('reroll_btn'))}</button>`}
         </div>
         <div style="font-size: 11px; color: var(--ink-muted); font-style: italic; text-align: center; max-width: 260px;">
-          ${k.portrait ? 'Your photo is stylized into a pixel-art portrait.' : 'A random indie-RPG hero — equipped gear appears on the body.'}
+          ${escapeHtml(k.portrait ? t('portrait_pixel_caption') : t('hero_sheet_caption'))}
         </div>
         <div style="width: 260px; margin-top: 6px;">
-          <h4 style="font-family: 'Cinzel', serif; margin: 0 0 4px; font-size: 12px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 1px;">Attributes</h4>
+          <h4 style="font-family: 'Cinzel', serif; margin: 0 0 4px; font-size: 12px; color: var(--wood-dark); text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(t('attributes'))}</h4>
           ${statsHtml}
         </div>
       </div>
@@ -9896,7 +10081,7 @@ function renderHeroSheet() {
     </div>
 
     <div class="inventory-section">
-      <h4>🎒 Inventory (${k.inventory.length})</h4>
+      <h4>${escapeHtml(t('inventory_label'))} (${stackedInventory.length})</h4>
       <div class="inventory-grid">${invHtml}</div>
     </div>
 
@@ -9993,12 +10178,33 @@ function renderLegendaryHeroSheet(k) {
 function renderCosmeticGalleryForHero(k) {
   const inv = state.cosmeticInventory || [];
   if (!inv.length) {
+    // BUG-19 fix — show concrete progress toward the next cosmetic
+    // drop instead of a generic "alle 7 Tage" hint. Tier-7 reward
+    // fires on every 7-day multiple, so days-until = 7 - (current
+    // streak % 7). When streak is exactly a multiple of 7 the next
+    // drop is "today" or already pending.
+    let progressHint = '';
+    try {
+      if (typeof window.computeFamilyStreak === 'function') {
+        const cur = window.computeFamilyStreak() || 0;
+        const target = Math.ceil((cur + 1) / 7) * 7;
+        const remaining = Math.max(0, target - cur);
+        const tmpl = t('cosmetics_progress_hint');
+        progressHint = tmpl
+          .replace('{current}', String(cur))
+          .replace('{target}', String(target))
+          .replace('{remaining}', String(remaining));
+      }
+    } catch (e) {}
     return `
       <div class="inventory-section">
         <h4>💫 ${escapeHtml(t('cosmetics_title'))}</h4>
         <div style="font-size: 12px; color: var(--ink-muted); font-style: italic;">
           ${escapeHtml(t('cosmetics_empty'))}
         </div>
+        ${progressHint ? `<div style="font-size: 12px; color: var(--gold-bright); margin-top: 6px; font-family: 'MedievalSharp', cursive;">
+          ${escapeHtml(progressHint)}
+        </div>` : ''}
       </div>`;
   }
   const lang = (state.settings && state.settings.lang) || 'en';
@@ -10216,7 +10422,7 @@ function discardItem(instanceId) {
   const inst = k.inventory.find(i => i.instanceId === instanceId);
   if (!inst) return;
   const it = itemById(inst.itemId);
-  if (!confirm(`Discard ${it ? it.name : 'this item'}? It will be lost.`)) return;
+  if (!confirm(t('discard_item_confirm').replace('{name}', it ? L(it.name) : t('this_item_label')))) return;
   k.inventory = k.inventory.filter(i => i.instanceId !== instanceId);
   Object.keys(k.equipment).forEach(s => { if (k.equipment[s] === instanceId) k.equipment[s] = null; });
   save();
@@ -14329,10 +14535,11 @@ function awardTreasure(tierMultiplier) {
       h.balance += bonus;
       h.totalEarned = (h.totalEarned || 0) + bonus;
     }
+    const itemName = item ? L(item.name) : null;
     const note = paidAmount > 0
-      ? (item ? `🏆 ${L(adv.title)} ${t('treasure_word')} · ${item.icon} ${item.name}`
+      ? (item ? `🏆 ${L(adv.title)} ${t('treasure_word')} · ${item.icon} ${itemName}`
               : `🏆 ${L(adv.title)} ${t('treasure_word')}`)
-      : (item ? `🎁 ${L(adv.title)} ${t('gift_word')} · ${item.icon} ${item.name}`
+      : (item ? `🎁 ${L(adv.title)} ${t('gift_word')} · ${item.icon} ${itemName}`
               : `🎁 ${L(adv.title)} ${t('gift_word')}`);
     logTx(h.id, 'earn', paidAmount, note, {
       adventurePaid: mayPayCoins, adventureRunId: runId, itemInstanceId: null,
@@ -14340,7 +14547,7 @@ function awardTreasure(tierMultiplier) {
       payload: {
         adventureId: adv ? adv.id : null,
         itemIcon: item ? item.icon : null,
-        itemName: item ? item.name : null
+        itemName: itemName
       }
     });
     bumpStreak(h);
@@ -14423,7 +14630,7 @@ function renderAdventureEnd() {
           ${goldLine}
           ${r.item ? `<div class="treasure-card-item rarity-${r.item.rarity}">
             <span style="font-size:18px;">${r.item.icon}</span>
-            <span>${escapeHtml(r.item.name)}</span>
+            <span>${escapeHtml(L(r.item.name))}</span>
           </div>
           <div style="font-size:10px; font-family:'MedievalSharp',cursive; color: var(--gold-bright); font-style: italic;">${r.item.stat ? '+' + RARITY_BONUS[r.item.rarity] + ' ' + statLabel(r.item.stat) : ''}</div>` : ''}
         </div>`;

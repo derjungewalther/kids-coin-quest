@@ -18,6 +18,19 @@
  *   BUG-11  hero card click zone fully covers the visible avatar
  *   BUG-12  manifest.json is requested at most once per page boot
  *           under the new SW (subset of BUG-02)
+ *   BUG-13  hero sheet attributes + achievement tiles use dark text
+ *           (no more pale-yellow-on-tan low-contrast pattern)
+ *   BUG-14  hero sheet localized end-to-end (slot labels, item names,
+ *           section headers, buttons)
+ *   BUG-15  identical inventory items stack with a ×N badge
+ *   BUG-16  no "indie-RPG" or other dev language leaks into player UI
+ *   BUG-17  achievement German uses ß ("Heißer Lauf") not ss
+ *   BUG-18  @username never appears on the kid card; auto-generated
+ *           when omitted at recruit time
+ *   BUG-19  cosmetic empty state shows concrete progress to next drop
+ *   BUG-20  Escape closes the topmost open modal
+ *   BUG-21  modal close buttons render the localized t('close_btn')
+ *   BUG-22  modals toggle aria-hidden on open/close + restore focus
  */
 import { test, expect, seedHero } from './fixtures.mjs';
 
@@ -344,5 +357,248 @@ test.describe('Audit 2026-04-26 regressions', () => {
     // prompt query). Pre-fix this was 4×; the SW change has to keep
     // it ≤2 so the install prompt doesn't flicker on Android.
     expect(manifestRequests).toBeLessThanOrEqual(2);
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-13 — Hero sheet + achievement tiles use dark text on parchment.
+  // -------------------------------------------------------------------
+  test('BUG-13 · achievement-tile-label colour is dark-wood, not pale gold', async ({ page }) => {
+    const kidId = await seedHero(page, { userName: 'g13', balance: 100, totalEarned: 100 });
+    await page.evaluate((id) => {
+      const k = window.kidById(id);
+      k.achievements = ['first_quest', 'level_5'];
+      window.save();
+      window.openHeroSheet(id);
+    }, kidId);
+    const colour = await page.locator('.achievement-tile-label').first().evaluate((el) =>
+      getComputedStyle(el).color
+    );
+    const m = colour.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    expect(m).not.toBeNull();
+    const [r, g, b] = [parseInt(m[1]), parseInt(m[2]), parseInt(m[3])];
+    expect(r).toBeLessThan(120);
+    expect(g).toBeLessThan(120);
+    expect(b).toBeLessThan(120);
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-14 — Hero sheet localized end-to-end.
+  // -------------------------------------------------------------------
+  test('BUG-14 · slot label + item name render in DE locale', async ({ page }) => {
+    const kidId = await seedHero(page, { userName: 'g14' });
+    await page.evaluate((id) => {
+      window.state.settings.lang = 'de';
+      window.updateI18n();
+      const k = window.kidById(id);
+      const hat = window.ITEMS.find(it => it.slot === 'hat' && it.id === 'feathered_cap');
+      window.giveItemToKid(id, hat);
+      const inst = k.inventory.find(i => i.itemId === 'feathered_cap');
+      if (inst) k.equipment.hat = inst.instanceId;
+      window.save();
+      window.openHeroSheet(id);
+    }, kidId);
+    const html = await page.locator('#heroSheetContent').innerHTML();
+    // German item name "Federhut" must render, not English "Feathered Cap".
+    expect(html).toContain('Federhut');
+    expect(html).not.toContain('Feathered Cap');
+    // Slot labels — must be DE words.
+    expect(html).toContain('Hut');
+    expect(html).toContain('Rüstung');
+    expect(html).toContain('Waffe');
+    expect(html).toContain('Zubehör');
+    // Section headers must be localized too.
+    expect(html).toMatch(/Attribute|Eigenschaften/);
+    // The dev-language leak must be gone.
+    expect(html).not.toContain('indie-RPG');
+    expect(html).not.toContain('Indie-RPG');
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-15 — Stacked inventory.
+  // -------------------------------------------------------------------
+  test('BUG-15 · duplicate item drops render as a single tile with ×N badge', async ({ page }) => {
+    const kidId = await seedHero(page, { userName: 'g15' });
+    await page.evaluate((id) => {
+      const ring = window.ITEMS.find(it => it.id === 'lucky_ring');
+      window.giveItemToKid(id, ring);
+      window.giveItemToKid(id, ring);
+      window.giveItemToKid(id, ring);
+      window.save();
+      window.openHeroSheet(id);
+    }, kidId);
+    // Three pushes → still one tile (stacked).
+    await expect(page.locator('#heroSheetContent .inv-item')).toHaveCount(1);
+    // Stack badge shows ×3.
+    await expect(page.locator('#heroSheetContent .stack-badge')).toContainText('×3');
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-16 — No dev-language leaks anywhere player-facing.
+  // -------------------------------------------------------------------
+  test('BUG-16 · "indie-RPG" string is not in either locale\'s upload caption', async ({ page }) => {
+    const r = await page.evaluate(() => {
+      const orig = window.state.settings.lang;
+      window.state.settings.lang = 'en';
+      const en = window.t('upload_desc_char');
+      window.state.settings.lang = 'de';
+      const de = window.t('upload_desc_char');
+      window.state.settings.lang = orig;
+      return { en, de };
+    });
+    expect(r.en).not.toMatch(/indie-RPG/i);
+    expect(r.de).not.toMatch(/indie-RPG/i);
+    // Replacement copy is on-tone (mentions "storybook" or "Märchen").
+    expect(r.en.toLowerCase()).toMatch(/storybook|hero/);
+    expect(r.de.toLowerCase()).toMatch(/märchen|held/);
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-17 — German achievement uses ß.
+  // -------------------------------------------------------------------
+  test('BUG-17 · streak_3 achievement renders "Heißer Lauf" with ß', async ({ page }) => {
+    const r = await page.evaluate(() => {
+      // Walk the catalog by building a max-stats hero and reading the
+      // tile's German label.
+      const k = {
+        id: 'k_h17', name: 'Hot', class: 'warrior',
+        stats: { brave: 5, clever: 5, kind: 5 },
+        balance: 0, xp: { brave: 0, clever: 0, kind: 0 },
+        inventory: [], equipment: {}, achievements: [],
+        streak: { days: 5, lastDay: (() => {
+          const d = new Date();
+          return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        })() }
+      };
+      window.state.kids.push(k);
+      window.state.settings.lang = 'de';
+      window.openHeroSheet(k.id);
+      const labels = Array.from(document.querySelectorAll('.achievement-tile-label')).map(el => el.textContent);
+      return labels;
+    });
+    expect(r.some(l => /Heißer/.test(l))).toBe(true);
+    expect(r.some(l => /Heisser/.test(l))).toBe(false);
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-18 — @username gone from card; auto-generation works.
+  // -------------------------------------------------------------------
+  test('BUG-18 · kid card no longer renders @username', async ({ page }) => {
+    await seedHero(page, { name: 'Ida', userName: 'ida_handle' });
+    await page.evaluate(() => window.renderKids());
+    const html = await page.locator('.kid-card').first().innerHTML();
+    expect(html).not.toContain('@ida_handle');
+    expect(html).not.toMatch(/class="kid-user"/);
+  });
+
+  test('BUG-18 · slugifyUserName produces a stable handle from a display name', async ({ page }) => {
+    const r = await page.evaluate(() => ({
+      simple: window.slugifyUserName('Lily Brave'),
+      umlaut: window.slugifyUserName('Hänsel & Gretel'),
+      sharp:  window.slugifyUserName('Heißer Held'),
+      empty:  window.slugifyUserName('')
+    }));
+    expect(r.simple).toBe('lilybrave');
+    expect(r.umlaut).toMatch(/^hanselgretel/);
+    expect(r.sharp).toMatch(/^heissh|^heisser/);
+    expect(r.empty).toBe('hero');
+  });
+
+  test('BUG-18 · addKid auto-generates a username when the field is empty', async ({ page }) => {
+    await page.getByRole('button', { name: /Recruit New Hero/i }).click();
+    await page.locator('#newKidName').fill('Auto User');
+    // Leave #newKidUserName blank.
+    await page.locator('.class-card').first().click();
+    await page.locator('#addKidModal .btn-primary').click();
+    const stored = await page.evaluate(() => window.state.kids[0].userName);
+    expect(stored).toMatch(/^autouser/);
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-19 — Cosmetic empty state shows progress.
+  // -------------------------------------------------------------------
+  test('BUG-19 · cosmetics empty state surfaces a streak-progress hint', async ({ page }) => {
+    const kidId = await seedHero(page, { userName: 'g19' });
+    await page.evaluate((id) => {
+      window.state.cosmeticInventory = [];
+      window.ensureFamilyStreakState();
+      const today = window.todayKeyFamily();
+      window.state.streak.activeDays = [
+        window.dayKeyOffset(today, -1), today
+      ];
+      window.save();
+      window.openHeroSheet(id);
+    }, kidId);
+    const html = await page.locator('#heroSheetContent').innerHTML();
+    // Either EN or DE phrasing — both contain a digit/day reference.
+    expect(html).toMatch(/2 \/ 7|Streak|Strähne/);
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-20 — Escape closes the topmost open modal.
+  // -------------------------------------------------------------------
+  test('BUG-20 · pressing Escape closes the open hero sheet modal', async ({ page }) => {
+    const kidId = await seedHero(page, { userName: 'g20' });
+    await page.evaluate((id) => window.openHeroSheet(id), kidId);
+    await expect(page.locator('#heroSheetModal')).toHaveClass(/open/);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#heroSheetModal')).not.toHaveClass(/open/);
+  });
+
+  test('BUG-20 · Escape closes only the topmost modal when two are open', async ({ page }) => {
+    await seedHero(page, { userName: 'g20b' });
+    await page.evaluate(() => {
+      window.openModal('addKidModal');
+      window.openModal('renameHeroModal');
+    });
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#renameHeroModal')).not.toHaveClass(/open/);
+    await expect(page.locator('#addKidModal')).toHaveClass(/open/);
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-21 — Modal close buttons localized.
+  // -------------------------------------------------------------------
+  test('BUG-21 · hero sheet close button uses t("close_btn")', async ({ page }) => {
+    const kidId = await seedHero(page, { userName: 'g21' });
+    await page.evaluate((id) => {
+      window.state.settings.lang = 'de';
+      window.updateI18n();
+      window.openHeroSheet(id);
+    }, kidId);
+    const html = await page.locator('#heroSheetContent').innerHTML();
+    expect(html).toContain('Schließen');
+    expect(html).not.toMatch(/>Close</);
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-22 — Modals manage aria-hidden + restore focus.
+  // -------------------------------------------------------------------
+  test('BUG-22 · openModal flips aria-hidden to "false"; closeModal back to "true"', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      window.openModal('addKidModal');
+      await new Promise(r => setTimeout(r, 50));
+      const open = document.getElementById('addKidModal').getAttribute('aria-hidden');
+      window.closeModal('addKidModal');
+      await new Promise(r => setTimeout(r, 20));
+      const closed = document.getElementById('addKidModal').getAttribute('aria-hidden');
+      return { open, closed };
+    });
+    expect(result.open).toBe('false');
+    expect(result.closed).toBe('true');
+  });
+
+  test('BUG-22 · all modal-backdrops declare role="dialog" + aria-modal="true"', async ({ page }) => {
+    const audit = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('.modal-backdrop')).map(el => ({
+        id: el.id,
+        role: el.getAttribute('role'),
+        modal: el.getAttribute('aria-modal')
+      }))
+    );
+    expect(audit.length).toBeGreaterThan(0);
+    for (const m of audit) {
+      expect.soft(m.role, `modal#${m.id}`).toBe('dialog');
+      expect.soft(m.modal, `modal#${m.id}`).toBe('true');
+    }
   });
 });
