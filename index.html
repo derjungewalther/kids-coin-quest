@@ -4668,6 +4668,7 @@ const TRANSLATIONS = {
     legendary_card_subtitle: 'Supports your journey',
     legendary_card_bond: 'Adventures together: {n}',
     legendary_companion_row: 'Legendary Companion',
+    legendary_recruited_at: 'Recruited',
     legendary_companion_desc: 'A mentor walks beside the kids. Optional — adventures play the same without one.',
     legendary_undeletable: 'Legendary heroes cannot be removed',
     legendary_cap_reached: 'Legendary roster is full',
@@ -5145,6 +5146,7 @@ const TRANSLATIONS = {
     legendary_card_subtitle: 'Unterstützt eure Reise',
     legendary_card_bond: 'Gemeinsame Abenteuer: {n}',
     legendary_companion_row: 'Legendärer Begleiter',
+    legendary_recruited_at: 'Angeworben',
     legendary_companion_desc: 'Ein Mentor schreitet neben den Kindern. Optional — Abenteuer laufen auch ohne genauso.',
     legendary_undeletable: 'Legendäre Helden können nicht entfernt werden',
     legendary_cap_reached: 'Die legendäre Truppe ist voll',
@@ -7224,10 +7226,24 @@ function formatDecimalLocaleEditable(n) {
 // Plain locale-aware decimal — no currency, used in toasts and log notes
 // where the surrounding sentence already provides the context.
 function fmtNumber(n) {
-  const lang = (state.settings && state.settings.lang) || 'en';
-  const sep = lang === 'de' ? ',' : '.';
   if (n == null || isNaN(n)) return '';
-  return (Math.round(n * 100) / 100).toString().replace('.', sep);
+  const lang = (state.settings && state.settings.lang) || 'en';
+  // Use Intl.NumberFormat so values ≥1000 get a proper thousands
+  // separator in both locales (12.345,67 in DE / 12,345.67 in EN).
+  // Decimals are kept only when they're non-zero up to 2 places, so
+  // small whole-coin balances render as "5" not "5,00".
+  const rounded = Math.round(n * 100) / 100;
+  try {
+    return new Intl.NumberFormat(lang === 'de' ? 'de-DE' : 'en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    }).format(rounded);
+  } catch (e) {
+    // Fallback for environments without Intl: keep the legacy
+    // string-replace path, but at least log so it's noticed.
+    const sep = lang === 'de' ? ',' : '.';
+    return rounded.toString().replace('.', sep);
+  }
 }
 // Single source of truth for date-time formatting. German UI gets the
 // 25.04.2026, 13:07 short form; English gets the local short form.
@@ -9594,6 +9610,11 @@ function openHeroSheet(kidId) {
 function renderHeroSheet() {
   const k = kidById(openSheetKidId);
   if (!k) return;
+  // R3-S4: legendary mentors render a stripped-down sheet — no
+  // stats, no inventory, no equipment slots, no upload-photo. Just
+  // the class identity + bond + ability description + cosmetic
+  // gallery so kids can dress up their mentor.
+  if (isLegendaryHero(k)) return renderLegendaryHeroSheet(k);
   const cls = CLASSES.find(c => c.id === k.class) || CLASSES[0];
   const container = document.getElementById('heroSheetContent');
 
@@ -9746,6 +9767,58 @@ function renderHeroSheet() {
     </div>
 
     ${renderCosmeticGalleryForHero(k)}
+  `;
+}
+
+// R3-S4 — Legendary mentor hero sheet: stripped variant with no
+// stats / inventory / equipment / portrait re-roll. Shows class
+// identity, bond level, ability description, and the cosmetic
+// gallery. Replaces the kid-style sheet for hero records where
+// isLegendaryHero(k) is true.
+function renderLegendaryHeroSheet(k) {
+  const def = legendaryClassDef(k.legendary.class);
+  const className = t('legendary_class_' + k.legendary.class);
+  const tagline = t('legendary_class_' + k.legendary.class + '_tagline');
+  const abilityName = t('legendary_ability_' + k.legendary.class + '_name');
+  const bond = (k.legendary && k.legendary.bondLevel) || 0;
+  const bondLabel = t('legendary_card_bond').replace('{n}', String(bond));
+  const recruited = k.legendary.recruitedAt ? fmtDate(k.legendary.recruitedAt) : '';
+  const portraitInner = k.portrait
+    ? `<img src="${k.portrait}" alt="${escapeHtml(k.name)}" />`
+    : `<div class="legendary-emoji" style="font-size:96px; line-height:1;">${def.emoji}</div>`;
+  const cosmeticsHtml = renderCosmeticGalleryForHero(k);
+  const container = document.getElementById('heroSheetContent');
+  // Class colours like Mond (silver) and Licht (light gold) read poorly
+  // on the cream-parchment modal background, so the H3 stays in the
+  // default wood-dark and the class identity is carried by the pill +
+  // emoji + ability colour separately.
+  // Ability colour gets a slight darkening so even silver/gold remain
+  // readable on cream — a class-specific text-shadow gives definition.
+  const textShadow = '0 1px 0 rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.4)';
+  container.innerHTML = `
+    <div class="hero-sheet-head" style="--legendary-color: ${def.color}; display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+      <div class="hero-sheet-name-block">
+        <h3>${escapeHtml(k.name)}
+          <span class="legendary-class-pill" style="border-color:${def.color}; color:${def.color}; background: rgba(0,0,0,0.04);">✦ ${escapeHtml(className)}</span>
+        </h3>
+        <div class="kid-class">${def.emoji} ${escapeHtml(className)}</div>
+      </div>
+      <button class="btn btn-ghost" onclick="closeModal('heroSheetModal')">${escapeHtml(t('close_btn'))}</button>
+    </div>
+    <div class="hero-sheet-body" style="text-align:center; padding: 18px 8px;">
+      <div class="avatar-svg-box" style="width:160px; height:160px; margin:0 auto; border-color:${def.color}; box-shadow: 0 0 24px ${def.color};">${portraitInner}</div>
+      <div style="margin-top:14px; font-family: 'Cinzel', serif; color: ${def.color}; font-size: 16px; text-shadow: ${textShadow};">
+        ${escapeHtml(abilityName)}
+      </div>
+      <div style="margin-top:4px; color: var(--ink-muted); font-style: italic;">${escapeHtml(tagline)}</div>
+      <div class="legendary-bond-line" style="margin-top:14px; font-size: 14px; color: var(--wood-dark);">
+        ${escapeHtml(bondLabel)}
+      </div>
+      ${recruited ? `<div style="margin-top:6px; color: var(--ink-muted); font-size: 12px;">
+        ${escapeHtml(t('legendary_recruited_at') || 'Recruited')}: ${escapeHtml(recruited)}
+      </div>` : ''}
+    </div>
+    ${cosmeticsHtml}
   `;
 }
 

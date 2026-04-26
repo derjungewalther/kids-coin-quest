@@ -123,9 +123,14 @@ test.describe('Visual capture · desktop 1280×900', () => {
     await seedHero(page, { name: 'Boris', userName: 'boris', class: 'magician', balance: 4,  totalEarned: 9 });
     await seedHero(page, { name: 'Cleo',  userName: 'cleo',  class: 'healer',   balance: 2,  totalEarned: 3 });
     await page.evaluate(() => {
+      const todayYmd = (() => {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      })();
       const k = window.state.kids[0];
       k.goal = { name: 'Fahrrad', target: 50, emoji: '🚲' };
-      k.streak = { days: 5, lastEarn: new Date().toISOString() };
+      // effectiveStreak gates the badge on lastDay matching today.
+      k.streak = { days: 5, best: 5, lastDay: todayYmd };
       window.state.kids[1].xp = { brave: 12, clever: 8, kind: 4 };
       window.save(); window.renderKids();
     });
@@ -608,7 +613,6 @@ test.describe('Visual capture · desktop 1280×900', () => {
     await page.evaluate(() => {
       window.pinVerified = true;
       window.ensureFamilyStreakState();
-      // Seed a chunky heatmap: 14 active days, one shielded day, 3 misses.
       const today = window.todayKeyFamily();
       const active = [];
       for (let i = 0; i < 14; i++) active.push(window.dayKeyOffset(today, -i));
@@ -616,8 +620,10 @@ test.describe('Visual capture · desktop 1280×900', () => {
       window.state.streak.freezesUsed = [window.dayKeyOffset(today, -7)];
       window.state.streak.longest = 14;
       window.save();
-      const tab = document.querySelector('.tab[data-view="settings"]');
-      if (tab) tab.click();
+      // The heatmap lives on the Parents tab (renderParentDashboard),
+      // not Settings. switchTab routes through requirePin which is
+      // already satisfied because we set pinVerified above.
+      window.switchTab('parents');
     });
     await captureFullPage(page, '46-eltern-heatmap');
   });
@@ -883,7 +889,13 @@ test.describe('Visual capture · desktop 1280×900', () => {
     const kidId = await seedHero(page, { name: 'StreakK', userName: 'streakk' });
     await page.evaluate((id) => {
       const k = window.kidById(id);
-      k.streak = { days: 99, lastEarn: new Date().toISOString() };
+      // effectiveStreak requires lastDay matching today (or yesterday)
+      // and reads .days for the count. lastEarn alone does nothing.
+      const todayYmd = (() => {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      })();
+      k.streak = { days: 99, best: 99, lastDay: todayYmd };
       window.save();
       window.renderKids();
     }, kidId);
