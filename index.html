@@ -3112,9 +3112,36 @@
     vertical-align: middle;
   }
   .adventure-hero-card .avatar { width: 44px; height: 44px; font-size: 24px; }
-  .adv-hero-meta { flex: 1; min-width: 0; }
-  .adv-hero-name { font-family: 'Cinzel', serif; font-weight: 700; color: var(--wood); font-size: 14px; }
-  .adv-hero-user { font-family: 'MedievalSharp', cursive; font-size: 12px; color: var(--ink-muted); font-style: italic; }
+  /* Reserve right margin for the pick-marker (+/✓) and bottom margin
+     for the "In der Gruppe" / "Zur Gruppe hinzufügen" hint that sit
+     absolute in the corners. Without this, long German names like
+     "Carlo der Weisse" wrap UNDER the pick-marker badge and the
+     rank text gets covered by the pick-hint. */
+  .adv-hero-meta {
+    flex: 1; min-width: 0;
+    padding-right: 28px;
+    padding-bottom: 18px;
+  }
+  .adv-hero-name {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    color: var(--wood); font-size: 14px;
+    line-height: 1.25;
+  }
+  .adv-hero-user {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 12px; color: var(--ink-muted); font-style: italic;
+    line-height: 1.3;
+  }
+  /* Bottom pick-hint reads as a status, not a CTA — give it a
+     subtle pill so it stops looking glued to the rank text. */
+  .adv-hero-pick-hint {
+    background: rgba(244,211,94,0.12);
+    padding: 1px 8px;
+    border-radius: 999px;
+  }
+  .adventure-hero-card.selected .adv-hero-pick-hint {
+    background: rgba(45,106,79,0.18);
+  }
 
   .adventure-scene {
     background:
@@ -3329,7 +3356,7 @@
   .adventure-option.locked { filter: grayscale(0.6) brightness(0.85); cursor: not-allowed; }
   .adventure-option.locked:hover { transform: none; box-shadow: var(--shadow); }
   .adventure-difficulty-badge {
-    position: absolute; top: 10px; right: 10px;
+    position: absolute; top: 14px; right: 14px;
     font-family: 'Cinzel', serif;
     font-size: 10px; font-weight: 900;
     letter-spacing: 1px;
@@ -3338,6 +3365,8 @@
     text-transform: uppercase;
     color: #fff;
     border: 1px solid rgba(0,0,0,0.4);
+    z-index: 1;
+    white-space: nowrap;
   }
   .difficulty-easy   { background: linear-gradient(135deg, #3a8560, #2d6a4f); }
   .difficulty-medium { background: linear-gradient(135deg, #d88a2a, #c2691a); }
@@ -3457,6 +3486,12 @@
   .adventure-option h3 {
     font-family: 'Cinzel', serif; margin: 0 0 8px; color: var(--wood);
     border-bottom: 1px solid var(--gold-dark); padding-bottom: 4px;
+    /* Reserve space for the absolute-positioned difficulty badge in
+       the top-right so long titles ("Fischer Sebastian und das stille
+       Boot") don't overlap the badge. The 78px clears the widest
+       label "EPISCH" / "MITTEL" with side padding. */
+    padding-right: 78px;
+    line-height: 1.25;
   }
   .adventure-option p { font-style: italic; color: var(--ink-muted); margin: 8px 0; font-size: 14px; }
   .adventure-option .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
@@ -4873,6 +4908,9 @@ const TRANSLATIONS = {
     adventure_filter_aria: 'Adventure filters',
     adventure_filter_empty: 'No adventures match these filters yet.',
     adventure_filter_reset: 'Reset filters',
+    cancel_btn: '✕ Cancel',
+    cancel_adventure_confirm: 'Stop this adventure? All progress is lost — heroes return home empty-handed.',
+    cancel_adventure_toast: 'Adventure abandoned. Heroes head home.',
     legendary_companion_desc: 'A mentor walks beside the kids. Optional — adventures play the same without one.',
     legendary_undeletable: 'Legendary heroes cannot be removed',
     legendary_cap_reached: 'Legendary roster is full',
@@ -5373,6 +5411,9 @@ const TRANSLATIONS = {
     adventure_filter_aria: 'Abenteuerfilter',
     adventure_filter_empty: 'Kein Abenteuer passt zu diesen Filtern.',
     adventure_filter_reset: 'Filter zurücksetzen',
+    cancel_btn: '✕ Abbrechen',
+    cancel_adventure_confirm: 'Abenteuer abbrechen? Aller Fortschritt geht verloren — die Helden kehren mit leeren Händen heim.',
+    cancel_adventure_toast: 'Abenteuer abgebrochen. Die Helden ziehen heimwärts.',
     legendary_companion_desc: 'Ein Mentor schreitet neben den Kindern. Optional — Abenteuer laufen auch ohne genauso.',
     legendary_undeletable: 'Legendäre Helden können nicht entfernt werden',
     legendary_cap_reached: 'Die legendäre Truppe ist voll',
@@ -12157,8 +12198,9 @@ function renderAdventureSelect() {
         <div class="avatar-svg-box">${renderCharacterSVG(k, true)}</div>
         <div class="adv-hero-meta">
           <div class="adv-hero-name">${escapeHtml(k.name)} <span class="level-badge">Lv ${lvl}</span></div>
-          <div class="adv-hero-user">@${escapeHtml(k.userName)} · ${className(cls)}</div>
-          <div class="adv-hero-user">${rankName(k)}</div>
+          <!-- BUG-18: @username dropped from the picker (was confusing
+               for kids). Class + rank stay; they're meaningful. -->
+          <div class="adv-hero-user">${cls.icon} ${className(cls)} · ${rankName(k)}</div>
         </div>
         <div class="adv-hero-pick-hint" aria-hidden="true">${isIn ? t('in_party') : t('tap_to_add')}</div>
       </div>`;
@@ -12606,6 +12648,38 @@ function restartAdventure() {
   playChime();
 }
 
+// Cancel out of an in-progress adventure entirely. Unlike saveAndExit
+// (which leaves a resume slot) and restart (which jumps back to scene
+// 0), this discards all progress, clears any saved-adventure state,
+// and returns the kid to the adventure picker. PIN-gated like other
+// destructive flows so kids can't tap it accidentally and lose loot.
+function cancelAdventure() {
+  if (hasPinSet() && !pinVerified) {
+    requirePin(() => cancelAdventure(), 'pin_required');
+    return;
+  }
+  if (!confirm(t('cancel_adventure_confirm'))) return;
+  state.savedAdventure = null;
+  save();
+  resetAdventure();
+  stopNarration();
+  toast(t('cancel_adventure_toast'), 'info');
+  playChime();
+}
+
+// Single source of truth for the per-scene action bar. Every scene
+// renderer (choice / puzzle / sequence / memory / statcheck / split /
+// minigame) injects this so the kid always has Save & Exit / Restart /
+// Cancel reachable. Inline-styled to keep it self-contained.
+function sceneActionBarHtml() {
+  return `
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(244,211,94,0.3);">
+      <button class="btn btn-ghost btn-sm" onclick="saveAndExitAdventure()">${escapeHtml(t('save_exit'))}</button>
+      <button class="btn btn-ghost btn-sm" onclick="restartAdventure()">${escapeHtml(t('restart'))}</button>
+      <button class="btn btn-danger btn-sm" onclick="cancelAdventure()">${escapeHtml(t('cancel_btn'))}</button>
+    </div>`;
+}
+
 // Pop new stars / fade lost ones when the Courage bar re-renders.
 function animateCourageDelta() {
   const bar = document.querySelector('.party-hp');
@@ -12868,10 +12942,7 @@ function renderAdventureScene() {
         </div>
         <div style="font-family:'Cinzel',serif; color: var(--gold-bright); font-size: 12px; letter-spacing: 1px; margin: 10px 0 6px; text-transform: uppercase;">${t('choose_approach')}</div>
         ${opts}
-        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(244,211,94,0.3);">
-          <button class="btn btn-ghost btn-sm" onclick="saveAndExitAdventure()">${t('save_exit')}</button>
-          <button class="btn btn-ghost btn-sm" onclick="restartAdventure()">${t('restart')}</button>
-        </div>
+        ${sceneActionBarHtml()}
       </div>`;
     persistAdventure();
     lastNarratedText = sceneText;
@@ -12972,6 +13043,7 @@ function renderAdventureScene() {
       <div style="display:flex; gap:8px; justify-content:flex-end; padding-top: 10px; border-top: 1px dashed rgba(244,211,94,0.3);">
         <button class="btn btn-ghost btn-sm" onclick="chosenOptionBack()">← ${t('back')}</button>
         <button class="btn btn-ghost btn-sm" onclick="saveAndExitAdventure()">${t('save_exit')}</button>
+        <button class="btn btn-danger btn-sm" onclick="cancelAdventure()">${t('cancel_btn')}</button>
       </div>
     </div>`;
 }
@@ -13029,7 +13101,7 @@ function renderPuzzleScene(a, scene, c) {
       <div class="puzzle-options">${optsHtml}</div>
       ${hintEl}
       ${resultLine}
-      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px;">${continueBtn}</div>
+      <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:14px; padding-top: 12px; border-top: 1px dashed rgba(244,211,94,0.3);"><button class="btn btn-danger btn-sm" onclick="cancelAdventure()">${escapeHtml(t("cancel_btn"))}</button><div style="display:flex; gap:8px;">${continueBtn}</div></div>
     </div>`;
   persistAdventure();
   lastNarratedText = sceneText + ' ' + question;
@@ -13149,7 +13221,7 @@ function renderSequenceScene(a, scene, c) {
       <div class="sequence-pattern">${tilesHtml}</div>
       <div style="text-align:center;">${replayBtn}</div>
       ${resultLine}
-      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px;">${continueBtn}</div>
+      <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:14px; padding-top: 12px; border-top: 1px dashed rgba(244,211,94,0.3);"><button class="btn btn-danger btn-sm" onclick="cancelAdventure()">${escapeHtml(t("cancel_btn"))}</button><div style="display:flex; gap:8px;">${continueBtn}</div></div>
     </div>`;
   persistAdventure();
   lastNarratedText = sceneText;
@@ -13322,7 +13394,7 @@ function renderMemoryScene(a, scene, c) {
       ${statusLine}
       <div class="memory-grid" style="grid-template-columns: repeat(${cols}, 1fr);">${cardsHtml}</div>
       ${resultLine}
-      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px;">${continueBtn}</div>
+      <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:14px; padding-top: 12px; border-top: 1px dashed rgba(244,211,94,0.3);"><button class="btn btn-danger btn-sm" onclick="cancelAdventure()">${escapeHtml(t("cancel_btn"))}</button><div style="display:flex; gap:8px;">${continueBtn}</div></div>
     </div>`;
   persistAdventure();
   lastNarratedText = sceneText;
@@ -13452,7 +13524,7 @@ function renderStatCheckScene(a, scene, c) {
       <div style="font-family:'Cinzel',serif; color: var(--gold-bright); font-size:12px; letter-spacing:1px; margin:10px 0 6px; text-transform:uppercase; text-align:center;">${t('statcheck_prompt')}</div>
       <div class="statcheck-options">${optsHtml}</div>
       ${resultLine}
-      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px;">${continueBtn}</div>
+      <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:14px; padding-top: 12px; border-top: 1px dashed rgba(244,211,94,0.3);"><button class="btn btn-danger btn-sm" onclick="cancelAdventure()">${escapeHtml(t("cancel_btn"))}</button><div style="display:flex; gap:8px;">${continueBtn}</div></div>
     </div>`;
   persistAdventure();
   lastNarratedText = sceneText;
@@ -13570,7 +13642,7 @@ function renderSplitScene(a, scene, c) {
       <div class="split-tasks">${assignmentsHtml}</div>
       ${rollBtn}
       ${overallLine}
-      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px;">${continueBtn}</div>
+      <div style="display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:14px; padding-top: 12px; border-top: 1px dashed rgba(244,211,94,0.3);"><button class="btn btn-danger btn-sm" onclick="cancelAdventure()">${escapeHtml(t("cancel_btn"))}</button><div style="display:flex; gap:8px;">${continueBtn}</div></div>
     </div>`;
   persistAdventure();
   lastNarratedText = sceneText;
@@ -13748,6 +13820,7 @@ function renderMinigameScene(a, scene, c) {
       </div>
       <div class="scene-puzzle" id="minigamePuzzleSlot"></div>
       <div id="minigameOutcomeSlot"></div>
+      ${sceneActionBarHtml()}
     </div>`;
   persistAdventure();
   lastNarratedText = sceneText;
@@ -13795,18 +13868,47 @@ function finishMinigameOutcome(outcome, scene) {
     errors: outcome ? outcome.errors : null,
     durationMs: outcome ? outcome.durationMs : null
   });
-  // Outcome banner before continue.
+  // Outcome banner + continue button so the kid actually advances.
+  // Without the explicit button the old code just re-rendered the
+  // same scene after 800ms — the memory game looked completed but
+  // there was no way out (BUG: "im memory spiel wenn man fertig
+  // ist dann geht es nicht weiter").
   const slot = document.getElementById('minigameOutcomeSlot');
   if (slot) {
     const successText = scene.success ? L(scene.success) : '';
     const failureText = scene.failure ? L(scene.failure) : '';
-    slot.innerHTML = success
+    const isLast = adventureState.sceneIdx >= a.scenes.length - 1;
+    const wiped = adventureState.hp <= 0;
+    const continueBtn = wiped
+      ? `<button class="btn btn-danger" onclick="endAdventure(false)">${escapeHtml(t('retreat'))}</button>`
+      : isLast
+        ? `<button class="btn btn-primary" onclick="endAdventure(true)">${escapeHtml(t('conclude'))}</button>`
+        : `<button class="btn btn-primary" onclick="nextScene()">${escapeHtml(t('onward'))}</button>`;
+    const lootHtml = droppedItem
+      ? `<div class="loot-reward" style="margin-top:10px;">
+           <div style="font-family:'Cinzel',serif; font-size: 11px; color: var(--gold-bright); letter-spacing: 1px; text-transform: uppercase;">${t('loot_found')}</div>
+           <div class="icon">${droppedItem.icon}</div>
+           <div class="name">${escapeHtml(L(droppedItem.name))}</div>
+           <div class="rarity ${droppedItem.rarity}">${t('rarity_' + droppedItem.rarity)}</div>
+         </div>`
+      : '';
+    slot.innerHTML = (success
       ? `<div class="dice-result success" style="margin-top:10px;">${t('success_label')}</div>
          <div class="adventure-narrative" style="margin-top:6px;">${escapeHtmlMultiline(successText)}</div>`
       : `<div class="dice-result failure" style="margin-top:10px;">${t('failure_label')}</div>
-         <div class="adventure-narrative" style="margin-top:6px;">${escapeHtmlMultiline(failureText)}</div>`;
+         <div class="adventure-narrative" style="margin-top:6px;">${escapeHtmlMultiline(failureText)}</div>`)
+      + lootHtml
+      + `<div style="display:flex; justify-content:flex-end; margin-top:14px; padding-top: 12px; border-top: 1px dashed rgba(244,211,94,0.3);">
+           ${continueBtn}
+         </div>`;
+  } else {
+    // Slot missing (shouldn't happen but degrade gracefully): just
+    // advance after a short pause.
+    setTimeout(() => {
+      if (adventureState.sceneIdx >= a.scenes.length - 1) endAdventure(adventureState.hp > 0);
+      else nextScene();
+    }, 800);
   }
-  setTimeout(() => { renderAdventure(); }, 800);
 }
 
 // ---- Memory adapter: real implementation that mounts a pair-matching
@@ -14552,7 +14654,7 @@ function renderAdventureResult() {
         <div class="loot-reward">
           <div style="font-family:'Cinzel',serif; font-size: 11px; color: var(--gold-bright); letter-spacing: 1px; text-transform: uppercase;">${t('loot_found')}</div>
           <div class="icon">${r.loot.icon}</div>
-          <div class="name">${escapeHtml(r.loot.name)}</div>
+          <div class="name">${escapeHtml(L(r.loot.name))}</div>
           <div class="rarity ${r.loot.rarity}">${t('rarity_' + r.loot.rarity)}${r.loot.stat ? ` · +${RARITY_BONUS[r.loot.rarity]} ${statLabel(r.loot.stat)}` : ''}</div>
           ${recipient ? `<div style="font-size: 12px; color: var(--parchment); opacity: 0.8; margin-top: 4px;">${t('added_to_inventory').replace('{name}', escapeHtml(recipient.name))}</div>` : ''}
         </div>
