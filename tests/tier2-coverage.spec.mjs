@@ -44,21 +44,39 @@ test.describe('TIER 2 — achievements catalog', () => {
     },
     {
       id: 'streak_3',
-      // effectiveStreak reads k.streak = { lastDay, days, best }.
+      // Streak achievements now check the FAMILY streak
+      // (state.streak.activeDays + freezesUsed against today). Per-hero
+      // k.streak is no longer surfaced anywhere. We backfill 3 days of
+      // activity ending today so computeFamilyStreak() returns 3.
       mutate: (kid, w) => {
-        kid.streak = { lastDay: w.todayYmd(), days: 3, best: 3 };
+        const today = w.todayKeyFamily ? w.todayKeyFamily() : w.todayYmd();
+        const minus = (k, d) => w.dayKeyOffset ? w.dayKeyOffset(k, -d)
+          : w.ymdMinus(k, d);
+        if (!w.state.streak) w.state.streak = {};
+        w.state.streak.activeDays = [minus(today, 2), minus(today, 1), today];
+        w.state.streak.freezesUsed = [];
       }
     },
     {
       id: 'streak_7',
       mutate: (kid, w) => {
-        kid.streak = { lastDay: w.todayYmd(), days: 7, best: 7 };
+        const today = w.todayKeyFamily ? w.todayKeyFamily() : w.todayYmd();
+        const minus = (k, d) => w.dayKeyOffset ? w.dayKeyOffset(k, -d)
+          : w.ymdMinus(k, d);
+        if (!w.state.streak) w.state.streak = {};
+        w.state.streak.activeDays = Array.from({ length: 7 }, (_, i) => minus(today, 6 - i));
+        w.state.streak.freezesUsed = [];
       }
     },
     {
       id: 'streak_30',
       mutate: (kid, w) => {
-        kid.streak = { lastDay: w.todayYmd(), days: 30, best: 30 };
+        const today = w.todayKeyFamily ? w.todayKeyFamily() : w.todayYmd();
+        const minus = (k, d) => w.dayKeyOffset ? w.dayKeyOffset(k, -d)
+          : w.ymdMinus(k, d);
+        if (!w.state.streak) w.state.streak = {};
+        w.state.streak.activeDays = Array.from({ length: 30 }, (_, i) => minus(today, 29 - i));
+        w.state.streak.freezesUsed = [];
       }
     },
     {

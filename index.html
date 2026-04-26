@@ -8232,10 +8232,13 @@ function renderKids() {
     const avatarInner = k.portrait
       ? `<img src="${k.portrait}" alt="${escapeHtml(k.name)}" />`
       : renderCharacterSVG(k, true);
-    const streakDays = effectiveStreak(k);
-    const streakHtml = streakDays >= 2
-      ? `<span class="streak-badge" title="${escapeHtml(t('streak_tooltip').replace('{n}', streakDays))}">🔥 ${streakDays}</span>`
-      : '';
+    // Per-hero streak badge removed (Apr 2026) — the streak is a
+    // family-level concept now (one flame in the header for the whole
+    // crew). The per-kid `k.streak` record still gets updated by
+    // bumpStreak() because some legacy data paths read it, but it's no
+    // longer surfaced anywhere in the UI. Achievements that test for
+    // streak progress now check `state.streak` (family) instead.
+    const streakHtml = '';
     // Explicit nullish + positive-target check so a stray `{}` or
     // legacy state with target=0 doesn't render the progress branch and
     // leave just an empty bar (P1-07). Edit hint is always shown on the
@@ -9621,15 +9624,19 @@ const ACHIEVEMENTS = [
   { id: 'coins_200',     icon: '🏦', en: 'Treasurer',            de: 'Schatzmeister',
     descEn: 'Earn 200 coins in total',                  descDe: 'Verdiene insgesamt 200 Münzen',
     test: k => (k.totalEarned || 0) >= 200 },
+  // Streak achievements check the FAMILY streak (state.streak), not
+  // per-hero. The whole crew unlocks together — same logic as the flame
+  // badge in the header. (Apr 2026 unification: per-hero streak surface
+  // removed; achievements followed.)
   { id: 'streak_3',      icon: '🔥', en: 'On a Roll',            de: 'Heißer Lauf',
-    descEn: 'Quest 3 days in a row',                    descDe: '3 Tage in Folge eine Quest',
-    test: k => effectiveStreak(k) >= 3 },
+    descEn: 'Family on a 3-day quest streak',           descDe: '3 Tage in Folge als Familie aktiv',
+    test: k => (typeof computeFamilyStreak === 'function' ? computeFamilyStreak() : 0) >= 3 },
   { id: 'streak_7',      icon: '🔥', en: 'Week Warrior',         de: 'Wochenkämpfer',
-    descEn: 'Quest 7 days in a row',                    descDe: '7 Tage in Folge eine Quest',
-    test: k => effectiveStreak(k) >= 7 },
+    descEn: 'Family on a 7-day quest streak',           descDe: '7 Tage in Folge als Familie aktiv',
+    test: k => (typeof computeFamilyStreak === 'function' ? computeFamilyStreak() : 0) >= 7 },
   { id: 'streak_30',     icon: '🚀', en: 'Unstoppable',          de: 'Unaufhaltsam',
-    descEn: '30-day quest streak',                      descDe: '30-Tage-Streak',
-    test: k => effectiveStreak(k) >= 30 },
+    descEn: '30-day family quest streak',               descDe: '30-Tage-Streak als Familie',
+    test: k => (typeof computeFamilyStreak === 'function' ? computeFamilyStreak() : 0) >= 30 },
   { id: 'goal_reached',  icon: '🎯', en: 'Dream Achieved',       de: 'Traum erreicht',
     descEn: 'Hit a savings goal',                       descDe: 'Ein Sparziel erreicht',
     test: k => !!(k.goal && k.goal.achievedAt) },

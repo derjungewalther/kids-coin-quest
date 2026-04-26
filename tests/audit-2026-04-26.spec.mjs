@@ -601,4 +601,62 @@ test.describe('Audit 2026-04-26 regressions', () => {
       expect.soft(m.modal, `modal#${m.id}`).toBe('true');
     }
   });
+
+  // ---------------------------------------------------------------------
+  // BUG-23 · Streak unification: family-only, never per-hero
+  //
+  // April 2026: per-hero streak badge ("🔥 N" on every kid card) was
+  // redundant with the family-streak flame in the header and confused
+  // the model. We removed it from the kid card and switched the
+  // streak_3/7/30 achievements to test the family streak. These tests
+  // pin both behaviours so a future refactor can't silently bring back
+  // the per-hero surface.
+  // ---------------------------------------------------------------------
+  test('BUG-23 · kid cards render no .streak-badge regardless of k.streak.days', async ({ page }) => {
+    await seedHero(page, { userName: 'streakcard' });
+    await page.evaluate(() => {
+      const k = window.state.kids[0];
+      // Force a long per-hero streak record. v1 would have rendered
+      // "🔥 12" on the kid card — v2 must show nothing.
+      const today = (window.todayKeyFamily ? window.todayKeyFamily() : window.todayYmd());
+      k.streak = { lastDay: today, days: 12, best: 12 };
+      window.renderKids();
+    });
+    const inCardBadges = await page.locator('.kid-card .streak-badge').count();
+    expect(inCardBadges).toBe(0);
+    // The family flame in the header MUST still be there (always present,
+    // even at 0 days — it's just dimmed via data-cold).
+    await expect(page.locator('#familyStreakBadge')).toBeVisible();
+  });
+
+  test('BUG-23 · streak_3 unlocks from family activity, not per-hero data', async ({ page }) => {
+    const kidId = await seedHero(page, { userName: 'streakfam' });
+    const has = await page.evaluate((kid) => {
+      const k = window.state.kids.find(x => x.id === kid);
+      // Per-hero streak deliberately empty — only the family side has data.
+      k.streak = { lastDay: null, days: 0, best: 0 };
+      const today = window.todayKeyFamily();
+      const d = (n) => window.dayKeyOffset(today, -n);
+      window.state.streak = window.state.streak || {};
+      window.state.streak.activeDays = [d(2), d(1), today];
+      window.state.streak.freezesUsed = [];
+      window.checkAchievements(k, 'all');
+      return Array.isArray(k.achievements) && k.achievements.includes('streak_3');
+    }, kidId);
+    expect(has).toBe(true);
+  });
+
+  test('BUG-23 · streak_3 does NOT unlock when only the per-hero record is set', async ({ page }) => {
+    const kidId = await seedHero(page, { userName: 'streakperhero' });
+    const has = await page.evaluate((kid) => {
+      const k = window.state.kids.find(x => x.id === kid);
+      const today = window.todayKeyFamily();
+      // Only per-hero streak — family side empty.
+      k.streak = { lastDay: today, days: 30, best: 30 };
+      window.state.streak = { activeDays: [], freezesUsed: [], current: 0, longest: 0 };
+      window.checkAchievements(k, 'all');
+      return Array.isArray(k.achievements) && k.achievements.includes('streak_3');
+    }, kidId);
+    expect(has).toBe(false);
+  });
 });
