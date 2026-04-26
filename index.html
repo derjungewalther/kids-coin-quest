@@ -12192,6 +12192,264 @@ const ADVENTURES = [
                    en: 'Sebastian quietly gathers the plates back up. "The wind shifted them."' }
       }
     ]
+  },
+
+  // ===========================================================
+  // Der tiefe Amboss — RPG-Bergwerk-Adventure (Apr 2026)
+  // 8 Szenen: 4× Würfel (1, 4, 6, 8) + 4× Mini-Game (2, 3, 5, 7).
+  // Erzählerischer Bogen: Hammerthane Brunhild schickt dich in den
+  // Berg, weil das uralte Schmiedefeuer erloschen ist. Drei Meister
+  // sind nicht zurückgekommen. Du bist die vierte Wahl — nicht weil
+  // sie verheizen will, sondern weil sie etwas Anderes versuchen
+  // muss. Lerne den Berg, finde die Wahrheit, entzünde das Feuer.
+  // Schwierigkeit: easy / minLevel 0 — DCs 8-12 sind kinderfreundlich,
+  // jeder Held der die Würfel werfen darf hat eine echte Chance.
+  // ===========================================================
+  {
+    id: 'tiefer-amboss', icon: '⛏', difficulty: 'easy', minLevel: 0, maxHp: 6,
+    title:   { de: 'Der tiefe Amboss',
+               en: 'The Deep Anvil' },
+    summary: { de: 'Tief im Berg ist das Schmiedefeuer erloschen. Steig hinab und entzünde es neu.',
+               en: 'Deep in the mountain the forge fire has died. Descend and rekindle it.' },
+    intro: {
+      de: 'Achthundert Jahre lang hat der tiefe Amboss gesungen. Jeder Hammerschlag aus den Schmieden der Zwerge — jede Klinge, jeder Helm, jeder Beschlag — hat seinen Funken aus dem unstillbaren Feuer im Herzen des Berges geholt. Achthundert Jahre.\n\nHeute Morgen, drei Stunden vor Sonnenaufgang, ist das Lied verstummt.\n\nIn der Halle aus rußgeschwärztem Granit, unter Rauchfahnen die wie Bärte hängen, sitzt Hammerthane Brunhild auf ihrem Steinthron und schlägt mit dem Knöchel gegen die Lehne. Drei Bergmeister sind schon hinabgestiegen. Keiner ist zurückgekommen.\n\nSie zeigt auf dich. „Du", sagt sie. Ihre Stimme klingt wie Eisen das auf Eisen schlägt. „Du hast keine Angst vor engen Räumen, sagt man. Du fragst, bevor du schlägst. Das könnte heute reichen." Sie nickt zu dem Schacht hinter ihr — schwarz und kalt. „Steig hinab. Finde heraus, warum das Feuer aus ist. Und entzünde es wieder, wenn du kannst."',
+      en: 'For eight hundred years the Deep Anvil has sung. Every hammer-stroke in every dwarven forge — every blade, every helm, every fitting — has drawn its spark from the unquenchable fire at the heart of the mountain. Eight hundred years.\n\nThis morning, three hours before sunrise, the song fell silent.\n\nIn the hall of soot-blackened granite, beneath smoke-trails that hang like beards, Hammerthane Brunhild sits on her stone throne and raps a knuckle against its arm. Three mining-masters have descended already. None have come back.\n\nShe points at you. "You," she says. Her voice sounds like iron striking iron. "You aren\'t afraid of tight spaces, they tell me. You ask before you strike. That might be enough today." She nods toward the shaft behind her — black and cold. "Go down. Find out why the fire is out. And light it again, if you can."'
+    },
+    victory: {
+      de: '🔥 Tief unter dir, am Boden des Schachts, fängt etwas an zu glühen — erst dunkelrot wie eine schlafende Glut, dann oranges Orange, dann das tiefe Goldgelb das die Zwerge „Brunhilds Atem" nennen. Der erste Hammerschlag in achthundertundeins Jahren rollt durch den Berg wie ein langer, leiser Donner. Auf jedem Stollen, in jeder Werkstatt, im rußigen Speisesaal stehen die Zwerge auf und legen die Hand aufs Herz.\n\nBrunhild empfängt dich oben am Schacht. Sie ist staubig, ihre Augen rot vom Wachen. Sie nimmt deinen Helm ab, schlägt ihn dreimal mit der eigenen Faust an — eine Geste, die nur Hammerthane für ihre eigenen Leute machen — und setzt ihn dir wieder auf.\n\n„Der Berg hat sein Lied wieder", sagt sie leise. „Und du hast deinen Platz darin verdient."',
+      en: '🔥 Deep below you, at the bottom of the shaft, something begins to glow — first dark red like a sleeping coal, then orange-orange, then the deep golden yellow the dwarves call "Brunhild\'s Breath." The first hammer-stroke in eight hundred and one years rolls through the mountain like a long, quiet thunder. In every gallery, every workshop, every soot-stained hall, the dwarves stand up and place a hand over their heart.\n\nBrunhild receives you back at the shaft. She is dust-covered, her eyes red from the watch. She lifts off your helmet, strikes it three times with her own fist — a gesture Hammerthanes make only for their own — and sets it back on your head.\n\n"The mountain has its song again," she says quietly. "And you have earned your place in it."'
+    },
+    defeat: {
+      de: '🪨 Ein Stein gibt nach, ein Tau reißt, eine Lampe stirbt. Du sitzt in der Dunkelheit am Schachtboden, hörst den eigenen Atem, hörst Wasser irgendwo weit weg. Dann eine Lampe. Dann eine Stimme. Brunhild persönlich ist hinabgestiegen.\n\n„Drei Meister vor dir sind nicht zurückgekommen", sagt sie und reicht dir die Hand. „Du kommst zurück. Das ist mehr."\n\nSie nimmt dich mit nach oben. Im rußigen Speisesaal bekommst du heißes Bier — die Zwergenkinder-Sorte, mit Honig und Zimt — und ein Stück gebackenes Brot. Brunhild setzt sich neben dich. „Der Berg ist alt", sagt sie. „Älter als achthundert Jahre. Er kennt Geduld. Wir versuchen es nochmal. Beim nächsten Vollmond, wenn dein Arm wieder steht."',
+      en: '🪨 A stone gives way, a rope frays, a lamp dies. You sit in the dark at the bottom of the shaft, listening to your own breath, listening to water somewhere far off. Then a lamp. Then a voice. Brunhild herself has come down.\n\n"Three masters before you didn\'t come back," she says, holding out a hand. "You\'re coming back. That\'s the larger thing."\n\nShe brings you up. In the soot-stained mess hall you get hot ale — the dwarf-children kind, with honey and cinnamon — and a slice of baked bread. Brunhild sits beside you. "The mountain is old," she says. "Older than eight hundred years. It knows patience. We\'ll try again. At the next full moon, when your arm stands up again."'
+    },
+    scenes: [
+      // ----- 1 · Würfel: Brunnhilds Auftrag -------------------
+      {
+        title: { de: 'Brunnhilds Auftrag', en: "Brunhild's Charge" },
+        text: {
+          de: 'Hammerthane Brunhild stützt die Stirn auf den Knöchel und schaut dich aus rußgrauen Augen an. „Drei Meister sind hinabgestiegen. Drei sind nicht zurück. Du gehst als vierte oder vierter — aber nicht weil ich dich verheize. Sondern weil wir was anderes versuchen müssen." Sie wartet darauf, was du sagen willst.',
+          en: 'Hammerthane Brunhild rests her forehead on a knuckle and looks at you with soot-grey eyes. "Three masters went down. Three did not come back. You go as the fourth — but not because I am burning you up. Because we must try something different." She waits for what you\'ll say.'
+        },
+        options: [
+          { stat: 'brave', dc: 9,
+            label:   { de: '💪 Auf Hammer und Bart schwören', en: '💪 Swear on hammer and beard' },
+            success: { de: 'Du legst die Hand auf den Hammer am Gürtel und sprichst die alte Formel laut. Die Wache an der Tür legt einen Moment lang die Faust aufs Herz. Brunhild nickt. „Gut. Geh."',
+                       en: 'You lay your hand on the hammer at your belt and speak the old oath aloud. The guard at the door lays a fist on her heart for a moment. Brunhild nods. "Good. Go."' },
+            failure: { de: 'Du holst tief Luft, aber die Worte verfehlen den Takt. Brunhild zuckt nicht — nur ihre Augenbraue. „Nimm dir noch einen Moment", sagt sie freundlich. „Wir haben jetzt Zeit."',
+                       en: 'You take a deep breath, but the words miss the cadence. Brunhild doesn\'t flinch — only an eyebrow. "Take another moment," she says kindly. "We have time now."' } },
+          { stat: 'kind', dc: 8,
+            label:   { de: '💛 Höflich annehmen, ohne große Ehrenformel', en: '💛 Accept politely, without the great oath' },
+            success: { de: 'Du verbeugst dich nur leicht und sagst: „Ich gehe." Mehr nicht. Brunhild lächelt zum ersten Mal heute — kurz, knapp. „Wenig Worte, viel Tat", murmelt sie. „Das ist auch eine Art."',
+                       en: 'You give only a small bow and say, "I\'ll go." Nothing more. Brunhild smiles for the first time today — short, narrow. "Few words, much deed," she murmurs. "That\'s also a way."' },
+            failure: { de: 'Die Höflichkeitsworte kommen zu schnell und klingen einstudiert. Brunhild winkt ab. „Lass das. Sag mir einfach: gehst du?" Du nickst. Sie nickt zurück.',
+                       en: 'The polite phrases come too quick and sound rehearsed. Brunhild waves them off. "Skip that. Just tell me: are you going?" You nod. She nods back.' } },
+          { stat: 'clever', dc: 10,
+            label:   { de: '🧠 Über die Geologie fragen, bevor du gehst', en: '🧠 Ask about the geology before you go' },
+            success: { de: '„Hammerthane", sagst du, „bevor ich gehe — ist es das Schiefergestein in der dritten Tiefe? Drei Meister, alle bei Frühlingsschmelze." Brunhild richtet sich überrascht auf. „Du hast die Karten gelesen. Gut. Du gehst nicht blind."',
+                       en: '"Hammerthane," you say, "before I go — is it the slate stratum at third depth? Three masters, all during spring-melt." Brunhild straightens, surprised. "You\'ve read the charts. Good. You don\'t go in blind."' },
+            failure: { de: 'Du fragst nach der Geologie, aber dein Wissen reicht nicht weit genug. Brunhild zieht eine zerknitterte Karte hervor, klopft auf die dritte Tiefe und sagt: „Schiefer. Frühlingsschmelze. Merk dir das."',
+                       en: 'You ask about the geology, but your knowledge doesn\'t reach far enough. Brunhild pulls out a crumpled map, taps the third depth, and says: "Slate. Spring-melt. Remember that."' } }
+        ]
+      },
+      // ----- 2 · Mini-Game: Die rasende Lore (rhythm) ---------
+      {
+        id: 'da-2', minigame: 'rhythm',
+        title: { de: 'Die rasende Lore', en: 'The Runaway Cart' },
+        minigameConfig: {
+          rounds: 2, patternLength: 3,
+          drums: [
+            { id: 'bremse-links',  freq: 160, color: '#7d3a1c', icon: '⬅' },
+            { id: 'bremse-rechts', freq: 220, color: '#1c5d7d', icon: '➡' },
+            { id: 'bremse-zug',    freq: 120, color: '#3d3d3d', icon: '🔻' }
+          ],
+          tempoBpm: 95
+        },
+        text: {
+          de: 'Schon im ersten Schacht hörst du es — Schienenrattern. Eine ungebremste Lore donnert dir entgegen, voll mit Erz, fast außer Kontrolle. Kein Bergmann mehr in Sicht. „Greif das Bremsseil!", brüllt jemand aus der Tiefe. Du springst auf die Lore und legst beide Hände an die Seile. Drei Bremsen, ein bestimmter Takt — links, rechts, ziehen — sonst entgleist sie und blockiert den Weg ins Innere. Die Lore beschleunigt. Du musst den Takt jetzt finden.',
+          en: 'Already in the first shaft you hear it — rails rattling. An unbraked cart thunders toward you, loaded with ore, half out of control. No miner in sight. "Grab the brake rope!" someone shouts from below. You leap onto the cart and lay both hands on the ropes. Three brakes, a specific tempo — left, right, pull — or she derails and blocks the way down. The cart accelerates. You have to find the rhythm. Now.'
+        },
+        success: {
+          de: 'Die Lore ächzt, schlingert, dann hält sie. Funken springen vom Eisen, der Geruch ist scharf wie heißer Pfennig. Du stehst auf der schwankenden Plattform, atmest schwer, und hörst das Schienenrattern langsam verstummen.',
+          en: 'The cart groans, lurches, then halts. Sparks leap off the iron, the smell sharp as hot copper. You stand on the swaying platform, breathing hard, and hear the rail-rattle slowly fade.'
+        },
+        failure: {
+          de: 'Du verfehlst einen Schlag, und die Lore springt aus den Schienen. Sie kippt zur Seite, Erz poltert, du springst gerade noch ab. Du musst den Trümmerhaufen umgehen — verlierst Zeit, aber lebst.',
+          en: 'You miss a beat and the cart jumps the rails. It tips, ore clatters, and you barely leap clear. You have to go around the wreckage — lose time, but live.'
+        }
+      },
+      // ----- 3 · Mini-Game: Die singenden Kristalle (memory) --
+      {
+        id: 'da-3', minigame: 'memory',
+        title: { de: 'Die singenden Kristalle', en: 'The Singing Crystals' },
+        minigameConfig: {
+          pairs: 4,
+          items: [
+            { id: 'rubin',   icon: '🔴', label: { de: 'Rubin',   en: 'Ruby' } },
+            { id: 'saphir',  icon: '🔵', label: { de: 'Saphir',  en: 'Sapphire' } },
+            { id: 'topas',   icon: '🟡', label: { de: 'Topas',   en: 'Topaz' } },
+            { id: 'smaragd', icon: '🟢', label: { de: 'Smaragd', en: 'Emerald' } }
+          ]
+        },
+        text: {
+          de: 'Im zweiten Stollen findest du eine Wand voller eingefasster Kristalle — sie leuchten schwach und summen, fast unhörbar, als wären sie verstimmt. Eine alte Inschrift erklärt: paarweise zünden sie. Wer die Paare findet, öffnet das Tor zur dritten Tiefe. Wer nicht — der bleibt oben. Du tippst den ersten Kristall an. Er glüht und summt einen tiefen Ton.',
+          en: 'In the second tunnel you find a wall set with crystals — they glow faintly and hum, almost inaudibly, as if out of tune. An old inscription explains: in pairs they light. Find the pairs and the gate to the third depth opens. Fail — and you stay up here. You tap the first crystal. It glows and hums a low note.'
+        },
+        success: {
+          de: 'Mit dem letzten Paar fällt ein Akkord auf die Wand wie ein einzelner langer Schlag auf eine tiefe Glocke. Das Tor zur dritten Tiefe schwingt langsam auf, schwarze Luft zieht herauf — kalt, aber nicht tot.',
+          en: 'With the last pair the wall rings out like a single long stroke on a deep bell. The gate to the third depth swings slowly open. Black air rises — cold, but not dead.'
+        },
+        failure: {
+          de: 'Die Kristalle verstummen einer nach dem anderen. Das Tor öffnet sich nicht. Du musst über den alten Belüftungsschacht klettern — länger, gefährlicher, aber er führt nach unten.',
+          en: 'The crystals fall silent one by one. The gate stays shut. You have to climb through the old ventilation shaft instead — longer, more dangerous, but it leads down.'
+        }
+      },
+      // ----- 4 · Würfel: Die Steingoblins ---------------------
+      {
+        title: { de: 'Die Steingoblins', en: 'The Stone Goblins' },
+        text: {
+          de: 'In einer Kammer mit niedriger Decke sitzen sie um ein kleines Feuer aus Schwefelflechten — vier kleine Steingoblins, grau wie das Gestein selbst, mit Augen wie zwei feuchte Kieselsteine. Sie sind nicht böse. Aber sie haben sich hier eingenistet und lassen niemanden durch. Der älteste schaut dich an, kaut auf einer Wurzel, und wartet.',
+          en: 'In a low-ceilinged chamber four small stone goblins sit around a small fire of sulphur lichen — grey as the rock itself, with eyes like two wet pebbles. They are not evil. But they have settled here and they let no one pass. The eldest looks at you, chewing on a root, and waits.'
+        },
+        options: [
+          { stat: 'brave', dc: 10,
+            label:   { de: '💪 Hammer in den Boden, Funken sprühen, dich groß machen', en: '💪 Slam your hammer down, throw sparks, make yourself big' },
+            success: { de: 'Der Hammer schlägt ein, Funken springen wie kleine Sterne, und die vier Goblins ducken sich, blinzeln und weichen zur Seite. Der älteste murmelt etwas das wie „verstanden" klingt, und sie räumen den Pfad.',
+                       en: 'The hammer cracks down, sparks fly like small stars, and the four goblins duck, blink, and step aside. The eldest mutters something that sounds like "understood," and they clear the path.' },
+            failure: { de: 'Der Hammer rutscht ab und schlägt seitlich gegen den Stein. Die Goblins lachen — mit hohen scharfen Quietschern — gehen aber trotzdem zur Seite, fast aus Mitleid. Du gehst rot wie heißes Eisen durch.',
+                       en: 'The hammer slips and skids sideways into the rock. The goblins laugh — high, sharp squeaks — but step aside anyway, almost out of pity. You walk through red as hot iron.' } },
+          { stat: 'kind', dc: 8,
+            label:   { de: '💛 Brot und Käse aus dem Reiseproviant teilen', en: '💛 Share bread and cheese from your pack' },
+            success: { de: 'Du brichst den Laib, legst Käse darauf, und gibst dem ältesten Goblin die erste Hälfte. Er kaut, schmeckt, kaut weiter, und nickt langsam. Sie machen dir Platz und einer schiebt dir sogar einen Schwefelflechten-Zweig zu — als Lampe für später.',
+                       en: 'You break the loaf, lay cheese on it, and give the eldest goblin the first half. He chews, tastes, chews more, and nods slowly. They make space for you, and one even slides over a sulphur-lichen sprig — as a torch for later.' },
+            failure: { de: 'Du teilst, aber der Käse ist zu hart und zu salzig für sie. Sie wollen ihn nicht. Trotzdem siehst du, wie der älteste die Hand hebt und langsam zur Seite zeigt. Sie lassen dich durch — aber ohne Geschenk.',
+                       en: 'You share, but the cheese is too hard and too salty for them. They won\'t have it. Still, the eldest raises a hand and points slowly aside. They let you pass — but without a gift.' } },
+          { stat: 'clever', dc: 11,
+            label:   { de: '🧠 Ein Goblin-Rätsel im Tausch anbieten', en: '🧠 Offer a goblin riddle in trade' },
+            success: { de: 'Du fragst: „Was hat der Berg, was die Sonne nicht sehen kann?" Der älteste Goblin starrt dich an, dann lacht er hoch und herzhaft: „Sich selbst!" Sie sind so begeistert, dass sie dich nicht nur durchlassen — sie geben dir auch eine Karte vom Tunnel weiter unten, eingeritzt auf Goblin-Stein.',
+                       en: '"What has the mountain that the sun cannot see?" you ask. The eldest goblin stares, then laughs high and hard: "Itself!" They\'re so delighted they not only let you pass — they give you a map of the tunnel below, scratched into goblin-stone.' },
+            failure: { de: 'Dein Rätsel ist zu menschenförmig. Sie verstehen die Pointe nicht und schauen nur. Aber sie schätzen den Versuch. Der älteste klopft dir auf den Stiefel und macht dir Platz.',
+                       en: 'Your riddle is too human-shaped. They don\'t get the punchline, just stare. But they appreciate the effort. The eldest pats your boot and steps aside.' } }
+        ]
+      },
+      // ----- 5 · Mini-Game: Die zerschlagene Erzkiste (sort) --
+      {
+        id: 'da-5', minigame: 'sort',
+        title: { de: 'Die zerschlagene Erzkiste', en: 'The Shattered Ore Crate' },
+        minigameConfig: {
+          buckets: [
+            { id: 'edelmetalle', label: { de: 'Edelmetalle', en: 'Precious Metals' }, icon: '💰' },
+            { id: 'baustoffe',   label: { de: 'Baustoffe',   en: 'Building Stone' }, icon: '🧱' },
+            { id: 'brennstoffe', label: { de: 'Brennstoffe', en: 'Fuel' },           icon: '🔥' }
+          ],
+          items: [
+            { id: 'gold',   icon: '🟨', correctBucket: 'edelmetalle' },
+            { id: 'silber', icon: '⚪', correctBucket: 'edelmetalle' },
+            { id: 'kupfer', icon: '🟧', correctBucket: 'baustoffe' },
+            { id: 'eisen',  icon: '⚙', correctBucket: 'baustoffe' },
+            { id: 'kohle',  icon: '⚫', correctBucket: 'brennstoffe' },
+            { id: 'torf',   icon: '🟫', correctBucket: 'brennstoffe' }
+          ],
+          successThreshold: 0.7
+        },
+        text: {
+          de: 'Auf einem Vorsprung steht eine zerschlagene Erzkiste — eine vorausgegangene Lore muss hier abgestürzt sein. Erz liegt überall: Goldnuggets, Silberadern, dunkles Kupfer, Eisenstücke, Kohle, Torf. Du erkennst Brunnhilds Stempel an den Resten der Kiste. „Wenn du\'s findest", war ihr letzter Satz gewesen, „bring es zurück. Sortiert. Sonst kann\'s niemand brauchen." Drei Behälter stehen daneben.',
+          en: 'On a ledge sits a shattered ore crate — a cart must have crashed here earlier. Ore lies everywhere: gold nuggets, silver veins, dark copper, iron lumps, coal, peat. You recognize Brunhild\'s stamp on the wreckage. "If you find it," her last words had been, "bring it back. Sorted. Otherwise no one can use it." Three containers stand beside.'
+        },
+        success: {
+          de: 'Du sortierst sauber. Edelmetalle in den schweren Eisenbehälter, Baustoffe in die Steinkiste, Brennstoffe in den Korb mit der Lederabdeckung. Du markierst die Stelle, damit ein anderer Bergmann es später hochbringt.',
+          en: 'You sort cleanly. Precious metals into the heavy iron container, building stone into the rock crate, fuel into the leather-covered basket. You mark the spot so another miner can carry it up later.'
+        },
+        failure: {
+          de: 'Du sortierst, aber ein paar Stücke landen falsch. Brunhild wird einen Lehrling schicken müssen, um es nochmal zu machen. Aber Hauptsache, du bist nicht aufgehalten worden.',
+          en: 'You sort, but a few pieces end up in the wrong bin. Brunhild will have to send an apprentice to redo it. The main thing is, you weren\'t held up.'
+        }
+      },
+      // ----- 6 · Würfel: Der Schluchtsprung -------------------
+      {
+        title: { de: 'Der Schluchtsprung', en: 'The Chasm Leap' },
+        text: {
+          de: 'Eine Spalte hat den Tunnel zerteilt — drei Meter breit, schwarz wie der Schlund eines Drachen, an deren Boden du das Glitzern eines unterirdischen Flusses ahnst, weit unten. Auf der anderen Seite, halb verdeckt vom Schutt, hörst du ein leises Stöhnen. Ein verletzter Bergmann. Einer der drei verschollenen Meister, vielleicht. Du musst rüber. Aber wie?',
+          en: 'A fault has split the tunnel — three meters wide, black as a dragon\'s throat. At the bottom you sense the distant glitter of an underground river. On the other side, half hidden under rubble, you hear a faint groan. An injured miner. One of the three vanished masters, perhaps. You must cross. But how?'
+        },
+        options: [
+          { stat: 'brave', dc: 11,
+            label:   { de: '💪 Anlauf nehmen und springen', en: '💪 Take a run-up and leap' },
+            success: { de: 'Du läufst, springst, fühlst die Schlucht unter dir wie ein offenes Maul — und landest. Ein Stein bröckelt unter deinem Stiefel, aber du fängst dich. Der verletzte Bergmann hebt schwach den Kopf. „Du… bist gekommen", flüstert er.',
+                       en: 'You run, leap, feel the chasm yawn under you like an open mouth — and land. A stone crumbles under your boot, but you catch yourself. The injured miner weakly lifts his head. "You… came," he whispers.' },
+            failure: { de: 'Dein Sprung kommt zu kurz, aber du krallst dich an die Kante drüben. Du ziehst dich hoch, zitternd, mit aufgeschürften Händen. Du bist drüben. Aber der Sprung hat dich gekostet.',
+                       en: 'Your leap falls short, but you claw onto the far edge. You haul yourself up, trembling, palms torn. You\'re across. But the leap cost you.' } },
+          { stat: 'clever', dc: 9,
+            label:   { de: '🧠 Eine Brücke aus den Trümmern bauen', en: '🧠 Build a bridge from the rubble' },
+            success: { de: 'Du nimmst zwei zerbrochene Stützbalken, lehnst sie geschickt aneinander, beschwerst sie mit einem flachen Stein. Eine improvisierte Brücke. Du gehst hinüber, jeder Schritt vorsichtig — aber sie hält. Die Brücke wird auch der nächsten Mannschaft helfen.',
+                       en: 'You take two broken support beams, lean them cleverly against each other, weigh them down with a flat stone. An improvised bridge. You walk across, each step careful — but it holds. The bridge will help the next crew, too.' },
+            failure: { de: 'Die Brücke hält für deinen ersten Schritt, knirscht beim zweiten, und stürzt mit dem dritten ins Schwarze. Du springst gerade rechtzeitig auf die andere Seite, atemlos, ohne deinen Werkzeuggürtel. Den hast du verloren.',
+                       en: 'The bridge holds the first step, creaks on the second, and falls into the dark on the third. You leap just in time to the far side, breathless, without your tool belt. That\'s gone.' } },
+          { stat: 'kind', dc: 10,
+            label:   { de: '💛 Erst dem Verletzten ein Seil zuwerfen, dann selbst rüber', en: '💛 Throw a rope to the injured man first, then cross' },
+            success: { de: 'Du wickelst das Seil, schwingst, und es fällt bei ihm nieder. Er bindet es sich mühsam um die Hüfte. Erst sicherst du ihn — dann gehst du selbst rüber, balancierend auf einem schmalen Felsband, ohne Hast, weil du weißt: er wartet jetzt. Beide kommt ihr durch.',
+                       en: 'You loop the rope, swing it, and it falls beside him. He ties it around his hips, slowly. You secure him first — then cross yourself, balancing on a narrow stone ledge, without hurry, because you know: he\'s waiting now. You both make it across.' },
+            failure: { de: 'Das Seil landet zwei Schritt vor ihm. Er kann nicht aufstehen. Du musst zuerst rüber, mit blutigem Sprung, und ihn dann zu dir ziehen. Es klappt — aber knapp.',
+                       en: 'The rope lands two steps short of him. He can\'t stand. You have to cross first, with a bloodied leap, and then haul him over. It works — barely.' } }
+        ]
+      },
+      // ----- 7 · Mini-Game: Das Tunnellabyrinth (maze) --------
+      {
+        id: 'da-7', minigame: 'maze',
+        title: { de: 'Das Tunnellabyrinth', en: 'The Tunnel Maze' },
+        minigameConfig: {
+          width: 5, height: 5, start: [0,4], goal: [4,0], hero: '⛏',
+          obstacles: [
+            { pos: [1,3], icon: '🪨', kind: 'einsturz' },
+            { pos: [2,2], icon: '🪨', kind: 'einsturz' },
+            { pos: [3,3], icon: '💀', kind: 'gas' },
+            { pos: [3,1], icon: '🪨', kind: 'einsturz' },
+            { pos: [1,1], icon: '🪨', kind: 'einsturz' }
+          ],
+          moveLimit: 16, diagonals: false
+        },
+        text: {
+          de: 'Hinter der Schlucht beginnt das alte Versorgungslabyrinth — gegrabene Tunnel von vor hundert Jahren, manche eingestürzt, manche mit Methan gefüllt. Deine Lampe wird flackern, wenn du in eine Gaswolke kommst. Deine Atemluft reicht für etwa sechzehn Schritte. Der Stollen zur dritten Tiefe liegt am anderen Ende. Du brauchst den kürzesten sicheren Weg.',
+          en: 'Beyond the chasm begins the old supply maze — tunnels dug a hundred years ago, some collapsed, some filled with methane. Your lamp flickers when you enter a gas pocket. Your air will last for about sixteen steps. The shaft to the third depth lies at the far end. You need the shortest safe path.'
+        },
+        success: {
+          de: 'Deine Lampe flackert noch genau einmal, dann öffnet sich der Tunnel zu einer Galerie aus Granit. Du atmest tief ein. Die Luft hier unten ist kühler — aber sauber. Brunnhilds Tiefe.',
+          en: 'Your lamp flickers exactly once more, then the tunnel opens into a granite gallery. You take a deep breath. The air down here is cooler — but clean. Brunhild\'s depth.'
+        },
+        failure: {
+          de: 'Eine Sackgasse, ein Einsturz, ein Atemzug zu wenig. Du musst zurück, einen Umweg nehmen, und kommst hustend an der Galerie an. Du hast Zeit verloren — aber lebst.',
+          en: 'A dead end, a collapse, one breath too few. You have to go back, take a detour, and arrive at the gallery coughing. You\'ve lost time — but you\'re alive.'
+        }
+      },
+      // ----- 8 · Würfel: Der Funke der Tiefe ------------------
+      {
+        title: { de: 'Der Funke der Tiefe', en: 'The Spark of the Deep' },
+        text: {
+          de: 'Die Halle ist riesig, kreisrund, glatt wie poliert. In ihrer Mitte steht der tiefe Amboss — schwarz, kalt, ein eingelassener Ring aus Bronze um seine Basis. Über ihm hängt der ewige Hammer der ersten Hammerthane, an einer Kette die direkt aus dem Fels kommt. Du verstehst sofort: das Feuer kommt nicht von außen. Es kommt aus dem Amboss selbst, wenn er es wieder erkennt. Aber wie weckt man einen Amboss, der achthundert Jahre gesungen hat und plötzlich schweigt?',
+          en: 'The hall is vast, circular, smooth as polished glass. At its center stands the Deep Anvil — black, cold, a sunken bronze ring around its base. Above it hangs the eternal hammer of the first Hammerthane, on a chain that comes straight from the rock. You understand at once: the fire does not come from outside. It comes from the anvil itself, when it remembers. But how do you wake an anvil that has sung for eight hundred years and suddenly fallen silent?'
+        },
+        options: [
+          { stat: 'brave', dc: 11,
+            label:   { de: '💪 Den ewigen Hammer nehmen und einmal kraftvoll niederschlagen', en: '💪 Take the eternal hammer and bring it down once with everything you have' },
+            success: { de: 'Du nimmst die Kette, hebst den schweren Hammer mit beiden Händen, und schlägst — einmal, in der Mitte, mit allem was du bist. Der erste Funke springt wie ein erschrockenes Tier auf. Dann der zweite. Dann brüllt das Feuer aus dem Bronzering.',
+                       en: 'You take the chain, lift the heavy hammer with both hands, and strike — once, dead-center, with all that you are. The first spark leaps up like a startled animal. Then the second. Then the fire roars up from the bronze ring.' },
+            failure: { de: 'Du schlägst kraftvoll, aber zu seitlich. Der Hammer prallt ab, und der Amboss bleibt schwarz. Du brauchst eine zweite Idee.',
+                       en: 'You strike hard, but off-center. The hammer rebounds and the anvil stays black. You need a second idea.' } },
+          { stat: 'clever', dc: 10,
+            label:   { de: '🧠 Mit den singenden Kristallen die Bronzering-Resonanz wecken', en: '🧠 Use the singing crystals to wake the bronze-ring resonance' },
+            success: { de: 'Du legst je einen Kristall an die vier Himmelsrichtungen des Bronzerings. Sie summen, finden den Ton, der Ring singt mit, der Amboss antwortet — erst leise, dann tief, dann mit dem alten Lied. Die Funken kommen von unten, nicht von oben.',
+                       en: 'You place a crystal at each of the four cardinal points of the bronze ring. They hum, find the tone, the ring sings along, the anvil answers — first faintly, then deeply, then with the old song. The sparks rise from below, not above.' },
+            failure: { de: 'Die Kristalle finden den Ton nicht ganz. Der Ring summt nur leise. Aber genug, um dir Mut zu geben es einmal selbst zu probieren.',
+                       en: 'The crystals don\'t quite find the tone. The ring hums only faintly. But enough to give you the heart to try once yourself.' } },
+          { stat: 'kind', dc: 9,
+            label:   { de: '💛 Den geheimen Namen der ersten Hammerthane laut sprechen', en: '💛 Speak aloud the secret name of the first Hammerthane' },
+            success: { de: 'Du legst die Hand auf den kalten Amboss, schließt die Augen, und sprichst leise — fast nur ein Hauch — den Namen den Brunhild dir vor dem Abstieg ins Ohr geflüstert hat. Der Amboss vibriert unter deiner Hand. Dann kommt der Funke, klein und warm, wie ein Kind das wach wird.',
+                       en: 'You lay your hand on the cold anvil, close your eyes, and speak softly — almost only a breath — the name Brunhild whispered into your ear before you descended. The anvil vibrates beneath your hand. Then comes the spark, small and warm, like a child waking up.' },
+            failure: { de: 'Der Name kommt zu zaghaft, fast lautlos. Der Amboss hört ihn nicht. Aber der Versuch hat dich nicht müde gemacht — du kannst noch einmal anders.',
+                       en: 'The name comes too tentative, almost silent. The anvil doesn\'t hear it. But the attempt hasn\'t tired you — you can try another way.' } }
+        ]
+      }
+    ]
   }
 ];
 
