@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-26T16:19:49.568Z",
+  "generatedAt": "2026-04-26T16:44:51.887Z",
   "texts": [
     {
       "id": "019fc05ff733e6ae",
@@ -332,6 +332,11 @@
       "text": "Euer Held stemmt beide Füße an und drückt mit aller Kraft. Krii-i-i-itsch! Die Tür schwingt überrascht auf, denn noch nie hat jemand einfach gedrückt."
     },
     {
+      "id": "3aeb58fd7a8cb44d",
+      "lang": "de",
+      "text": "🌫 Der Nebel zieht zurück über den See, dichter als am Morgen. Die Wanderin hat sich neben Sebastian gesetzt und schaut still aufs Wasser. Sebastian zündet eine kleine Lampe an.\n\nEr sagt nicht, dass es schlecht gelaufen ist. Er sagt nicht, dass du müde aussiehst. Er sagt einfach: „Morgen ist auch ein See.\"\n\nEr reicht dir warmen Tee in einer alten Blechtasse, die nach dreißig Jahren See riecht. Ihr sitzt zu dritt auf dem Steg, schweigend, während der Nebel langsam zur Decke wird. „Manche Knoten\", sagt Sebastian schließlich, „lernt man nicht beim ersten Mal. Das ist nicht das Schlimme. Das Schlimme wäre, sie nicht nochmal zu probieren.\""
+    },
+    {
       "id": "3bf1eae09ea4b13d",
       "lang": "de",
       "text": "Auf der Rückseite, in winziger Schrift: „Heile mich mit dem, woraus ich bin.\" Euer Held erkennt — Honig! Ein Tropfen aus Frau Honigwabes eigenem Glas. Das Herz trinkt ihn und strahlt wie Mittagssonne."
@@ -487,6 +492,11 @@
       "text": "Eine warme Höhle öffnet sich zu einem stillen Nestraum. Dutzende steinerne Eier ruhen im Sand, jedes mit einer Rune geschmückt. Xyryth hat sie vor langer Zeit gelegt, und jedes Paar gehört zu einer Geschwister-Rune. Die Mutter-Magie des Drachen bittet euch, sie zu paaren, bevor sie euch tiefer lässt. Dreht immer zwei Eier um. Nur sanft — nicht schütteln."
     },
     {
+      "id": "53ccdd61880165a7",
+      "lang": "de",
+      "text": "🎣 Die Sonne steht inzwischen hoch über den Bergen, und der See ist nicht mehr still. Auf dem Steg sitzt die Wanderin im Schneidersitz und studiert konzentriert die kleinen Holzplättchen, die sie gleich in ihrem Rucksack mitnehmen wird.\n\nSebastian schaut in deinen Korb und nickt langsam — das langsame Nicken eines Mannes, der dreißig Jahre gewartet hat, um einmal sagen zu können: „Du hast es verstanden.\"\n\n„Du hast nicht nur Fische gefangen\", sagt er. „Du hast es weitergegeben. Das ist mehr.\" Er drückt dir den geknickten Hut für einen Moment auf den Kopf — eine kleine, fast scherzhafte Geste. Aber als du den Hut zurückgibst, merkst du, dass seine Augen ein wenig feucht sind.\n\n„Das nennen wir hier\", murmelt er und schaut wieder hinaus aufs Wasser, „einen guten Tag.\""
+    },
+    {
       "id": "5470f9efdb35595d",
       "lang": "de",
       "text": "Der nächste Gang öffnet sich zu einer Bibliothek so groß, dass die Decke im Dunkel verschwindet. Regale höher als Häuser strecken sich in alle Richtungen, vollgestopft mit Büchern, die seufzen, summen und sich selbst umblättern, wenn niemand hinschaut. Hinter einem Holzpult erhebt sich eine sanft lächelnde Dame in langem silbrigem Kleid. Sie ist meist da, doch man sieht ein wenig durch sie hindurch. Ihr Haar duftet noch nach Rosenwasser. Um ihren Hals hängt ein winziger Bronzeschlüssel. Sie hebt einen durchscheinenden Finger an die Lippen und flüstert: „Stille bitte... und eine schöne Geschichte, wenn ihr so lieb wärt. Hier unten wird es schrecklich still.\""
@@ -640,6 +650,11 @@
       "id": "72ce5138018b2eff",
       "lang": "de",
       "text": "Euer Held greift direkt durch das schwarze Glas — es fühlt sich kühl wie Wasser an — und schüttelt dem schüchternen Selbst fest die Hand. „Danke, dass du vorsichtig bist\", sagt er. „Ab hier mache ich weiter.\" Der Spiegel löst sich in einem sanften Lachen auf."
+    },
+    {
+      "id": "74d30a9d4cff7bb5",
+      "lang": "de",
+      "text": "Bevor die Sonne über die Berge kommt, gibt es eine halbe Stunde, in der das Wasser stiller ist als Glas. So still, dass man die eigenen Gedanken fallen hören kann. In dieser halben Stunde sitzt Fischer Sebastian schon auf seinem Steg.\n\nEr sitzt da seit dreißig Jahren — jeden Morgen derselbe umgedrehte Eimer, dieselbe geknickte Mütze, dieselbe Geduld. Früher, sagen die Dorfleute, war er ein berühmter Fischer in der großen Hafenstadt am Meer. Dann hat er eines Morgens seine Netze verschenkt, ist hierher gekommen, an diesen kleinen Bergsee, an den niemand mehr denkt. Er sagt nie, warum.\n\nGestern kam ein Brief — kurz, mit Bleistift geschrieben, in Sebastians krakeliger Schrift: „Komm vorbei, wenn du Lust hast etwas zu lernen, das nicht in Büchern steht.\"\n\nJetzt stehst du auf dem morgenfeuchten Steg. Sebastian schaut kurz auf, nickt einmal, und schiebt dir einen umgedrehten Eimer hin, auf dem du sitzen kannst. „Heute zeige ich dir nicht nur, wo die Fische sind\", sagt er leise. „Heute zeige ich dir, wie man sie findet. Und wenn der Tag gut wird — vielleicht gibst du es selbst noch jemandem weiter.\""
     },
     {
       "id": "75080207ca0c3ba5",
@@ -1102,11 +1117,6 @@
       "text": "Die Kinder sind zuerst scheu und halten Abstand. Doch euer Held setzt sich still mit offenen Armen hin, und nach einer Minute klettert das Kleinste auf den Schoß. Die anderen folgen langsam, eins nach dem anderen."
     },
     {
-      "id": "c09359cd31e4134c",
-      "lang": "de",
-      "text": "🌫 Der Nebel zieht über den See. Sebastian zündet eine kleine Lampe an. „Morgen ist auch noch ein Tag\", murmelt er und reicht dir warmen Tee."
-    },
-    {
       "id": "c1bc95a166017e3c",
       "lang": "de",
       "text": "Die Schnecken mögen den Gesang so sehr, dass sie weitertanzen. Euer Held wechselt zu einer gähnigen Melodie, und langsam rollen sie sich zum Nickerchen ein."
@@ -1312,11 +1322,6 @@
       "text": "Wusch! Euer Held nimmt Anlauf und springt direkt über das Loch. Er landet mit einem sanften Plumps auf der anderen Seite. Die übrigen Helden folgen vorsichtig."
     },
     {
-      "id": "e166c571f1f54770",
-      "lang": "de",
-      "text": "Der See ist still wie ein Spiegel. Fischer Sebastian sitzt auf einem umgedrehten Eimer, repariert ein Netz und winkt dich heran. „Komm\", sagt er leise, „heute zeige ich dir nicht nur, wo die Fische sind. Heute zeige ich dir, wie man sie findet.\""
-    },
-    {
       "id": "e1c5bfd125941678",
       "lang": "de",
       "text": "Das sechste Stockwerk ist voller sanfter, schimmernder Geister. Sie sind nicht unheimlich — alte Leute, Kinder und sogar ein freundlicher Esel, alle summen eine Melodie, die niemand mehr kennt. Sie stecken seit langem hier fest und warten, dass jemand zuhört. „Bitte\", flüstert ein Geistermädchen im Alter eures Helden. „Wir brauchen jemanden, der uns hört, bevor wir ruhen können.\""
@@ -1450,11 +1455,6 @@
       "id": "f6dc30f85dbd7247",
       "lang": "de",
       "text": "Manche Prüfungen wackelten. Die Türen öffnen sich trotzdem, doch das Echo klingt etwas traurig. Die Moral sinkt eine Stufe."
-    },
-    {
-      "id": "f7b7682a229fd9f6",
-      "lang": "de",
-      "text": "🎣 Sebastian schaut in deinen Korb und nickt langsam. „Du hast nicht nur Fische gefangen. Du weißt jetzt, wie es geht.\" Er drückt dir den geknickten Hut für einen Moment auf den Kopf. „Das nennen wir hier: ein guter Tag.\""
     },
     {
       "id": "f80635346de7b15e",
@@ -1635,6 +1635,11 @@
       "id": "1804034ef9308e0c",
       "lang": "en",
       "text": "\"Goodbye, dear ghosts!\" your hero shouts warmly, big wave, big smile. The ghosts laugh — some of them haven't heard a loud voice in centuries. They all wave back and fade into happy sparkles."
+    },
+    {
+      "id": "184a11e8a18e433d",
+      "lang": "en",
+      "text": "🌫 The mist rolls back over the lake, thicker than at dawn. The traveler has settled in next to Sebastian and stares quietly at the water. Sebastian lights a small lamp.\n\nHe does not say it went badly. He does not say you look tired. He just says: \"There will be another lake tomorrow.\"\n\nHe hands you warm tea in an old tin cup that smells of thirty years of mornings on the water. The three of you sit on the dock in silence while the mist slowly becomes a blanket. \"Some knots,\" Sebastian says finally, \"do not come to you on the first try. That is not the bad part. The bad part would be not trying them again.\""
     },
     {
       "id": "19ec5e5d519bb74b",
@@ -1990,6 +1995,11 @@
       "id": "5fd7feafe23eeb8a",
       "lang": "en",
       "text": "Sebastian points with his oar at a green island of reeds. \"They bite best back there. But the way is tight.\""
+    },
+    {
+      "id": "5fe4140718ae4bdb",
+      "lang": "en",
+      "text": "🎣 The sun is high over the mountains now, and the lake is no longer still. On the dock the traveler sits cross-legged, studying with great concentration the small wooden plates she will soon carry in her rucksack.\n\nSebastian peers into your basket and nods slowly — the slow nod of a man who has waited thirty years to be able to say: \"You understood it.\"\n\n\"You did not just catch fish,\" he says. \"You passed it on. That is the larger thing.\" He presses his crumpled hat onto your head for a moment — a small, almost teasing gesture. But when you hand the hat back, you notice his eyes are a little wet.\n\n\"Around here,\" he murmurs, looking out at the water again, \"that is what we call a good day.\""
     },
     {
       "id": "60b1480df4e6791c",
@@ -2422,6 +2432,11 @@
       "text": "The rolls eat the trail before following it. Your hero has to start over with sprinkles, which works — but takes a while."
     },
     {
+      "id": "9c89875a9a4b4141",
+      "lang": "en",
+      "text": "Before the sun crests the mountains, there is a half-hour when the water lies stiller than glass. So still you can almost hear your own thoughts settle. In that half-hour, Sebastian the Fisher is already on his dock.\n\nHe has been sitting there for thirty years — same upturned bucket each morning, same crumpled cap, same patience. The village people say he was once a famous fisher down in the great port city by the sea. Then one morning he gave away his nets, came here to this small mountain lake nobody thinks about anymore, and built a single dock from old wood. He never says why.\n\nYesterday a letter arrived — short, written in pencil in Sebastian's crooked hand: \"Come along, if you fancy learning something the books don't teach.\"\n\nNow you are standing on the dewy boards of the dock. Sebastian glances up, nods once, and slides an upturned bucket toward you to sit on. \"Today I am not just going to show you where the fish are,\" he says quietly. \"Today I am going to show you how to find them. And if the day goes well — perhaps you will pass it on to someone else, yourself.\""
+    },
+    {
       "id": "9c978c5cef7ed6ea",
       "lang": "en",
       "text": "The pebble is a little dull. The goblins sniff it and look disappointed. Still, they accept it out of politeness and wave the party on with a shrug."
@@ -2672,11 +2687,6 @@
       "text": "The crow just stares with her beady eyes. Then she flies over to the other side and peeks back. Maybe she wants you to follow a different path?"
     },
     {
-      "id": "c47b9b6d088914a1",
-      "lang": "en",
-      "text": "The lake is still as a mirror. Sebastian the fisher sits on an upturned bucket, mending a net, and waves you over. \"Come,\" he says softly, \"today I will not just show you where the fish are. Today I will show you how to find them.\""
-    },
-    {
       "id": "c4caa08b550210a1",
       "lang": "en",
       "text": "\"Children dream of your apple tarts. Old men remember their mothers when they smell your bread. You are loved more than you know.\" The Heart pulses, blooms golden, and fills the room with the scent of warm cinnamon."
@@ -2695,11 +2705,6 @@
       "id": "c606786c74a70e7f",
       "lang": "en",
       "text": "A muffled crash from upstairs. Mrs. Honeycomb gasps: \"Three rooms, three problems, all at once! A wedding cake is collapsing, a sourdough starter has grown to the size of a sheep, and a gingerbread guard has lost his head — literally. Split up! Each of you take one room!\""
-    },
-    {
-      "id": "c6a9db6449ac44cd",
-      "lang": "en",
-      "text": "🌫 Mist rolls in over the lake. Sebastian lights a small lamp. \"Tomorrow is another day,\" he murmurs, handing you warm tea."
     },
     {
       "id": "c83194a54c00deea",
@@ -2805,11 +2810,6 @@
       "id": "d7744816c83c3486",
       "lang": "en",
       "text": "There are a lot of ghosts, and your hero gets tired partway through. Still, the ones who got listened to leave peacefully, and the rest wave gratefully as you pass."
-    },
-    {
-      "id": "d894b454fe3bc3ee",
-      "lang": "en",
-      "text": "🎣 Sebastian peers into your basket and nods slowly. \"You did not just catch fish. You know how, now.\" He presses his crumpled hat onto your head for a moment. \"Around here, that's what we call a good day.\""
     },
     {
       "id": "d937526e9c334085",
