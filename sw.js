@@ -1,7 +1,7 @@
 // Kids Coin Quest — service worker
 // Bump CACHE_VERSION whenever index.html ships a change you want users to see
 // immediately after reload. Old caches are purged on activate.
-const CACHE_VERSION = 'kcq-v9';
+const CACHE_VERSION = 'kcq-v10';
 
 // `index.html` and `/` always need a fresh check so users pick up
 // new app code immediately. Everything else (assets, scripts, fonts)

@@ -2667,6 +2667,117 @@
   .plan-pill.plan-pro    { background: rgba(244,211,94,0.18); color: var(--gold-bright); border-color: var(--gold-dark); }
   .plan-pill.plan-family { background: rgba(168,85,247,0.18); color: #c084fc; border-color: #a855f7; }
 
+  /* === Pricing Modal (Apr 2026) — comparison table + upgrade CTA. */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 560px) {
+    .pricing-grid { grid-template-columns: 1fr; }
+  }
+  .pricing-tier {
+    background: rgba(62,40,23,0.08);
+    border: 1px solid var(--parchment-darker);
+    border-radius: 8px;
+    padding: 18px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .pricing-tier-pro {
+    border: 2px solid var(--gold-bright);
+    background: linear-gradient(180deg, rgba(244,211,94,0.10), rgba(62,40,23,0.10));
+    box-shadow: 0 0 16px rgba(244,211,94,0.18);
+    position: relative;
+  }
+  .pricing-tier-pro::before {
+    content: 'RECOMMENDED';
+    position: absolute;
+    top: -10px;
+    right: 16px;
+    background: var(--gold-bright);
+    color: #2b1810;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+  .pricing-tier-name {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold-dark);
+    text-align: center;
+  }
+  .pricing-tier-price {
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--gold-bright);
+    text-align: center;
+  }
+  .pricing-tier-period {
+    text-align: center;
+    color: var(--ink-muted);
+    font-size: 12px;
+    font-style: italic;
+    margin-top: -4px;
+  }
+  .pricing-period-toggle {
+    display: flex; gap: 6px; justify-content: center; margin-top: 4px;
+  }
+  .pricing-period-btn {
+    background: rgba(62,40,23,0.10);
+    border: 1px solid var(--parchment-darker);
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .pricing-period-btn:hover { border-color: var(--gold-bright); }
+  .pricing-period-btn.active {
+    background: var(--gold-bright);
+    color: #2b1810;
+    border-color: var(--gold-dark);
+    font-weight: 700;
+  }
+  .pricing-features {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .pricing-features li { padding: 2px 0; color: var(--ink); }
+
+  /* "⭐ Pro" badge shown on tier-locked adventure cards. */
+  .pro-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold-dark));
+    color: #2b1810;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    z-index: 2;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .adventure-option.tier-locked { cursor: pointer; }
+  .adventure-option.tier-locked:hover { transform: translateY(-1px); }
+  .adventure-option.tier-locked .lock-overlay {
+    background: linear-gradient(180deg, rgba(244,211,94,0.18), rgba(62,40,23,0.45));
+    color: var(--gold-bright);
+    font-weight: 700;
+  }
+
   /* Compact admin form input (used by plan/period dropdowns in Plans tab). */
   .admin-input {
     font-size: 12px;
@@ -4751,6 +4862,65 @@
   </div>
 </div>
 
+<!-- Pricing Modal — comparison table + upgrade CTA. Triggered when a
+     free user hits a gate (3rd hero, locked adventure) OR via a
+     "View plans" link. -->
+<div class="modal-backdrop" id="pricingModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal pricing-modal" style="max-width: 720px;">
+    <div id="pricingReason" style="display:none; padding: 8px 12px; background: rgba(244,211,94,0.1); border-left: 3px solid var(--gold-bright); border-radius: 4px; margin-bottom: 14px; font-size: 13px; color: var(--ink);"></div>
+    <h2 style="text-align: center; margin: 0 0 4px; font-family: 'Cinzel', serif; color: var(--gold-bright);">
+      ⭐ <span data-i18n="pricing_title">Upgrade to Pro</span>
+    </h2>
+    <p style="text-align: center; color: var(--ink-muted); font-style: italic; margin: 0 0 18px;" data-i18n="pricing_subtitle">
+      All 8 adventures, unlimited heroes, premium narration.
+    </p>
+
+    <div class="pricing-grid">
+      <div class="pricing-tier pricing-tier-free">
+        <div class="pricing-tier-name" data-i18n="pricing_free_name">Free</div>
+        <div class="pricing-tier-price">€0</div>
+        <div class="pricing-tier-period" data-i18n="pricing_forever">forever</div>
+        <ul class="pricing-features">
+          <li>✓ <span data-i18n="pricing_feature_3_adv">3 adventures</span></li>
+          <li>✓ <span data-i18n="pricing_feature_2_heroes">2 heroes</span></li>
+          <li>✓ <span data-i18n="pricing_feature_basic_quests">All quests &amp; rewards</span></li>
+          <li>✓ <span data-i18n="pricing_feature_streaks">Family streak system</span></li>
+          <li>✗ <span data-i18n="pricing_feature_no_nova" style="color: var(--ink-muted);">Web Speech narration</span></li>
+        </ul>
+      </div>
+
+      <div class="pricing-tier pricing-tier-pro">
+        <div class="pricing-tier-name">⭐ <span data-i18n="pricing_pro_name">Pro</span></div>
+        <div class="pricing-period-toggle" id="pricingPeriodToggle">
+          <button class="pricing-period-btn active" data-period="monthly" onclick="setPricingPeriod('monthly')">€3<span data-i18n="pricing_per_month"> /mo</span></button>
+          <button class="pricing-period-btn"        data-period="yearly"  onclick="setPricingPeriod('yearly')">€19.99<span data-i18n="pricing_per_year"> /yr</span></button>
+        </div>
+        <div class="pricing-tier-period" id="pricingTierSubLabel"><span data-i18n="pricing_yearly_save">Save 44% with yearly</span></div>
+        <ul class="pricing-features">
+          <li>✓ <span data-i18n="pricing_feature_8_adv">All 8 adventures</span></li>
+          <li>✓ <span data-i18n="pricing_feature_unlimited_heroes">Unlimited heroes</span></li>
+          <li>✓ <span data-i18n="pricing_feature_nova">Premium Nova narration (OpenAI)</span></li>
+          <li>✓ <span data-i18n="pricing_feature_cloud">Cross-device cloud sync</span></li>
+          <li>✓ <span data-i18n="pricing_feature_custom">Unlimited custom adventures</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="display:flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 18px;">
+      <button class="btn btn-primary" id="pricingUpgradeBtn" onclick="onPricingUpgradeClick()">
+        ⭐ <span data-i18n="pricing_upgrade_btn">Upgrade to Pro</span>
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('pricingModal')" data-i18n="pricing_maybe_later">
+        Maybe later
+      </button>
+    </div>
+
+    <div style="font-size: 11px; color: var(--ink-muted); text-align: center; margin-top: 14px; font-style: italic;" data-i18n="pricing_stripe_coming_soon">
+      Stripe-powered checkout coming soon. Want to upgrade today? Email support.
+    </div>
+  </div>
+</div>
+
 <!-- Streak Reward Modal (celebrates a tier-3/7/30 unlock) -->
 <div class="modal-backdrop" id="rewardModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="modal reward-modal">
@@ -5328,6 +5498,35 @@ const TRANSLATIONS = {
     admin_stat_streak: 'Streak',
     admin_stat_quests: 'Quests',
     admin_drill_meta: 'IDs',
+    pricing_title: 'Upgrade to Pro',
+    pricing_subtitle: 'All 8 adventures, unlimited heroes, premium narration.',
+    pricing_free_name: 'Free',
+    pricing_pro_name: 'Pro',
+    pricing_forever: 'forever',
+    pricing_per_month: ' /mo',
+    pricing_per_year: ' /yr',
+    pricing_yearly_save: 'Save 44% with yearly · billed €19.99 once',
+    pricing_yearly_billed: 'Billed €19.99 once a year · cancel anytime',
+    pricing_feature_3_adv: '3 adventures (Grove, Bakery, Sebastian)',
+    pricing_feature_8_adv: 'All 8 adventures',
+    pricing_feature_2_heroes: '2 heroes',
+    pricing_feature_unlimited_heroes: 'Unlimited heroes',
+    pricing_feature_basic_quests: 'All quests & rewards',
+    pricing_feature_streaks: 'Family streak system',
+    pricing_feature_no_nova: 'Web Speech only (robotic)',
+    pricing_feature_nova: 'Premium Nova narration (OpenAI)',
+    pricing_feature_cloud: 'Cross-device cloud sync',
+    pricing_feature_custom: 'Unlimited custom adventures',
+    pricing_upgrade_btn: 'Upgrade to Pro',
+    pricing_maybe_later: 'Maybe later',
+    pricing_stripe_coming_soon: 'Stripe-powered checkout coming soon. The Upgrade button opens an email — we\'ll set you up manually until then.',
+    pricing_already_pro: '⭐ You already have Pro!',
+    pricing_view_plans: 'View plans',
+    pricing_email_sent: 'Email opened. Send it and we\'ll activate Pro for your account.',
+    pricing_reason_hero_limit: 'Free includes 2 heroes. Upgrade to Pro for unlimited heroes.',
+    pricing_reason_adventure_locked: 'This adventure is part of Pro. Upgrade to unlock all 8.',
+    pricing_reason_account: 'Compare plans below.',
+    pro_required: 'Pro required',
     session_expired_title: 'Your session has expired',
     session_expired_desc: 'You were signed in as {email}, but the session is no longer valid. Your data is safe locally — sign in again to keep syncing to the cloud.',
     session_expired_signin: '👤 Sign in again',
@@ -5933,6 +6132,35 @@ const TRANSLATIONS = {
     admin_stat_streak: 'Streak',
     admin_stat_quests: 'Quests',
     admin_drill_meta: 'IDs',
+    pricing_title: 'Auf Pro upgraden',
+    pricing_subtitle: 'Alle 8 Abenteuer, unbegrenzte Helden, Premium-Vertonung.',
+    pricing_free_name: 'Free',
+    pricing_pro_name: 'Pro',
+    pricing_forever: 'für immer',
+    pricing_per_month: ' /Monat',
+    pricing_per_year: ' /Jahr',
+    pricing_yearly_save: '44% sparen · einmal €19.99 jährlich',
+    pricing_yearly_billed: 'Einmal €19.99 pro Jahr · jederzeit kündbar',
+    pricing_feature_3_adv: '3 Abenteuer (Hain, Bäckerei, Sebastian)',
+    pricing_feature_8_adv: 'Alle 8 Abenteuer',
+    pricing_feature_2_heroes: '2 Helden',
+    pricing_feature_unlimited_heroes: 'Unbegrenzte Helden',
+    pricing_feature_basic_quests: 'Alle Quests & Belohnungen',
+    pricing_feature_streaks: 'Familien-Streak-System',
+    pricing_feature_no_nova: 'Browser-Stimme (robotisch)',
+    pricing_feature_nova: 'Premium Nova-Vertonung (OpenAI)',
+    pricing_feature_cloud: 'Geräteübergreifende Cloud-Sync',
+    pricing_feature_custom: 'Unbegrenzte eigene Abenteuer',
+    pricing_upgrade_btn: 'Auf Pro upgraden',
+    pricing_maybe_later: 'Vielleicht später',
+    pricing_stripe_coming_soon: 'Stripe-Checkout kommt bald. Bis dahin öffnet der Upgrade-Knopf eine E-Mail — wir schalten dich manuell frei.',
+    pricing_already_pro: '⭐ Du hast bereits Pro!',
+    pricing_view_plans: 'Pläne ansehen',
+    pricing_email_sent: 'E-Mail geöffnet. Schick sie ab und wir aktivieren Pro für dich.',
+    pricing_reason_hero_limit: 'Free umfasst 2 Helden. Pro für unbegrenzte Helden.',
+    pricing_reason_adventure_locked: 'Dieses Abenteuer gehört zu Pro. Upgrade für alle 8.',
+    pricing_reason_account: 'Vergleiche die Pläne unten.',
+    pro_required: 'Pro erforderlich',
     session_expired_title: 'Deine Sitzung ist abgelaufen',
     session_expired_desc: 'Du warst angemeldet als {email}, aber die Sitzung ist nicht mehr gültig. Deine Daten sind lokal sicher — melde dich neu an, um wieder mit der Cloud zu synchronisieren.',
     session_expired_signin: '👤 Erneut anmelden',
@@ -6443,6 +6671,22 @@ function narrate(text) {
   stopPrerenderedAudio();
   const trimmed = String(text).trim();
   const lang = state.settings.lang === 'de' ? 'de' : 'en';
+  // Free-tier gate: skip the premium-audio path entirely. Free users
+  // hear Web Speech (always available, robotic). Pro users get Nova.
+  // We check this AFTER stopNarration so an in-flight Pro session that
+  // just downgraded gets cut off cleanly.
+  if (!isPro()) {
+    if (!narratorSupported()) return;
+    const clean = trimmed.replace(/[⚔⚜✨🌟🪄🎵🏹🧙‍♂️🧝‍♀️🛡️🗡️🐉🎩📿⛑️🎓👑🔮🔨⚡🧪📖🏅👕🦺🥋👖🧵👢👟🥾💍🧠💪💛🤍🏡🌲💎🗼🌑🔥🌋🎲🏆🎁🟢🔴💰📊⭐🔒👋📷📜✎]/gu, '');
+    const u = new SpeechSynthesisUtterance(clean);
+    u.lang = lang === 'de' ? 'de-DE' : 'en-US';
+    u.rate = state.settings.narratorRate || 1.0;
+    u.pitch = state.settings.narratorPitch || 1.0;
+    const voice = pickBestVoice(lang);
+    if (voice) { u.voice = voice; u.lang = voice.lang; }
+    window.speechSynthesis.speak(u);
+    return;
+  }
   // Try pre-rendered audio first. Async, but sync-looking fallback is fine.
   (async () => {
     const manifest = await loadNarratorManifest();
@@ -8493,6 +8737,15 @@ function slugifyUserName(name) {
 }
 
 function addKid() {
+  // Free-tier gate: max 2 heroes. Pro gets unlimited.
+  // We re-check at submit-time (not just modal-open) so race conditions
+  // can't sneak past — e.g. opening the modal as Pro then downgrading
+  // and submitting.
+  if (!isPro() && (state.kids || []).length >= FREE_TIER_HERO_LIMIT) {
+    closeModal('addKidModal');
+    openPricingModal('hero_limit');
+    return;
+  }
   const name = document.getElementById('newKidName').value.trim();
   // BUG-18: auto-generate username from display name when the hidden
   // field is empty (default flow). Falls back to whatever the field
@@ -11202,10 +11455,20 @@ function partyMinLevel() {
   if (heroes.length === 0) return 0;
   return Math.min(...heroes.map(h => heroLevel(h)));
 }
-function adventureLocked(adv) {
-  if (adventureState.party.length === 0) return true;
-  return partyMinLevel() < adv.minLevel;
+// Free-tier sees only these three adventures. Picked for variety:
+// classic d20 choice (grove), narrative-cosy (bakery), mini-game
+// showcase (fischer-sebastian). Pro unlocks the remaining five.
+const FREE_TIER_ADVENTURE_IDS = ['grove', 'bakery', 'fischer-sebastian'];
+window.FREE_TIER_ADVENTURE_IDS = FREE_TIER_ADVENTURE_IDS;
+
+function adventureLockReason(adv) {
+  if (adventureState.party.length === 0) return 'no-party';
+  if (partyMinLevel() < adv.minLevel) return 'level';
+  if (!isPro() && !FREE_TIER_ADVENTURE_IDS.includes(adv.id)) return 'tier';
+  return null;
 }
+function adventureLocked(adv) { return adventureLockReason(adv) !== null; }
+window.adventureLockReason = adventureLockReason;
 
 const _OLD_ADVENTURES_UNUSED = [
   {
@@ -13294,8 +13557,15 @@ function renderAdventureSelect() {
   });
 
   const advs = visibleAdvs.map(a => {
-    const locked = adventureLocked(a);
-    const click = locked ? `showLockToast('${a.id}')` : `chooseAdventure('${a.id}')`;
+    const lockReason = adventureLockReason(a);
+    const locked = !!lockReason;
+    const tierLocked = lockReason === 'tier';
+    // Tier-lock → open pricing modal; level-lock → toast as before.
+    const click = !locked
+      ? `chooseAdventure('${a.id}')`
+      : tierLocked
+        ? `openPricingModal('adventure_locked')`
+        : `showLockToast('${a.id}')`;
     const hasParty = adventureState.party.length > 0;
     const meets = hasParty && pml >= a.minLevel;
     // Colored level line — green when you qualify, amber when short, gray when no party yet.
@@ -13303,16 +13573,20 @@ function renderAdventureSelect() {
     const yourLevelLine = hasParty
       ? `<span style="color:${levelColor}; font-weight:700;">${t('your_level')} ${pml}</span> · ${meets ? '✓' : `${t('needs_level')} ${a.minLevel}`}`
       : `<span style="color:${levelColor};">${t('min_level')} ${a.minLevel}</span>`;
-    const lockHtml = locked
-      ? `<div class="lock-overlay">🔒 ${t('requires_level')} ${a.minLevel}${!hasParty ? ' ' + t('pick_party_first') : ` · ${t('yours_is')} ${pml}`}</div>`
-      : '';
+    const lockHtml = !locked ? ''
+      : tierLocked
+        ? `<div class="lock-overlay">⭐ ${t('pro_required')}</div>`
+        : `<div class="lock-overlay">🔒 ${t('requires_level')} ${a.minLevel}${!hasParty ? ' ' + t('pick_party_first') : ` · ${t('yours_is')} ${pml}`}</div>`;
     const customBadge = a.custom
       ? `<span class="custom-adv-badge" title="${escapeHtml(t('custom_adv_badge'))}">✏ ${t('custom_short')}</span>`
       : '';
+    const proBadge = tierLocked
+      ? `<span class="pro-badge" title="${escapeHtml(t('pro_required'))}">⭐ Pro</span>`
+      : '';
     return `
-    <div class="adventure-option${locked ? ' locked' : ''}" onclick="${click}">
+    <div class="adventure-option${locked ? ' locked' : ''}${tierLocked ? ' tier-locked' : ''}" onclick="${click}">
       <span class="adventure-difficulty-badge difficulty-${a.difficulty}">${t('diff_' + a.difficulty)}</span>
-      ${customBadge}
+      ${customBadge}${proBadge}
       <h3>${a.icon} ${L(a.title)}</h3>
       <p>${escapeHtml(L(a.summary))}</p>
       <div class="adv-min-level">${a.scenes.length} ${t('scenes_count')} · ${a.maxHp} ⭐ ${t('morale')} · ${yourLevelLine}</div>
@@ -13517,7 +13791,9 @@ function chooseAdventure(advId) {
   if (adventureState.party.length === 0) { toast('Select at least one hero for the party!', 'error'); return; }
   const adv = ADVENTURES.find(a => a.id === advId);
   if (!adv) return;
-  if (adventureLocked(adv)) { showLockToast(advId); return; }
+  const lockReason = adventureLockReason(adv);
+  if (lockReason === 'tier') { openPricingModal('adventure_locked'); return; }
+  if (lockReason) { showLockToast(advId); return; }
   adventureState.adventureId = advId;
   adventureState.sceneIdx = 0;
   adventureState.maxHp = adv.maxHp || 5;
@@ -16225,6 +16501,80 @@ function supaInvalidate(key) { _supaInflight.delete(key); }
 
 let supaSession = null;
 let supaProfile = null;       // { user_id, email, is_admin }
+let supaSubscription = null;  // { user_id, plan, status, billing_period, current_period_end }
+const FREE_TIER_HERO_LIMIT = 2;
+window.FREE_TIER_HERO_LIMIT = FREE_TIER_HERO_LIMIT;
+
+// isPro: true iff the user is signed in AND has an active or trialing
+// 'pro' subscription. Anonymous + free + canceled all count as "not Pro".
+// Used by the feature gates: hero recruit, adventure picker, narrator.
+function isPro() {
+  if (!supaSession || !supaSubscription) return false;
+  if (supaSubscription.plan !== 'pro') return false;
+  if (!['active', 'trialing'].includes(supaSubscription.status)) return false;
+  return true;
+}
+function getMyPlan() {
+  if (!supaSession) return 'free';
+  return (supaSubscription && supaSubscription.plan) || 'free';
+}
+window.isPro = isPro;
+window.getMyPlan = getMyPlan;
+function getMyBillingPeriod() {
+  return (supaSubscription && supaSubscription.billing_period) || null;
+}
+
+// Pricing modal — opens with optional reason context ('hero_limit',
+// 'adventure_locked', 'narration', or omit for plain "View plans").
+let _pricingPeriod = 'monthly';
+function openPricingModal(reason) {
+  // Already Pro: short-circuit to a friendly toast instead of the modal.
+  if (isPro()) { toast(t('pricing_already_pro'), 'success'); return; }
+  const reasonBox = document.getElementById('pricingReason');
+  if (reasonBox) {
+    if (reason && t('pricing_reason_' + reason)) {
+      reasonBox.textContent = t('pricing_reason_' + reason);
+      reasonBox.style.display = '';
+    } else {
+      reasonBox.style.display = 'none';
+    }
+  }
+  setPricingPeriod(_pricingPeriod);
+  openModal('pricingModal');
+}
+window.openPricingModal = openPricingModal;
+
+function setPricingPeriod(period) {
+  _pricingPeriod = period === 'yearly' ? 'yearly' : 'monthly';
+  document.querySelectorAll('.pricing-period-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.period === _pricingPeriod));
+  const sub = document.getElementById('pricingTierSubLabel');
+  if (sub) sub.innerHTML = _pricingPeriod === 'yearly'
+    ? `<span>${t('pricing_yearly_billed')}</span>`
+    : `<span>${t('pricing_yearly_save')}</span>`;
+}
+window.setPricingPeriod = setPricingPeriod;
+
+function onPricingUpgradeClick() {
+  // Stripe checkout isn't wired yet. Two friendly fallback paths:
+  // 1. Not signed in → push to sign in first (so we have a user_id to
+  //    attach the future subscription to).
+  // 2. Signed in → open mailto: with a pre-filled body for now.
+  if (!supaSession) {
+    closeModal('pricingModal');
+    if (typeof openSignInModal === 'function') openSignInModal();
+    return;
+  }
+  const subject = encodeURIComponent('Kids Coin Quest — Upgrade to Pro');
+  const body = encodeURIComponent(
+    `Hi,\n\nI'd like to upgrade to Pro (${_pricingPeriod === 'yearly' ? '€19.99/year' : '€3/month'}).\n\n` +
+    `My account: ${(supaSession.user && supaSession.user.email) || ''}\n\n` +
+    `Thanks!`
+  );
+  window.location.href = `mailto:support@kidscoinquest.app?subject=${subject}&body=${body}`;
+  toast(t('pricing_email_sent'), 'info');
+}
+window.onPricingUpgradeClick = onPricingUpgradeClick;
 let cloudFamilyId = null;
 let cloudLastRemoteUpdatedAt = null;
 let cloudSyncTimer = null;
@@ -16329,6 +16679,7 @@ async function applySession(session) {
   updateAccountBtnLabel();
   if (!supaSession) {
     supaProfile = null;
+    supaSubscription = null;
     cloudFamilyId = null;
     cloudLastRemoteUpdatedAt = null;
     renderAccountPanel();
@@ -16351,6 +16702,21 @@ async function applySession(session) {
   }
   // Load (or create) the profile row to read is_admin, then pull cloud state.
   await loadOrCreateProfile();
+  // Load the subscription row so isPro() works on first paint. The
+  // fetch is RLS-gated to the user's own row only; failure is silent
+  // (defaults to free behavior).
+  try {
+    const { data: subRow } = await supaClient
+      .from('subscriptions')
+      .select('user_id, plan, status, billing_period, current_period_end')
+      .eq('user_id', supaSession.user.id)
+      .maybeSingle();
+    if (subRow) supaSubscription = subRow;
+  } catch (e) {
+    // Old Supabase (pre-2026-04-26-admin-extensions migration) won't
+    // have the subscriptions table yet. Don't bork the login.
+    supaSubscription = null;
+  }
   await cloudLoad();
   renderAccountPanel();
   renderAdminVisibility();
@@ -16785,11 +17151,22 @@ function renderAccountPanel() {
   const adminBadge = isAdminUser()
     ? `<span style="display:inline-block; background: var(--royal); color:#fff; padding:2px 8px; border-radius:999px; font-size:11px; letter-spacing:1px; margin-left:8px;">ADMIN</span>`
     : '';
+  // Plan badge: shown next to email so user always knows their tier.
+  const plan = getMyPlan();
+  const period = getMyBillingPeriod();
+  const planBadge = plan === 'pro'
+    ? `<span class="plan-pill plan-pro">⭐ Pro${period === 'yearly' ? ' · €19.99/yr' : period === 'monthly' ? ' · €3/mo' : ''}</span>`
+    : `<span class="plan-pill plan-free">Free</span>`;
+  const upgradeBtn = plan === 'free'
+    ? `<button class="btn btn-primary btn-sm" onclick="openPricingModal('account')">⭐ ${t('pricing_upgrade_btn')}</button>`
+    : '';
   panel.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:10px;">
-      <div><strong>${escapeHtml(t('signed_in_as'))}:</strong> ${escapeHtml(email)} ${adminBadge}</div>
+      <div><strong>${escapeHtml(t('signed_in_as'))}:</strong> ${escapeHtml(email)} ${adminBadge} ${planBadge}</div>
       <div style="font-size: 13px; color: ${statusColor};">${escapeHtml(statusTxt)}</div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        ${upgradeBtn}
+        <button class="btn btn-ghost btn-sm" onclick="openPricingModal('account')">📋 ${t('pricing_view_plans')}</button>
         <button class="btn btn-ghost btn-sm" onclick="signOutAccount()">${t('sign_out')}</button>
         <button class="btn btn-danger btn-sm" onclick="openDeleteAccountModal()">${t('delete_account_btn')}</button>
       </div>
