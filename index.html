@@ -2441,6 +2441,41 @@
     margin-top: 4px;
   }
 
+  /* BUG-05/06 fix — heroes view header row.
+     The old layout stacked title / ornament / recruit-CTA vertically,
+     which made the empty section read as broken slot placeholders.
+     The new row keeps everything inline; the count pill makes the
+     "you have N heroes" state legible at a glance. */
+  .heroes-section-head { padding: 12px 16px 10px; }
+  .heroes-head-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .heroes-head-row h2 { margin: 0; flex-shrink: 0; }
+  .heroes-count-pill {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.6px;
+    color: var(--gold-bright);
+    padding: 4px 10px;
+    border: 1px solid rgba(244,211,94,0.45);
+    border-radius: 999px;
+    background: rgba(0,0,0,0.18);
+  }
+  .heroes-count-pill:empty { display: none; }
+  .heroes-head-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  @media (max-width: 480px) {
+    .heroes-head-actions { margin-left: 0; }
+  }
+
   .ornament {
     text-align: center;
     color: var(--gold);
@@ -2690,7 +2725,29 @@
     letter-spacing: 0.5px;
   }
 
-  .avatar { overflow: hidden; }
+  .avatar { overflow: visible; position: relative; }
+  /* BUG-07 fix — surface the user's avatar-emoji pick somewhere on the
+     hero card. The full character art is procedural (renderCharacterSVG)
+     and ignores the picker, but kids who deliberately picked 🐲 / 🦊 /
+     etc. still want to see their choice. Tiny corner badge keeps the
+     procedural art dominant while honouring the pick. */
+  .kid-avatar-badge {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--parchment);
+    border: 2px solid var(--gold-dark);
+    border-radius: 50%;
+    font-size: 14px;
+    line-height: 1;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    pointer-events: none;
+  }
+  /* avatar-svg-box variant has overflow: hidden — re-enable visible
+     for the same .avatar container in case it's used elsewhere. */
+  .avatar.avatar-svg-box { overflow: visible; }
   .avatar img {
     width: 100%; height: 100%;
     object-fit: cover; border-radius: 50%;
@@ -3797,17 +3854,26 @@
 </div>
 
 <main>
-  <!-- HEROES VIEW -->
+  <!-- HEROES VIEW
+       Header reworked Apr-2026 (BUG-05/06): the standalone "❦ ❦ ❦"
+       ornament was being read as 3 broken slot placeholders, and the
+       recruit CTA sat *above* the populated grid which made the whole
+       block look like an empty-state shell. Now the title + count +
+       recruit CTAs all live on a single header row, and the grid sits
+       directly below — the layout reads as "you have X heroes, here
+       they are, and here's how to add another". -->
   <div class="view active" id="view-kids">
-    <div class="section">
-      <h2 data-i18n="fellowship">🛡 The Fellowship</h2>
-      <div class="ornament">❦ ❦ ❦</div>
-      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="openAddKidModal()" data-i18n="recruit_hero">⚔ Recruit New Hero</button>
-        <button class="btn-recruit-legendary" id="recruitLegendaryBtn" onclick="openAddKidModal(true)" style="display:none;">
-          ⭐ <span data-i18n="recruit_legendary_btn">Recruit Legendary Hero</span>
-        </button>
-        <span class="legendary-slot-pill" id="legendarySlotPill" style="display:none;"></span>
+    <div class="section heroes-section-head">
+      <div class="heroes-head-row">
+        <h2 data-i18n="fellowship">🛡 The Fellowship</h2>
+        <span class="heroes-count-pill" id="heroesCountPill" aria-live="polite"></span>
+        <div class="heroes-head-actions">
+          <button class="btn btn-primary btn-sm" onclick="openAddKidModal()" data-i18n="recruit_hero">⚔ Recruit New Hero</button>
+          <button class="btn-recruit-legendary" id="recruitLegendaryBtn" onclick="openAddKidModal(true)" style="display:none;">
+            ⭐ <span data-i18n="recruit_legendary_btn">Recruit Legendary Hero</span>
+          </button>
+          <span class="legendary-slot-pill" id="legendarySlotPill" style="display:none;"></span>
+        </div>
       </div>
     </div>
     <div class="kids-grid" id="kidsGrid"></div>
@@ -4682,6 +4748,7 @@ const TRANSLATIONS = {
     legendary_card_bond: 'Adventures together: {n}',
     legendary_companion_row: 'Legendary Companion',
     legendary_recruited_at: 'Recruited',
+    name_taken_error: 'A hero with this name is already in your family. Pick a unique one.',
     legendary_companion_desc: 'A mentor walks beside the kids. Optional — adventures play the same without one.',
     legendary_undeletable: 'Legendary heroes cannot be removed',
     legendary_cap_reached: 'Legendary roster is full',
@@ -5160,6 +5227,7 @@ const TRANSLATIONS = {
     legendary_card_bond: 'Gemeinsame Abenteuer: {n}',
     legendary_companion_row: 'Legendärer Begleiter',
     legendary_recruited_at: 'Angeworben',
+    name_taken_error: 'Ein Held mit diesem Namen ist schon in deiner Familie. Wähle einen anderen.',
     legendary_companion_desc: 'Ein Mentor schreitet neben den Kindern. Optional — Abenteuer laufen auch ohne genauso.',
     legendary_undeletable: 'Legendäre Helden können nicht entfernt werden',
     legendary_cap_reached: 'Die legendäre Truppe ist voll',
@@ -5836,11 +5904,11 @@ function renderParentDashboard() {
     const quests = weekTx.filter(t => t.type === 'earn' && t.activityId).length;
     const adventures = weekTx.filter(t => t.type === 'earn' && t.note && (t.note.includes('🏆') || t.note.includes('🎁'))).length;
     if (weekTx.length === 0) {
-      return `<div class="parent-kid-card"><h4>${k.avatar} ${escapeHtml(k.name)}</h4><div style="color: #4a5a6a; font-style: italic;">${t('no_activity_week')}</div></div>`;
+      return `<div class="parent-kid-card"><h4>${kidEmoji(k)} ${escapeHtml(k.name)}</h4><div style="color: #4a5a6a; font-style: italic;">${t('no_activity_week')}</div></div>`;
     }
     return `
       <div class="parent-kid-card">
-        <h4>${k.avatar} ${escapeHtml(k.name)} <span style="font-weight:400; font-size:13px; color:#4a5a6a;">· ${fmt(k.balance)}</span></h4>
+        <h4>${kidEmoji(k)} ${escapeHtml(k.name)} <span style="font-weight:400; font-size:13px; color:#4a5a6a;">· ${fmt(k.balance)}</span></h4>
         <div class="parent-metrics">
           <div class="parent-metric"><div class="parent-metric-label">🟢 ${t('earned_week')}</div><div class="parent-metric-value">${fmt(earned)}</div></div>
           <div class="parent-metric"><div class="parent-metric-label">🔴 ${t('spent_week')}</div><div class="parent-metric-value">${fmt(spent)}</div></div>
@@ -5856,7 +5924,7 @@ function renderParentDashboard() {
   // Leaderboard
   const leaderboard = renderActivityLeaderboard();
   // Quick actions
-  const kidOpts = state.kids.map(k => `<option value="${k.id}">${k.avatar} ${escapeHtml(k.name)}</option>`).join('');
+  const kidOpts = state.kids.map(k => `<option value="${k.id}">${kidEmoji(k)} ${escapeHtml(k.name)}</option>`).join('');
 
   // Family streak heatmap — last 60 local-days, active vs shielded vs missed.
   const streakHeatmap = renderFamilyStreakHeatmap();
@@ -7292,6 +7360,20 @@ function toast(msg, type = '') {
 }
 
 function kidById(kid) { return state.kids.find(k => k.id === kid); }
+
+// BUG-07 fix — single source of truth for "compact icon" of a hero.
+// Reads kid.avatar if set (the user's emoji-picker pick from the
+// recruit modal), falls back to the class icon, then to a generic
+// hero glyph. Used by dropdowns, parent dashboard, withdraw/donate
+// modal headers — anywhere we want a one-character hero badge.
+// Hero CARDS still use renderCharacterSVG for the full procedural
+// portrait; the emoji is rendered as a small corner badge on top.
+function kidEmoji(k) {
+  if (!k) return '🦸';
+  if (k.avatar) return k.avatar;
+  const cls = (typeof CLASSES !== 'undefined') ? CLASSES.find(c => c.id === k.class) : null;
+  return (cls && cls.icon) || '🦸';
+}
 // Effective DC for a scene option, applying the Council's difficulty choice.
 // Sprout softens challenges by 2, Squire is raw, Knight adds +1.
 function dcFor(rawDc) {
@@ -7468,6 +7550,17 @@ function openAddKidModal(isLegendary) {
   openModal('addKidModal');
 }
 
+// BUG-08 fix — case-insensitive full-name dedupe across the family
+// roster. Two heroes named "Carlo der Weisse" / "Gabi der Weisse"
+// were possible because the validator only checked username, not
+// display name. Recruit + rename flows both call this.
+function nameTaken(displayName, excludeId) {
+  const n = String(displayName || '').trim().toLowerCase();
+  if (!n) return false;
+  return state.kids.some(k =>
+    k.id !== excludeId && (k.name || '').trim().toLowerCase() === n);
+}
+
 function usernameTaken(uname, excludeId) {
   const u = uname.toLowerCase();
   return state.kids.some(k => k.id !== excludeId && (k.userName || '').toLowerCase() === u);
@@ -7512,6 +7605,8 @@ function addKid() {
   if (!userName) { toast('A unique username is required!', 'error'); return; }
   if (!/^[a-zA-Z0-9_]{2,20}$/.test(userName)) { toast('Username: 2–20 letters, numbers, or underscores', 'error'); return; }
   if (usernameTaken(userName)) { toast('That username is already claimed', 'error'); return; }
+  // BUG-08: also reject duplicate display names (case-insensitive).
+  if (nameTaken(name)) { toast(t('name_taken_error'), 'error'); return; }
   if (start < 0) { toast('Starting gold cannot be negative', 'error'); return; }
   // Legendary recruit: consume one of the awarded slots and stamp the hero
   // with a +1 bonus across all base stats. We re-validate the slot count
@@ -7616,8 +7711,35 @@ function confirmDeleteHero() {
 }
 function cancelDeleteHero() { pendingDeleteKidId = null; closeModal('deleteHeroModal'); }
 
+// Update the header count pill on every renderKids run. Reads
+// heroes vs. legendary mentors separately so parents see the split
+// without doing arithmetic. CSS hides the pill via :empty when no
+// heroes are recruited yet (the empty-state castle is already loud
+// enough on its own).
+function updateHeroesCountPill() {
+  const el = document.getElementById('heroesCountPill');
+  if (!el) return;
+  const kids = (state.kids || []).filter(k => !isLegendaryHero(k));
+  const legendary = (state.kids || []).filter(isLegendaryHero);
+  if (kids.length === 0 && legendary.length === 0) { el.textContent = ''; return; }
+  const lang = (state.settings && state.settings.lang) || 'en';
+  const heroWord = kids.length === 1
+    ? (lang === 'de' ? 'Held' : 'hero')
+    : (lang === 'de' ? 'Helden' : 'heroes');
+  const legWord = legendary.length === 1
+    ? (lang === 'de' ? 'Legende' : 'legend')
+    : (lang === 'de' ? 'Legenden' : 'legends');
+  let txt = `${kids.length} ${heroWord}`;
+  if (legendary.length > 0) txt += ` · ${legendary.length} ${legWord}`;
+  el.textContent = txt;
+}
+
 function renderKids() {
   const grid = document.getElementById('kidsGrid');
+  // BUG-05/06 fix: keep the header count pill in sync with the roster
+  // every render so the user always sees "5 Helden · 2 Legenden" or
+  // similar. Hidden via :empty CSS rule when there are zero heroes.
+  updateHeroesCountPill();
   if (state.kids.length === 0) {
     grid.innerHTML = '<div class="empty"><div class="empty-icon">🏰</div><div>No heroes walk these halls yet.<br/>Click <strong>Recruit New Hero</strong> to begin thy tale!</div></div>';
     return;
@@ -7686,7 +7808,7 @@ function renderKids() {
     <div class="kid-card" data-kid="${k.id}">
       <div class="kid-head">
         <div class="kid-head-click" onclick="openHeroSheet('${k.id}')" title="View character sheet">
-          <div class="avatar">${avatarInner}</div>
+          <div class="avatar">${avatarInner}<span class="kid-avatar-badge" aria-hidden="true">${kidEmoji(k)}</span></div>
           <div style="flex:1; min-width:0;">
             <h3 class="kid-name">${escapeHtml(k.name)} <span class="level-badge">Lv ${heroLevel(k)}</span> ${k.legendary ? `<span class="legendary-badge" title="${escapeHtml(t('legendary_badge_label'))}">⭐ ${t('legendary_badge_label')}</span>` : ''} ${streakHtml}</h3>
             ${(!hasPinSet() || pinVerified) ? `<div class="kid-user">@${escapeHtml(k.userName || 'hero')}</div>` : ''}
@@ -9087,7 +9209,7 @@ function checkAchievements(k, _ev) {
 function openPayout(kidId) {
   const k = kidById(kidId);
   payoutKidId = kidId;
-  document.getElementById('payoutKidInfo').textContent = `${k.avatar} ${k.name} — vault: ${fmt(k.balance)}`;
+  document.getElementById('payoutKidInfo').textContent = `${kidEmoji(k)} ${k.name} — vault: ${fmt(k.balance)}`;
   document.getElementById('payoutAmount').value = '';
   document.getElementById('payoutNote').value = '';
   openModal('payoutModal');
@@ -9113,7 +9235,7 @@ function confirmPayout() {
 function openDonate(kidId) {
   const k = kidById(kidId);
   donateKidId = kidId;
-  document.getElementById('donateKidInfo').textContent = `${k.avatar} ${k.name} — vault: ${fmt(k.balance)}`;
+  document.getElementById('donateKidInfo').textContent = `${kidEmoji(k)} ${k.name} — vault: ${fmt(k.balance)}`;
   document.getElementById('donateAmount').value = '';
   document.getElementById('donateTo').value = '';
   openModal('donateModal');
@@ -9309,7 +9431,7 @@ function renderHistoryFilter() {
   const sel = document.getElementById('historyFilter');
   const current = sel.value;
   sel.innerHTML = `<option value="all">${escapeHtml(t('all_heroes'))}</option>` +
-    state.kids.map(k => `<option value="${k.id}">${k.avatar} ${escapeHtml(k.name)}</option>`).join('');
+    state.kids.map(k => `<option value="${k.id}">${kidEmoji(k)} ${escapeHtml(k.name)}</option>`).join('');
   sel.value = current;
 }
 
@@ -9479,7 +9601,7 @@ function renderHistory() {
   list.innerHTML = txs.map(tx => {
     const k = kidById(tx.kidId);
     const typeEmoji = { earn: '⚔', payout: '💰', donate: '❤', interest: '🏦' }[tx.type] || '•';
-    const kName = k ? `${k.avatar} ${escapeHtml(k.name)}` : `(${t('banished')})`;
+    const kName = k ? `${kidEmoji(k)} ${escapeHtml(k.name)}` : `(${t('banished')})`;
     const noteText = renderChronicleNote(tx);
     return `
       <div class="history-item">
@@ -9933,6 +10055,8 @@ function confirmRenameHero() {
   if (!newUserName) { toast('A unique username is required!', 'error'); return; }
   if (!/^[a-zA-Z0-9_]{2,20}$/.test(newUserName)) { toast('Username: 2–20 letters, numbers, or underscores', 'error'); return; }
   if (usernameTaken(newUserName, k.id)) { toast('That username is already claimed', 'error'); return; }
+  // BUG-08: full-name dedupe also applies on rename (excluding self).
+  if (nameTaken(newName, k.id)) { toast(t('name_taken_error'), 'error'); return; }
   k.name = newName;
   k.userName = newUserName;
   save();
