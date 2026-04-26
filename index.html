@@ -3364,12 +3364,17 @@
   .avatar-svg-box {
     border: 2px solid var(--gold-dark);
     border-radius: 4px;
-    background: linear-gradient(180deg, rgba(62,40,23,0.4), rgba(20,8,4,0.5));
+    /* Lighter parchment-tinted backdrop so the procedural characters
+       (which use class palette tones close to the page's dark bg)
+       actually contrast against the box. The earlier dark gradient
+       made small avatars in the party bar nearly indistinguishable
+       from the page background. */
+    background: linear-gradient(180deg, #f0dcb0 0%, #d9c089 100%);
     overflow: hidden; flex-shrink: 0;
   }
   .avatar-svg-box .char-svg { width: 100%; height: 100%; display: block; }
-  .adventure-hero-card .avatar-svg-box { width: 54px; height: 54px; border-color: var(--parchment-darker); background: rgba(62,40,23,0.08); }
-  .adventure-hero-card.selected .avatar-svg-box { border-color: var(--gold-dark); background: rgba(244,211,94,0.15); }
+  .adventure-hero-card .avatar-svg-box { width: 54px; height: 54px; border-color: var(--parchment-darker); background: linear-gradient(180deg, #f0dcb0 0%, #d9c089 100%); }
+  .adventure-hero-card.selected .avatar-svg-box { border-color: var(--gold-dark); background: linear-gradient(180deg, #fff5c4 0%, #f4d35e 100%); }
   .party-avatar-svg { width: 52px; height: 52px; }
   .adv-hero-choice .avatar-svg-box { width: 44px; height: 44px; }
   .dice-hero-portrait {
@@ -6925,8 +6930,18 @@ function renderSceneIllustration(adv, sceneIdx) {
                preserveAspectRatio="xMidYMid slice"
                clip-path="url(#${clipId})"/>`
       : `<g clip-path="url(#${clipId})">
-           <rect x="2" y="2" width="76" height="76" fill="rgba(244,211,94,0.08)"/>
-           ${renderCharacterSVG(h, true, { x: 2, y: -8, size: 80 })}
+           <!-- Inner background tinted brighter so the procedural
+                character + hat read against the dark scene backdrop.
+                Was rgba(244,211,94,0.08) — almost invisible against
+                the dusk gradient. Now a parchment-tinted disc that
+                gives the figure a stage to stand on. -->
+           <rect x="2" y="2" width="76" height="76" fill="#e9d3a2"/>
+           <!-- Pos shifted from y=-8 to y=2 so the figure stays
+                centered in the new viewBox (which already starts at
+                y=0 to include the hat — the upward shift was a hack
+                to compensate for the old viewBox cutting off the
+                hat). -->
+           ${renderCharacterSVG(h, true, { x: 2, y: 2, size: 76 })}
          </g>`;
     return `
       <g transform="translate(${x}, ${y})">
@@ -6977,9 +6992,14 @@ function renderCharacterSVG(kid, compact, pos) {
   const arm = getEquippedItem(kid, 'armor');
   const acc = getEquippedItem(kid, 'accessory');
 
-  // Compact mode zooms into the upper third (used in tight spots like the
-  // hero card avatar circle); full mode shows the whole figure.
-  const viewBox = compact ? '24 12 80 80' : '0 0 128 128';
+  // Compact mode shows head + hat + upper body in a square frame.
+  // Earlier viewBox was '24 12 80 80' which started below the hat —
+  // halos and witch hats were getting clipped above the avatar circle
+  // in scene illustrations and on the small party-bar tiles. Lifted
+  // the top edge to y=0 so the hat is fully inside the box; the
+  // viewport still reads as a head-and-shoulders portrait, just no
+  // longer cropped above the eyebrows.
+  const viewBox = compact ? '24 0 80 80' : '0 0 128 128';
   const posAttr = pos ? ` x="${pos.x}" y="${pos.y}" width="${pos.size}" height="${pos.size}"` : '';
 
   // Per-instance gradient suffix — sanitised so it's a valid SVG id.
