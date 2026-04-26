@@ -2454,6 +2454,43 @@
     margin-top: 4px;
   }
 
+  /* === Session-expired banner (Apr 2026) — top of <main> when local
+     data exists but supaSession === null, so the user always sees their
+     auth state instead of being misled by cached heroes. */
+  .session-expired-banner {
+    background: linear-gradient(180deg, #5a3a18, #432d12);
+    border: 1px solid var(--gold-dark);
+    border-bottom: 3px solid var(--gold-bright);
+    color: var(--parchment);
+    padding: 10px 14px;
+    margin: 0 0 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    animation: sessionExpiredSlide 0.3s ease;
+  }
+  @keyframes sessionExpiredSlide {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .session-expired-inner {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .session-expired-icon {
+    font-size: 22px; color: var(--gold-bright);
+    filter: drop-shadow(0 0 4px rgba(244,211,94,0.4));
+  }
+  .session-expired-text { flex: 1; min-width: 200px; }
+  .session-expired-text strong {
+    font-family: 'Cinzel', serif;
+    font-size: 14px; color: var(--gold-bright);
+    letter-spacing: 0.5px;
+  }
+  .session-expired-sub {
+    font-size: 12px; color: var(--parchment); opacity: 0.85;
+    margin-top: 2px;
+  }
+  .session-expired-actions { display: flex; gap: 6px; align-items: center; }
+
   /* === Admin Dashboard (Apr 2026) — only visible to is_admin users.
      Tabbed view with stat cards, sortable family table, login activity
      bars, engagement metrics. Styled to match the parchment theme. */
@@ -5203,6 +5240,10 @@ const TRANSLATIONS = {
     admin_col_last_active: 'Last active',
     admin_col_signup: 'Signed up',
     admin_sql_hint: 'If you see "function … does not exist": run the supabase-migration-2026-04-26-admin-dashboard.sql in your Supabase SQL editor.',
+    session_expired_title: 'Your session has expired',
+    session_expired_desc: 'You were signed in as {email}, but the session is no longer valid. Your data is safe locally — sign in again to keep syncing to the cloud.',
+    session_expired_signin: '👤 Sign in again',
+    session_expired_dismiss: 'Dismiss · keep working offline',
     sign_out_confirm: 'Sign out? Your data stays safe in the cloud.',
     invalid_email: 'Please enter a valid email.',
     mem_pairs_label: 'Pairs found',
@@ -5760,6 +5801,10 @@ const TRANSLATIONS = {
     admin_col_last_active: 'Letzte Aktivität',
     admin_col_signup: 'Registriert',
     admin_sql_hint: 'Falls du „function … does not exist" siehst: führe supabase-migration-2026-04-26-admin-dashboard.sql im Supabase-SQL-Editor aus.',
+    session_expired_title: 'Deine Sitzung ist abgelaufen',
+    session_expired_desc: 'Du warst angemeldet als {email}, aber die Sitzung ist nicht mehr gültig. Deine Daten sind lokal sicher — melde dich neu an, um wieder mit der Cloud zu synchronisieren.',
+    session_expired_signin: '👤 Erneut anmelden',
+    session_expired_dismiss: 'Schließen · offline weiterarbeiten',
     sign_out_confirm: 'Abmelden? Deine Daten bleiben in der Cloud.',
     invalid_email: 'Bitte eine gültige E-Mail eingeben.',
     mem_pairs_label: 'Paare gefunden',
@@ -16157,7 +16202,20 @@ async function applySession(session) {
     renderAccountPanel();
     renderAdminVisibility();
     applyLandingVisibility();
+    renderSessionExpiredBanner();
     return;
+  }
+  // Track that this user was signed in. If their JWT later expires (default
+  // 1h, refresh token ~30d) and the auto-refresh fails, on boot we see this
+  // marker + no session → render the "session expired, sign in again"
+  // banner so the user isn't confused by seeing their cached heroes
+  // without an auth indicator.
+  if (state && state.settings) {
+    const email = (session.user && session.user.email) || '';
+    if (email && state.settings.cloudLinkedEmail !== email) {
+      state.settings.cloudLinkedEmail = email;
+      try { save(); } catch (e) {}
+    }
   }
   // Load (or create) the profile row to read is_admin, then pull cloud state.
   await loadOrCreateProfile();
@@ -16165,7 +16223,62 @@ async function applySession(session) {
   renderAccountPanel();
   renderAdminVisibility();
   applyLandingVisibility();
+  renderSessionExpiredBanner();
 }
+
+// =============================================================
+// Session-expired banner — shows at the top of the kids view when
+// localStorage knows the user WAS signed in (state.settings.cloudLinkedEmail)
+// but the current Supabase session is gone (refresh-token expired,
+// localStorage cleared partially, or auto-refresh failed silently).
+//
+// Without this banner the app shows the cached heroes from localStorage
+// even though the user is logged out — confusing, since they assume they
+// are still logged in. The banner makes the auth state unambiguous and
+// gives a single-click recovery path.
+// =============================================================
+function renderSessionExpiredBanner() {
+  let banner = document.getElementById('sessionExpiredBanner');
+  const linkedEmail = state && state.settings && state.settings.cloudLinkedEmail;
+  const showBanner = !!(supaConfigured() && linkedEmail && !supaSession);
+  if (!showBanner) {
+    if (banner) banner.remove();
+    return;
+  }
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'sessionExpiredBanner';
+    banner.className = 'session-expired-banner';
+    // Insert at the very top of <main>, above all views.
+    const main = document.querySelector('main');
+    if (main) main.insertBefore(banner, main.firstChild);
+  }
+  banner.innerHTML = `
+    <div class="session-expired-inner">
+      <div class="session-expired-icon">⚠</div>
+      <div class="session-expired-text">
+        <strong>${escapeHtml(t('session_expired_title'))}</strong>
+        <div class="session-expired-sub">${escapeHtml(t('session_expired_desc').replace('{email}', linkedEmail))}</div>
+      </div>
+      <div class="session-expired-actions">
+        <button class="btn btn-primary btn-sm" onclick="openSignInModal()">${escapeHtml(t('session_expired_signin'))}</button>
+        <button class="btn btn-ghost btn-sm" onclick="dismissSessionExpiredBanner()" title="${escapeHtml(t('session_expired_dismiss'))}">×</button>
+      </div>
+    </div>`;
+}
+function dismissSessionExpiredBanner() {
+  const b = document.getElementById('sessionExpiredBanner');
+  if (b) b.remove();
+  // Clear the marker so we don't re-show on the next render. The user
+  // explicitly chose "I'm fine working offline." If they sign in later,
+  // applySession() re-sets cloudLinkedEmail.
+  if (state && state.settings) {
+    state.settings.cloudLinkedEmail = null;
+    try { save(); } catch (e) {}
+  }
+}
+window.dismissSessionExpiredBanner = dismissSessionExpiredBanner;
+window.renderSessionExpiredBanner = renderSessionExpiredBanner;
 
 function updateAccountBtnLabel() {
   const btn = document.getElementById('accountBtn');
@@ -16959,6 +17072,10 @@ grantWeeklyFreezeIfDue();
 applyFreezeIfNeeded();
 applyLandingVisibility();  // decide before other renders which shell is visible
 updateI18n();
+// Render the session-expired banner immediately on boot so a user with
+// stale localStorage but no session sees their auth state without
+// having to wait for initSupabase() to complete.
+try { renderSessionExpiredBanner(); } catch (e) {}
 // Show any pending reward that survived a previous session, after the
 // landing/intro UI has settled.
 setTimeout(() => { try { updateFamilyStreakBadge(); updateLegendaryRecruitButton(); maybeShowNextReward(); } catch (e) {} }, 1500);
