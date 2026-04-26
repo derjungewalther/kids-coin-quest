@@ -95,7 +95,14 @@ create policy "subscriptions_admin_write_all" on public.subscriptions
 -- Update admin_families_detail to include archived_at + plan info.
 -- The column list grows; old clients reading by index would break, but
 -- the dashboard reads by name so it's safe.
+--
+-- DROP first because Postgres rejects `create or replace function`
+-- when the OUT-parameter signature changes (error 42P13: "cannot
+-- change return type of existing function"). The previous migration
+-- created this function with 13 return columns; we're extending to 17.
 -- =============================================================
+drop function if exists public.admin_families_detail();
+
 create or replace function public.admin_families_detail()
 returns table(
   family_id        uuid,

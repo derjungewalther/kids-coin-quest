@@ -106,6 +106,7 @@ update public.profiles set is_admin = true where email = 'foo@bar.com';
 ## Common gotchas
 
 - **`column reference "X" is ambiguous`** in plpgsql functions with `returns table(... X ...)`: add `#variable_conflict use_column` directive at top of function body. The OUT parameter shadows column refs by default.
+- **`42P13: cannot change return type of existing function`**: when extending a `returns table(...)` signature (adding/changing OUT params), `create or replace` is rejected. Always prepend `drop function if exists public.<name>(<arg-types>);` before the create. Idempotent migrations need explicit DROP for any function whose signature might evolve.
 - **Top-level `const X = ...` not visible to `page.evaluate(() => window.X)`**: top-level `const` is lexical-only, not on window. Use `var X` or add `window.X = X` after declaration.
 - **jsDelivr edge cache** holds raw GitHub files ~7 days. **Never** put manifest-style files (lookup tables that must be in sync with the deploy) on jsDelivr. Same-origin only.
 - **iOS/Chrome-mobile autoplay block:** `audio.play()` rejects without prior user gesture. The `narratorUnlocked` flag in `bindNarratorUnlock()` handles this with a silent base64 mp3 primed on first tap.
