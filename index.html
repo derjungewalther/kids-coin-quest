@@ -2454,6 +2454,166 @@
     margin-top: 4px;
   }
 
+  /* === Admin Dashboard (Apr 2026) — only visible to is_admin users.
+     Tabbed view with stat cards, sortable family table, login activity
+     bars, engagement metrics. Styled to match the parchment theme. */
+  .admin-tabs {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    border-bottom: 1px solid var(--wood-dark);
+    margin: 14px 0 16px;
+  }
+  .admin-tab {
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: none;
+    color: var(--ink-muted);
+    padding: 8px 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.15s;
+  }
+  .admin-tab:hover { color: var(--gold-bright); background: rgba(244,211,94,0.06); }
+  .admin-tab.active {
+    color: var(--gold-bright);
+    background: rgba(62,40,23,0.16);
+    border-color: var(--wood-dark);
+    border-bottom: 1px solid rgba(62,40,23,0.16);
+    margin-bottom: -1px;
+  }
+  .admin-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .admin-stat {
+    background: rgba(62,40,23,0.10);
+    border: 1px solid var(--parchment-darker);
+    border-radius: 4px;
+    padding: 12px 14px;
+  }
+  .admin-stat-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+  .admin-stat-value {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--gold-dark);
+    margin-top: 4px;
+  }
+  .admin-stat-sub { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .admin-table th {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 2px solid var(--wood-dark);
+    font-family: 'Cinzel', serif;
+    color: var(--gold-dark);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 11px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .admin-table th:hover { color: var(--gold-bright); }
+  .admin-table th[data-sort-active]::after { content: attr(data-sort-dir); margin-left: 4px; opacity: 0.6; }
+  .admin-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--parchment-darker);
+  }
+  .admin-table tr:hover td { background: rgba(244,211,94,0.05); }
+  .admin-search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    border: 1px solid var(--wood-dark);
+    background: var(--parchment);
+    color: var(--ink);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+  .admin-bar-row {
+    display: grid;
+    grid-template-columns: 90px 1fr 50px;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 12px;
+    color: var(--ink);
+  }
+  .admin-bar-track {
+    background: rgba(62,40,23,0.10);
+    border-radius: 3px;
+    height: 14px;
+    overflow: hidden;
+    position: relative;
+  }
+  .admin-bar-fill {
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold-bright));
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+  .admin-bar-count { text-align: right; font-family: 'IBM Plex Mono', monospace; color: var(--ink-muted); }
+  .admin-rank-list { margin: 0; padding: 0; list-style: none; }
+  .admin-rank-list li {
+    display: grid;
+    grid-template-columns: 28px 1fr 60px;
+    align-items: center;
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--parchment-darker);
+    font-size: 13px;
+  }
+  .admin-rank-list li:last-child { border-bottom: none; }
+  .admin-rank-num {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: var(--gold-dark);
+    font-weight: 700;
+  }
+  .admin-rank-count {
+    font-family: 'IBM Plex Mono', monospace;
+    text-align: right;
+    color: var(--ink-muted);
+  }
+  .admin-empty {
+    color: var(--ink-muted);
+    font-style: italic;
+    padding: 12px 0;
+  }
+  .admin-pill {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(244,211,94,0.15);
+    color: var(--gold-bright);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-left: 4px;
+  }
+  .admin-cell-email { font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+  .admin-cell-num   { font-family: 'IBM Plex Mono', monospace; text-align: right; }
+  @media (max-width: 600px) {
+    .admin-table th, .admin-table td { padding: 6px 4px; font-size: 11px; }
+    .admin-cell-email { font-size: 10px; word-break: break-all; }
+  }
+
   /* BUG-05/06 fix — heroes view header row.
      The old layout stacked title / ornament / recruit-CTA vertically,
      which made the empty section read as broken slot placeholders.
@@ -4195,11 +4355,18 @@
     </div>
     <div class="section" id="adminSection" style="display:none;">
       <h2>🛡 <span data-i18n="admin_title">Global Admin</span></h2>
-      <p style="color: var(--ink-muted); font-style: italic;" data-i18n="admin_desc">Read-only view of every family using this app.</p>
-      <div style="margin: 10px 0;">
-        <button class="btn btn-ghost btn-sm" onclick="supaInvalidate('admin-all-families'); supaInvalidate('admin-all-profiles'); loadAdminList()" data-i18n="admin_refresh">↻ Refresh</button>
+      <p style="color: var(--ink-muted); font-style: italic;" data-i18n="admin_desc">Read-only view across every family using this app.</p>
+      <div style="display:flex; gap:8px; flex-wrap: wrap; margin: 10px 0;">
+        <button class="btn btn-ghost btn-sm" onclick="refreshAdminDashboard()" data-i18n="admin_refresh">↻ Refresh</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportAdminCsv()" data-i18n="admin_export_csv">📥 Export CSV</button>
       </div>
-      <div id="adminList"></div>
+      <div class="admin-tabs" role="tablist">
+        <button class="admin-tab active" data-admin-tab="overview"   onclick="switchAdminTab('overview')"   data-i18n="admin_tab_overview">📊 Overview</button>
+        <button class="admin-tab"        data-admin-tab="families"   onclick="switchAdminTab('families')"   data-i18n="admin_tab_families">👨‍👩‍👧 Families</button>
+        <button class="admin-tab"        data-admin-tab="logins"     onclick="switchAdminTab('logins')"     data-i18n="admin_tab_logins">🔑 Logins</button>
+        <button class="admin-tab"        data-admin-tab="engagement" onclick="switchAdminTab('engagement')" data-i18n="admin_tab_engagement">🎯 Engagement</button>
+      </div>
+      <div id="adminTabBody"><div style="color: var(--ink-muted); font-style: italic;">…</div></div>
     </div>
     <div class="section">
       <h2 data-i18n="pin_backup_title">🔒 Backup & PIN</h2>
@@ -4981,11 +5148,61 @@ const TRANSLATIONS = {
     cloud_never_synced: 'Not yet synced to cloud',
     account_title: 'Account',
     admin_title: 'Global Admin',
-    admin_desc: 'Read-only view of every family using this app.',
+    admin_desc: 'Read-only view across every family using this app.',
     admin_refresh: '↻ Refresh',
     admin_no_families: 'No families yet.',
     admin_heroes: 'heroes',
     admin_last_active: 'last active',
+    admin_loading: 'Loading dashboard…',
+    admin_no_data: 'No data yet.',
+    admin_no_streaks: 'No active streaks yet.',
+    admin_export_csv: '📥 Export CSV',
+    admin_tab_overview: '📊 Overview',
+    admin_tab_families: '👨‍👩‍👧 Families',
+    admin_tab_logins: '🔑 Logins',
+    admin_tab_engagement: '🎯 Engagement',
+    admin_h_customer_base: 'Customer Base',
+    admin_h_engagement: 'Engagement',
+    admin_h_economy: 'Economy',
+    admin_h_streak_dist: 'Streak Distribution',
+    admin_h_hero_dist: 'Heroes per Family',
+    admin_h_top_coins: 'Top 5 by Coins',
+    admin_h_top_streaks: 'Top 5 by Streak',
+    admin_stat_families: 'Families',
+    admin_stat_users: 'Users',
+    admin_stat_signups_7d: 'New Signups',
+    admin_stat_signups_30d: 'New Signups',
+    admin_stat_active_7d: 'Active 7d',
+    admin_stat_active_30d: 'Active 30d',
+    admin_stat_inactive: 'Inactive',
+    admin_stat_dau: 'Daily Active',
+    admin_stat_wau: 'Weekly Active',
+    admin_stat_mau: 'Monthly Active',
+    admin_stat_heroes: 'Heroes',
+    admin_stat_coins: 'Coins',
+    admin_stat_tx: 'Transactions',
+    admin_stat_total_logins_30d: 'Sign-ins',
+    admin_stat_avg_per_day: 'Avg / Day',
+    admin_stat_peak_day: 'Peak Day',
+    admin_avg_heroes_label: '∅ {n} per family',
+    admin_avg_coins_label: '∅ 🪙 {n} per family',
+    admin_inactive_sub: 'no activity 90+ days',
+    admin_last_7_days: 'last 7 days',
+    admin_last_30_days: 'last 30 days',
+    admin_generated_at: 'Snapshot taken',
+    admin_search_placeholder: 'Search by email, family name, or user id…',
+    admin_families_shown: 'shown',
+    admin_logins_per_day: 'Sign-ins per Day (last 30)',
+    admin_logins_caveat: 'Note: shows last sign-in per user only — Supabase free tier doesn\'t expose the full audit log. Good as an engagement pulse, not exact daily totals.',
+    admin_col_email: 'Email',
+    admin_col_heroes: 'Heroes',
+    admin_col_coins: 'Coins',
+    admin_col_tx: 'TX',
+    admin_col_streak: 'Streak',
+    admin_col_last_login: 'Last login',
+    admin_col_last_active: 'Last active',
+    admin_col_signup: 'Signed up',
+    admin_sql_hint: 'If you see "function … does not exist": run the supabase-migration-2026-04-26-admin-dashboard.sql in your Supabase SQL editor.',
     sign_out_confirm: 'Sign out? Your data stays safe in the cloud.',
     invalid_email: 'Please enter a valid email.',
     mem_pairs_label: 'Pairs found',
@@ -5488,11 +5705,61 @@ const TRANSLATIONS = {
     cloud_never_synced: 'Noch nicht mit der Cloud synchronisiert',
     account_title: 'Konto',
     admin_title: 'Globaler Admin',
-    admin_desc: 'Schreibgeschützter Überblick über alle Familien.',
+    admin_desc: 'Schreibgeschützter Überblick über alle Familien dieser App.',
     admin_refresh: '↻ Aktualisieren',
     admin_no_families: 'Noch keine Familien.',
     admin_heroes: 'Helden',
     admin_last_active: 'zuletzt aktiv',
+    admin_loading: 'Dashboard wird geladen…',
+    admin_no_data: 'Noch keine Daten.',
+    admin_no_streaks: 'Keine aktiven Streaks.',
+    admin_export_csv: '📥 CSV exportieren',
+    admin_tab_overview: '📊 Übersicht',
+    admin_tab_families: '👨‍👩‍👧 Familien',
+    admin_tab_logins: '🔑 Logins',
+    admin_tab_engagement: '🎯 Engagement',
+    admin_h_customer_base: 'Kundenstamm',
+    admin_h_engagement: 'Engagement',
+    admin_h_economy: 'Wirtschaft',
+    admin_h_streak_dist: 'Streak-Verteilung',
+    admin_h_hero_dist: 'Helden pro Familie',
+    admin_h_top_coins: 'Top 5 nach Münzen',
+    admin_h_top_streaks: 'Top 5 nach Streak',
+    admin_stat_families: 'Familien',
+    admin_stat_users: 'Nutzer',
+    admin_stat_signups_7d: 'Neue Anmeldungen',
+    admin_stat_signups_30d: 'Neue Anmeldungen',
+    admin_stat_active_7d: 'Aktiv 7 T',
+    admin_stat_active_30d: 'Aktiv 30 T',
+    admin_stat_inactive: 'Inaktiv',
+    admin_stat_dau: 'Täglich aktiv',
+    admin_stat_wau: 'Wöchentlich aktiv',
+    admin_stat_mau: 'Monatlich aktiv',
+    admin_stat_heroes: 'Helden',
+    admin_stat_coins: 'Münzen',
+    admin_stat_tx: 'Transaktionen',
+    admin_stat_total_logins_30d: 'Anmeldungen',
+    admin_stat_avg_per_day: 'Ø pro Tag',
+    admin_stat_peak_day: 'Spitzentag',
+    admin_avg_heroes_label: '∅ {n} pro Familie',
+    admin_avg_coins_label: '∅ 🪙 {n} pro Familie',
+    admin_inactive_sub: 'keine Aktivität seit 90+ Tagen',
+    admin_last_7_days: 'letzte 7 Tage',
+    admin_last_30_days: 'letzte 30 Tage',
+    admin_generated_at: 'Stand',
+    admin_search_placeholder: 'Suche nach E-Mail, Familienname oder User-ID…',
+    admin_families_shown: 'angezeigt',
+    admin_logins_per_day: 'Anmeldungen pro Tag (letzte 30)',
+    admin_logins_caveat: 'Hinweis: zeigt nur den letzten Login pro Nutzer — Supabase-Free-Tier exportiert das vollständige Audit-Log nicht. Gut als Engagement-Puls, nicht als exakte Tageszahl.',
+    admin_col_email: 'E-Mail',
+    admin_col_heroes: 'Helden',
+    admin_col_coins: 'Münzen',
+    admin_col_tx: 'TX',
+    admin_col_streak: 'Streak',
+    admin_col_last_login: 'Letzter Login',
+    admin_col_last_active: 'Letzte Aktivität',
+    admin_col_signup: 'Registriert',
+    admin_sql_hint: 'Falls du „function … does not exist" siehst: führe supabase-migration-2026-04-26-admin-dashboard.sql im Supabase-SQL-Editor aus.',
     sign_out_confirm: 'Abmelden? Deine Daten bleiben in der Cloud.',
     invalid_email: 'Bitte eine gültige E-Mail eingeben.',
     mem_pairs_label: 'Paare gefunden',
@@ -16333,45 +16600,354 @@ function renderAdminVisibility() {
   const sec = document.getElementById('adminSection');
   if (!sec) return;
   sec.style.display = (supaSession && isAdminUser()) ? '' : 'none';
-  if (sec.style.display === '') loadAdminList();
+  if (sec.style.display === '') loadAdminDashboard();
 }
 
-async function loadAdminList() {
-  const box = document.getElementById('adminList');
-  if (!box || !supaClient || !isAdminUser()) return;
-  box.innerHTML = `<div style="color: var(--ink-muted); font-style: italic;">…</div>`;
-  // Admin RPCs check is_admin server-side and don't put any user UUID in
-  // the URL. Deduped so the global admin tab can refresh without firing
-  // four queries at the server (R2-P2-08 + R2-P2-09).
-  const [famR, profR] = await Promise.all([
-    supaDedupe('admin-all-families', () => supaClient.rpc('admin_list_all_families')),
-    supaDedupe('admin-all-profiles', () => supaClient.rpc('admin_list_all_profiles'))
-  ]);
-  if (famR.error) { box.innerHTML = `<div style="color:#ff8080;">${escapeHtml(famR.error.message)}</div>`; return; }
-  const profiles = {};
-  (profR.data || []).forEach(p => { profiles[p.user_id] = p; });
-  const rows = famR.data || [];
-  if (rows.length === 0) { box.innerHTML = `<div style="color: var(--ink-muted); font-style: italic;">${t('admin_no_families')}</div>`; return; }
-  box.innerHTML = rows.map(f => {
-    const p = profiles[f.owner_user_id] || {};
-    const heroCount = (f.state && Array.isArray(f.state.kids)) ? f.state.kids.length : 0;
-    const totalCoinNum = (f.state && Array.isArray(f.state.kids))
-      ? f.state.kids.reduce((s, k) => s + (Number(k.balance) || 0), 0)
-      : 0;
-    const totalCoin = fmtNumber(totalCoinNum);
-    const last = f.updated_at ? fmtDateTime(f.updated_at) : '—';
-    const adminMark = p.is_admin ? ' 🛡' : '';
-    return `
-      <div style="padding:10px 12px; border:1px solid var(--wood-dark); border-radius:6px; margin-bottom:8px; background: rgba(0,0,0,0.15);">
-        <div style="font-family:'MedievalSharp',cursive; color: var(--gold-bright); font-size:15px;">
-          ${escapeHtml(p.email || f.owner_user_id)}${adminMark}
-        </div>
-        <div style="font-size:12px; color: var(--ink-muted); margin-top:4px;">
-          ${heroCount} ${t('admin_heroes')} · 🪙 ${totalCoin} · ${t('admin_last_active')}: ${last}
-        </div>
-      </div>`;
-  }).join('');
+// =============================================================
+// Admin Dashboard (Apr 2026)
+// Replaces the old single-list `loadAdminList`. Shows aggregated KPIs,
+// a sortable+searchable family table, login activity bars, and
+// engagement metrics across all customer instances. Backed by three
+// new SQL RPCs (see supabase-migration-2026-04-26-admin-dashboard.sql).
+// All queries are admin-gated server-side; client also short-circuits
+// when isAdminUser() === false.
+// =============================================================
+const adminDashboard = {
+  tab: 'overview',
+  overview: null,        // jsonb stats blob
+  families: null,        // detailed family rows
+  loginActivity: null,   // per-day sign-in counts
+  search: '',
+  sort: { col: 'family_updated', dir: 'desc' }
+};
+
+function switchAdminTab(tab) {
+  adminDashboard.tab = tab;
+  document.querySelectorAll('.admin-tab').forEach(b =>
+    b.classList.toggle('active', b.dataset.adminTab === tab));
+  renderAdminTab();
 }
+window.switchAdminTab = switchAdminTab;
+
+async function loadAdminDashboard() {
+  const body = document.getElementById('adminTabBody');
+  if (!body || !supaClient || !isAdminUser()) return;
+  body.innerHTML = `<div class="admin-empty">${t('admin_loading')}</div>`;
+  try {
+    const [ovR, famR, loginR] = await Promise.all([
+      supaDedupe('admin-overview',     () => supaClient.rpc('admin_overview_stats')),
+      supaDedupe('admin-fam-detail',   () => supaClient.rpc('admin_families_detail')),
+      supaDedupe('admin-login-30d',    () => supaClient.rpc('admin_login_activity', { days: 30 }))
+    ]);
+    if (ovR.error)  throw ovR.error;
+    if (famR.error) throw famR.error;
+    adminDashboard.overview = ovR.data || {};
+    adminDashboard.families = famR.data || [];
+    adminDashboard.loginActivity = (loginR && loginR.data) || [];
+    renderAdminTab();
+  } catch (e) {
+    body.innerHTML = `<div style="color:#ff8080;">${escapeHtml(e.message || String(e))}<br>
+      <small>${t('admin_sql_hint')}</small></div>`;
+  }
+}
+window.loadAdminDashboard = loadAdminDashboard;
+
+function refreshAdminDashboard() {
+  ['admin-overview', 'admin-fam-detail', 'admin-login-30d',
+   'admin-all-families', 'admin-all-profiles'].forEach(supaInvalidate);
+  loadAdminDashboard();
+}
+window.refreshAdminDashboard = refreshAdminDashboard;
+
+function renderAdminTab() {
+  const body = document.getElementById('adminTabBody');
+  if (!body) return;
+  switch (adminDashboard.tab) {
+    case 'overview':   body.innerHTML = renderAdminOverview();   break;
+    case 'families':   body.innerHTML = renderAdminFamilies();   wireAdminFamilyHandlers(); break;
+    case 'logins':     body.innerHTML = renderAdminLogins();     break;
+    case 'engagement': body.innerHTML = renderAdminEngagement(); break;
+  }
+}
+
+function statCard(label, value, sub) {
+  return `<div class="admin-stat">
+    <div class="admin-stat-label">${escapeHtml(label)}</div>
+    <div class="admin-stat-value">${escapeHtml(String(value))}</div>
+    ${sub ? `<div class="admin-stat-sub">${escapeHtml(sub)}</div>` : ''}
+  </div>`;
+}
+
+function renderAdminOverview() {
+  const o = adminDashboard.overview || {};
+  if (!Object.keys(o).length) return `<div class="admin-empty">${t('admin_no_data')}</div>`;
+  const fmtCoin = (n) => fmtNumber(Math.round(Number(n) * 100) / 100);
+  const totalFam = Number(o.total_families || 0);
+  const pct = (n) => totalFam > 0 ? Math.round((Number(n) / totalFam) * 100) + '%' : '—';
+  return `
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 4px 0 6px;">${t('admin_h_customer_base')}</h3>
+    <div class="admin-stat-grid">
+      ${statCard(t('admin_stat_families'),   totalFam,                       '')}
+      ${statCard(t('admin_stat_users'),      o.total_users || 0,             o.admin_users ? (o.admin_users + ' admin') : '')}
+      ${statCard(t('admin_stat_signups_7d'), o.signups_7d || 0,              t('admin_last_7_days'))}
+      ${statCard(t('admin_stat_signups_30d'),o.signups_30d || 0,             t('admin_last_30_days'))}
+    </div>
+
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 14px 0 6px;">${t('admin_h_engagement')}</h3>
+    <div class="admin-stat-grid">
+      ${statCard(t('admin_stat_active_7d'),  o.families_active_7d || 0,      pct(o.families_active_7d))}
+      ${statCard(t('admin_stat_active_30d'), o.families_active_30d || 0,     pct(o.families_active_30d))}
+      ${statCard(t('admin_stat_inactive'),   o.inactive_90d || 0,            t('admin_inactive_sub'))}
+      ${statCard(t('admin_stat_dau'),        o.dau || 0,                     'DAU')}
+      ${statCard(t('admin_stat_wau'),        o.wau || 0,                     'WAU')}
+      ${statCard(t('admin_stat_mau'),        o.mau || 0,                     'MAU')}
+    </div>
+
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 14px 0 6px;">${t('admin_h_economy')}</h3>
+    <div class="admin-stat-grid">
+      ${statCard(t('admin_stat_heroes'),     o.total_heroes || 0,            t('admin_avg_heroes_label').replace('{n}', o.avg_heroes || 0))}
+      ${statCard(t('admin_stat_coins'),      '🪙 ' + fmtCoin(o.total_coins || 0), t('admin_avg_coins_label').replace('{n}', fmtCoin(o.avg_coins_per_fam || 0)))}
+      ${statCard(t('admin_stat_tx'),         o.total_transactions || 0,      '')}
+    </div>
+
+    <div style="font-size: 11px; color: var(--ink-muted); margin-top: 14px; font-style: italic;">
+      ${t('admin_generated_at')}: ${fmtDateTime(o.generated_at || new Date().toISOString())}
+    </div>`;
+}
+
+function renderAdminFamilies() {
+  const rows = adminDashboard.families || [];
+  if (!rows.length) return `<div class="admin-empty">${t('admin_no_families')}</div>`;
+  const q = adminDashboard.search.toLowerCase();
+  const filtered = rows.filter(r =>
+    !q || (r.email || '').toLowerCase().includes(q) ||
+    (r.family_name || '').toLowerCase().includes(q) ||
+    (r.owner_user_id || '').toLowerCase().includes(q));
+  const { col, dir } = adminDashboard.sort;
+  filtered.sort((a, b) => {
+    let av = a[col], bv = b[col];
+    if (av == null) av = ''; if (bv == null) bv = '';
+    if (typeof av === 'number' || typeof bv === 'number') {
+      av = Number(av) || 0; bv = Number(bv) || 0;
+      return dir === 'asc' ? av - bv : bv - av;
+    }
+    return dir === 'asc' ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+  });
+  const sortIcon = (c) => col === c ? (dir === 'asc' ? ' ▲' : ' ▼') : '';
+  const head = (c, label) =>
+    `<th data-sort-col="${c}" ${col === c ? 'data-sort-active="1"' : ''}>${escapeHtml(label)}${sortIcon(c)}</th>`;
+  const tableHead = `
+    <thead><tr>
+      ${head('email',          t('admin_col_email'))}
+      ${head('hero_count',     t('admin_col_heroes'))}
+      ${head('coin_total',     t('admin_col_coins'))}
+      ${head('tx_count',       t('admin_col_tx'))}
+      ${head('current_streak', t('admin_col_streak'))}
+      ${head('last_sign_in_at',t('admin_col_last_login'))}
+      ${head('family_updated', t('admin_col_last_active'))}
+      ${head('user_created',   t('admin_col_signup'))}
+    </tr></thead>`;
+  const body = filtered.map(r => {
+    const adminPill = r.is_admin ? `<span class="admin-pill">admin</span>` : '';
+    const coin = fmtNumber(Math.round(Number(r.coin_total || 0) * 100) / 100);
+    return `<tr>
+      <td class="admin-cell-email">${escapeHtml(r.email || r.owner_user_id || '')}${adminPill}</td>
+      <td class="admin-cell-num">${r.hero_count}</td>
+      <td class="admin-cell-num">🪙 ${coin}</td>
+      <td class="admin-cell-num">${r.tx_count}</td>
+      <td class="admin-cell-num">${r.current_streak ? '🔥 ' + r.current_streak : '—'}</td>
+      <td>${r.last_sign_in_at ? fmtDateTime(r.last_sign_in_at) : '—'}</td>
+      <td>${r.family_updated ? fmtDateTime(r.family_updated) : '—'}</td>
+      <td>${r.user_created ? fmtDateTime(r.user_created) : '—'}</td>
+    </tr>`;
+  }).join('');
+  return `
+    <input type="text" class="admin-search" id="adminFamSearch"
+           placeholder="${escapeHtml(t('admin_search_placeholder'))}"
+           value="${escapeHtml(adminDashboard.search)}" />
+    <div style="overflow-x: auto;">
+      <table class="admin-table">${tableHead}<tbody>${body}</tbody></table>
+    </div>
+    <div style="font-size: 11px; color: var(--ink-muted); margin-top: 8px;">
+      ${filtered.length} / ${rows.length} ${t('admin_families_shown')}
+    </div>`;
+}
+
+function wireAdminFamilyHandlers() {
+  const search = document.getElementById('adminFamSearch');
+  if (search) {
+    search.addEventListener('input', (e) => {
+      adminDashboard.search = e.target.value;
+      // Re-render only the table body — full rerender re-creates the
+      // input and we lose focus.
+      const body = document.getElementById('adminTabBody');
+      const cursor = e.target.selectionStart;
+      body.innerHTML = renderAdminFamilies();
+      const fresh = document.getElementById('adminFamSearch');
+      if (fresh) { fresh.focus(); fresh.setSelectionRange(cursor, cursor); }
+    });
+  }
+  document.querySelectorAll('.admin-table th[data-sort-col]').forEach(th => {
+    th.addEventListener('click', () => {
+      const c = th.dataset.sortCol;
+      if (adminDashboard.sort.col === c) {
+        adminDashboard.sort.dir = adminDashboard.sort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        adminDashboard.sort = { col: c, dir: c === 'email' ? 'asc' : 'desc' };
+      }
+      const body = document.getElementById('adminTabBody');
+      body.innerHTML = renderAdminFamilies();
+      wireAdminFamilyHandlers();
+    });
+  });
+}
+
+function renderAdminLogins() {
+  const days = adminDashboard.loginActivity || [];
+  if (!days.length) return `<div class="admin-empty">${t('admin_no_data')}</div>`;
+  const max = Math.max(1, ...days.map(d => Number(d.sign_ins) || 0));
+  const total = days.reduce((s, d) => s + (Number(d.sign_ins) || 0), 0);
+  const avgPerDay = days.length > 0 ? Math.round((total / days.length) * 10) / 10 : 0;
+  const peakDay = days.reduce((p, d) => (Number(d.sign_ins) || 0) > (Number(p.sign_ins) || 0) ? d : p, days[0]);
+  const bars = days.slice().reverse().map(d => {
+    const n = Number(d.sign_ins) || 0;
+    const pct = max > 0 ? (n / max) * 100 : 0;
+    return `<div class="admin-bar-row">
+      <div>${escapeHtml(String(d.day).slice(0, 10))}</div>
+      <div class="admin-bar-track"><div class="admin-bar-fill" style="width:${pct}%;"></div></div>
+      <div class="admin-bar-count">${n}</div>
+    </div>`;
+  }).join('');
+  return `
+    <div class="admin-stat-grid">
+      ${statCard(t('admin_stat_total_logins_30d'), total, t('admin_last_30_days'))}
+      ${statCard(t('admin_stat_avg_per_day'),     avgPerDay, '')}
+      ${statCard(t('admin_stat_peak_day'),        Number(peakDay.sign_ins) || 0, String(peakDay.day).slice(0, 10))}
+    </div>
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 14px 0 8px;">
+      ${t('admin_logins_per_day')}
+    </h3>
+    <div>${bars}</div>
+    <div style="font-size: 11px; color: var(--ink-muted); margin-top: 12px; font-style: italic;">
+      ${t('admin_logins_caveat')}
+    </div>`;
+}
+
+function renderAdminEngagement() {
+  const fams = adminDashboard.families || [];
+  if (!fams.length) return `<div class="admin-empty">${t('admin_no_families')}</div>`;
+  // Aggregate adventure completions across all families' transactions.
+  const advCount = {};
+  const achCount = {};
+  let totalQuests = 0;
+  let totalAchievements = 0;
+  let totalAdvCompletions = 0;
+  for (const f of fams) {
+    // We don't have raw state here — admin_families_detail returns
+    // computed scalars only. So engagement metrics here come from
+    // the 2 scalars we DO have: hero_count + current_streak. If the
+    // user wants per-family transaction breakdown we need a richer
+    // RPC. For now, show streak distribution + hero distribution.
+  }
+  // Streak distribution buckets
+  const buckets = { 0: 0, '1-2': 0, '3-6': 0, '7-13': 0, '14-29': 0, '30+': 0 };
+  for (const f of fams) {
+    const s = Number(f.current_streak || 0);
+    if (s === 0) buckets[0]++;
+    else if (s < 3) buckets['1-2']++;
+    else if (s < 7) buckets['3-6']++;
+    else if (s < 14) buckets['7-13']++;
+    else if (s < 30) buckets['14-29']++;
+    else buckets['30+']++;
+  }
+  const streakRows = Object.entries(buckets).map(([k, v]) => ({ label: k, count: v }));
+  const maxS = Math.max(1, ...streakRows.map(r => r.count));
+  const streakHtml = streakRows.map(r => `
+    <div class="admin-bar-row">
+      <div>${escapeHtml(r.label)}${r.label === '0' ? ' 🥱' : r.label === '30+' ? ' 🚀' : ''}</div>
+      <div class="admin-bar-track"><div class="admin-bar-fill" style="width:${(r.count / maxS) * 100}%;"></div></div>
+      <div class="admin-bar-count">${r.count}</div>
+    </div>`).join('');
+  // Hero count distribution
+  const heroBuckets = { 0: 0, 1: 0, 2: 0, 3: 0, '4+': 0 };
+  for (const f of fams) {
+    const h = Number(f.hero_count || 0);
+    if (h <= 3) heroBuckets[h]++;
+    else heroBuckets['4+']++;
+  }
+  const heroRows = Object.entries(heroBuckets).map(([k, v]) => ({ label: k, count: v }));
+  const maxH = Math.max(1, ...heroRows.map(r => r.count));
+  const heroHtml = heroRows.map(r => `
+    <div class="admin-bar-row">
+      <div>${escapeHtml(r.label)} ${t('admin_heroes')}</div>
+      <div class="admin-bar-track"><div class="admin-bar-fill" style="width:${(r.count / maxH) * 100}%;"></div></div>
+      <div class="admin-bar-count">${r.count}</div>
+    </div>`).join('');
+  // Top spender / top earner / top streak family
+  const topCoins = [...fams].sort((a, b) => Number(b.coin_total || 0) - Number(a.coin_total || 0)).slice(0, 5);
+  const topStreak = [...fams].sort((a, b) => Number(b.current_streak || 0) - Number(a.current_streak || 0)).slice(0, 5);
+  const topCoinsHtml = topCoins.length ? `<ol class="admin-rank-list">${
+    topCoins.map((f, i) => `<li>
+      <div class="admin-rank-num">${i + 1}.</div>
+      <div class="admin-cell-email">${escapeHtml(f.email || f.owner_user_id || '')}</div>
+      <div class="admin-rank-count">🪙 ${fmtNumber(Math.round(Number(f.coin_total || 0)))}</div>
+    </li>`).join('')
+  }</ol>` : `<div class="admin-empty">—</div>`;
+  const topStreakHtml = topStreak.filter(f => Number(f.current_streak || 0) > 0).length
+    ? `<ol class="admin-rank-list">${
+      topStreak.filter(f => Number(f.current_streak || 0) > 0).map((f, i) => `<li>
+        <div class="admin-rank-num">${i + 1}.</div>
+        <div class="admin-cell-email">${escapeHtml(f.email || f.owner_user_id || '')}</div>
+        <div class="admin-rank-count">🔥 ${f.current_streak}</div>
+      </li>`).join('')
+    }</ol>`
+    : `<div class="admin-empty">${t('admin_no_streaks')}</div>`;
+
+  return `
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 4px 0 8px;">
+      ${t('admin_h_streak_dist')}
+    </h3>
+    <div style="margin-bottom: 18px;">${streakHtml}</div>
+
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 4px 0 8px;">
+      ${t('admin_h_hero_dist')}
+    </h3>
+    <div style="margin-bottom: 18px;">${heroHtml}</div>
+
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 4px 0 8px;">
+      ${t('admin_h_top_coins')}
+    </h3>
+    ${topCoinsHtml}
+
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 18px 0 8px;">
+      ${t('admin_h_top_streaks')}
+    </h3>
+    ${topStreakHtml}`;
+}
+
+function exportAdminCsv() {
+  const rows = adminDashboard.families || [];
+  if (!rows.length) { toast(t('admin_no_families'), 'info'); return; }
+  const cols = ['email', 'family_name', 'hero_count', 'coin_total', 'tx_count',
+                'current_streak', 'last_sign_in_at', 'family_updated', 'user_created', 'is_admin'];
+  const csvEsc = (v) => {
+    if (v == null) return '';
+    const s = String(v);
+    if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  };
+  const csv = [cols.join(',')]
+    .concat(rows.map(r => cols.map(c => csvEsc(r[c])).join(',')))
+    .join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'kcq-admin-families-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+window.exportAdminCsv = exportAdminCsv;
 
 // --- INIT ---
 load();
