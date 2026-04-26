@@ -3266,6 +3266,51 @@
     margin-top: 4px;
   }
 
+  /* Adventure filter bar — sits above the adventure-list grid. Each
+     chip is a tiny pill button; the active state inverts to a gold
+     fill so the active filter reads at a glance. Two rows: difficulty
+     + availability. Wrap freely on narrow viewports. */
+  .adventure-filter-bar {
+    display: flex; flex-direction: column; gap: 10px;
+    margin: 8px 0 18px;
+    padding: 12px 14px;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid rgba(244,211,94,0.25);
+    border-radius: 8px;
+  }
+  .adventure-filter-bar .filter-row {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  }
+  .filter-row-label {
+    font-family: 'Cinzel', serif;
+    font-size: 12px; color: var(--gold-bright);
+    letter-spacing: 0.6px; text-transform: uppercase;
+    margin-right: 4px;
+  }
+  .filter-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(244,211,94,0.06);
+    color: var(--parchment);
+    border: 1px solid rgba(244,211,94,0.35);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 120ms, border-color 120ms, transform 80ms;
+  }
+  .filter-chip:hover { background: rgba(244,211,94,0.15); border-color: var(--gold-bright); }
+  .filter-chip.active {
+    background: var(--gold-bright);
+    color: var(--wood-dark);
+    border-color: var(--gold-dark);
+    font-weight: 700;
+  }
+  .filter-chip:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 2px;
+  }
+
   .adventure-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -4815,6 +4860,14 @@ const TRANSLATIONS = {
     this_item_label: 'this item',
     cosmetics_progress_hint: 'Streak: {current} / {target} days · {remaining} to the next piece',
     username_optional_label: 'Handle (optional — auto-generated from name)',
+    filter_all: 'All',
+    filter_show_all: 'Show all',
+    filter_unlocked_only: 'Only available',
+    filter_difficulty_label: 'Difficulty',
+    filter_availability_label: 'Availability',
+    adventure_filter_aria: 'Adventure filters',
+    adventure_filter_empty: 'No adventures match these filters yet.',
+    adventure_filter_reset: 'Reset filters',
     legendary_companion_desc: 'A mentor walks beside the kids. Optional — adventures play the same without one.',
     legendary_undeletable: 'Legendary heroes cannot be removed',
     legendary_cap_reached: 'Legendary roster is full',
@@ -5307,6 +5360,14 @@ const TRANSLATIONS = {
     this_item_label: 'diesen Gegenstand',
     cosmetics_progress_hint: 'Strähne: {current} / {target} Tage · noch {remaining} bis zum nächsten Stück',
     username_optional_label: 'Kürzel (optional — wird aus dem Namen erzeugt)',
+    filter_all: 'Alle',
+    filter_show_all: 'Alle zeigen',
+    filter_unlocked_only: 'Nur verfügbare',
+    filter_difficulty_label: 'Schwierigkeit',
+    filter_availability_label: 'Status',
+    adventure_filter_aria: 'Abenteuerfilter',
+    adventure_filter_empty: 'Kein Abenteuer passt zu diesen Filtern.',
+    adventure_filter_reset: 'Filter zurücksetzen',
     legendary_companion_desc: 'Ein Mentor schreitet neben den Kindern. Optional — Abenteuer laufen auch ohne genauso.',
     legendary_undeletable: 'Legendäre Helden können nicht entfernt werden',
     legendary_cap_reached: 'Die legendäre Truppe ist voll',
@@ -12082,7 +12143,32 @@ function renderAdventureSelect() {
         <div class="adv-hero-pick-hint" aria-hidden="true">${isIn ? t('in_party') : t('tap_to_add')}</div>
       </div>`;
   }).join('');
-  const advs = ADVENTURES.map(a => {
+  // Sort + filter the adventure catalog. Sort key:
+  //   1) difficulty rank (easy < medium < hard < epic)
+  //   2) minLevel (low → high) so the sub-order within a tier still
+  //      reflects what an early party can take on
+  //   3) localized title alphabetical, just for stability
+  // Custom adventures keep a `custom: true` flag and sort with the
+  // rest by difficulty — they get a "✏" badge so the kid can tell
+  // them apart visually, but they don't bunch at the bottom.
+  const DIFF_RANK = { easy: 0, medium: 1, hard: 2, epic: 3 };
+  ensureAdventureFilter();
+  const filter = state.adventureFilter;
+  const langCmp = (a, b) => L(a.title).localeCompare(L(b.title), state.settings.lang || 'en');
+  const sortedAdvs = [...ADVENTURES].sort((a, b) => {
+    const dA = DIFF_RANK[a.difficulty] ?? 999;
+    const dB = DIFF_RANK[b.difficulty] ?? 999;
+    if (dA !== dB) return dA - dB;
+    if (a.minLevel !== b.minLevel) return a.minLevel - b.minLevel;
+    return langCmp(a, b);
+  });
+  const visibleAdvs = sortedAdvs.filter(a => {
+    if (filter.difficulty !== 'all' && a.difficulty !== filter.difficulty) return false;
+    if (filter.availability === 'unlocked' && adventureLocked(a)) return false;
+    return true;
+  });
+
+  const advs = visibleAdvs.map(a => {
     const locked = adventureLocked(a);
     const click = locked ? `showLockToast('${a.id}')` : `chooseAdventure('${a.id}')`;
     const hasParty = adventureState.party.length > 0;
@@ -12108,6 +12194,17 @@ function renderAdventureSelect() {
       ${lockHtml}
     </div>`;
   }).join('');
+
+  const advsHtml = visibleAdvs.length === 0
+    ? `<div class="empty" style="padding: 32px;">
+         <div class="empty-icon">🔍</div>
+         <div>${escapeHtml(t('adventure_filter_empty'))}</div>
+         <button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="resetAdventureFilter()">
+           ${escapeHtml(t('adventure_filter_reset'))}
+         </button>
+       </div>`
+    : `<div class="adventure-list">${advs}</div>`;
+  const filterBarHtml = renderAdventureFilterBar();
   // Weekly paid-adventure banner — shows how many coin rewards are left this week.
   const limit = state.settings.paidAdventuresPerWeek;
   let paidBanner = '';
@@ -12136,7 +12233,68 @@ function renderAdventureSelect() {
     </div>
     <div class="section">
       <h2>${t('choose_quest')}</h2>
-      <div class="adventure-list">${advs}</div>
+      ${filterBarHtml}
+      ${advsHtml}
+    </div>`;
+}
+
+// Adventure filter state — persists in localStorage via save() so the
+// kid's last choice (e.g. "only easy adventures") sticks across reloads.
+function ensureAdventureFilter() {
+  if (!state.adventureFilter || typeof state.adventureFilter !== 'object') {
+    state.adventureFilter = { difficulty: 'all', availability: 'all' };
+  }
+  // Defensive: tolerate stale enum values from older state shapes.
+  const validDiff = ['all', 'easy', 'medium', 'hard', 'epic'];
+  const validAvail = ['all', 'unlocked'];
+  if (!validDiff.includes(state.adventureFilter.difficulty)) state.adventureFilter.difficulty = 'all';
+  if (!validAvail.includes(state.adventureFilter.availability)) state.adventureFilter.availability = 'all';
+}
+
+function setAdventureFilter(key, value) {
+  ensureAdventureFilter();
+  state.adventureFilter[key] = value;
+  save();
+  renderAdventureSelect();
+}
+
+function resetAdventureFilter() {
+  state.adventureFilter = { difficulty: 'all', availability: 'all' };
+  save();
+  renderAdventureSelect();
+}
+
+function renderAdventureFilterBar() {
+  ensureAdventureFilter();
+  const f = state.adventureFilter;
+  const diffOptions = [
+    { id: 'all',    label: t('filter_all'),     icon: '✦' },
+    { id: 'easy',   label: t('diff_easy'),      icon: '🌱' },
+    { id: 'medium', label: t('diff_medium'),    icon: '⚔' },
+    { id: 'hard',   label: t('diff_hard'),      icon: '🔥' },
+    { id: 'epic',   label: t('diff_epic'),      icon: '🐉' }
+  ];
+  const availOptions = [
+    { id: 'all',      label: t('filter_show_all') },
+    { id: 'unlocked', label: t('filter_unlocked_only') }
+  ];
+  const chip = (group, opt, active) => `
+    <button class="filter-chip${active ? ' active' : ''}"
+            onclick="setAdventureFilter('${group}','${opt.id}')"
+            aria-pressed="${active}">
+      ${opt.icon ? `<span aria-hidden="true">${opt.icon}</span>` : ''}
+      <span>${escapeHtml(opt.label)}</span>
+    </button>`;
+  return `
+    <div class="adventure-filter-bar" role="group" aria-label="${escapeHtml(t('adventure_filter_aria'))}">
+      <div class="filter-row">
+        <span class="filter-row-label">${escapeHtml(t('filter_difficulty_label'))}</span>
+        ${diffOptions.map(o => chip('difficulty', o, f.difficulty === o.id)).join('')}
+      </div>
+      <div class="filter-row">
+        <span class="filter-row-label">${escapeHtml(t('filter_availability_label'))}</span>
+        ${availOptions.map(o => chip('availability', o, f.availability === o.id)).join('')}
+      </div>
     </div>`;
 }
 

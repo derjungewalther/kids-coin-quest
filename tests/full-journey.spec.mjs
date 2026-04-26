@@ -134,22 +134,24 @@ test.describe('Kitchen-sink journey', () => {
     // Pick the hero into the party
     await page.locator('.adventure-hero-card').first().click();
     await expect(page.locator('.adventure-hero-card.selected')).toHaveCount(1);
-    // Pick the first unlocked adventure (Grove or Bakery, both easy)
+    // Pick the first unlocked adventure. Adventures are now sorted
+    // by difficulty (BUG-fix); within easy/level-0 we may land on
+    // any scene type, so branch on whatever scene 1 actually is.
     await page.locator('.adventure-option:not(.locked)').first().click();
     await page.locator('.adventure-scene').getByRole('button', { name: /Begin/i }).click();
-    // Scene 1 of the adventure — could be a 'choice' or one of the new
-    // mini-game types. Branch on what's visible.
-    const sceneType = await page.evaluate(() => {
+    const scene1 = await page.evaluate(() => {
       const a = window.ADVENTURES.find(x => x.id === window.adventureState.adventureId);
-      return a.scenes[0].type || 'choice';
+      const s = a.scenes[0];
+      return { type: s.type, minigame: s.minigame, hasOptions: !!(s.options && s.options.length) };
     });
-    if (sceneType === 'choice' || !sceneType) {
+    if (scene1.hasOptions && !scene1.type && !scene1.minigame) {
+      // Classic d20 choice scene — pick first option, roll, see result.
       await page.locator('.choice-option').first().click();
       await page.getByRole('button', { name: /Roll/i }).click();
       await expect(page.locator('.dice-display')).toBeVisible({ timeout: 3000 });
       await expect(page.locator('.dice-result')).toBeVisible();
     } else {
-      // For non-dice scenes, just confirm the scene heading rendered.
+      // Mini-game or other typed scene — just confirm it rendered.
       await expect(page.locator('.adventure-scene h3')).toBeVisible();
     }
 

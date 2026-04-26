@@ -266,8 +266,11 @@ test.describe('Adventure full flow', () => {
     await page.locator('.tab[data-view="adventure"]').click();
     // Select the hero
     await page.locator('.adventure-hero-card').first().click();
-    // Click the Grove (Easy) adventure
-    await page.locator('.adventure-option:not(.locked)').first().click();
+    // Pick The Enchanted Grove specifically — its first scene is a
+    // d20 choice (which is what this test exercises). Adventure list
+    // is now sorted by difficulty (BUG-fix), so .first() can be a
+    // memory-mini-game scene like Fischer Sebastian instead.
+    await page.locator('.adventure-option:not(.locked)').filter({ hasText: /Grove|Hain/i }).first().click();
     // Intro screen → Begin (scoped to the adventure scene to avoid the
     // "Begin Quest" button in the Recruit modal)
     await page.locator('.adventure-scene').getByRole('button', { name: /Begin/i }).click();
