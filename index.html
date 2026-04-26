@@ -5916,8 +5916,26 @@ function narrate(text) {
   (async () => {
     const manifest = await loadNarratorManifest();
     const key = await hashNarrationKey(lang, trimmed);
+    const manifestSize = (manifest[lang] && Object.keys(manifest[lang]).length) || 0;
     const path = manifest[lang] && manifest[lang][key];
-    if (path && await playPrerenderedAudio(path)) return; // done — premium voice
+    // Diagnostic logger — visible only when state.settings.narratorDebug
+    // is on (toggle via console: window.state.settings.narratorDebug = true).
+    // Lets a parent confirm whether the OpenAI Nova mp3 actually plays
+    // or whether the browser fell back to Web Speech (and why).
+    const dbg = !!(state.settings && state.settings.narratorDebug);
+    if (dbg) {
+      console.log('[KCQ narrate]', {
+        lang, key, manifestSize, mp3Path: path || '(miss)',
+        textPreview: trimmed.slice(0, 60) + (trimmed.length > 60 ? '…' : '')
+      });
+    }
+    if (path) {
+      const ok = await playPrerenderedAudio(path);
+      if (dbg) console.log(ok ? '[KCQ narrate] ✓ premium audio playing' : '[KCQ narrate] ✗ play() rejected — autoplay-blocked? falling back to Web Speech');
+      if (ok) return;
+    } else if (dbg) {
+      console.log('[KCQ narrate] ✗ no manifest entry for hash → falling back to Web Speech');
+    }
     // Fallback: Web Speech (for custom hero names / anything not pre-rendered).
     if (!narratorSupported()) return;
     const clean = trimmed.replace(/[⚔⚜✨🌟🪄🎵🏹🧙‍♂️🧝‍♀️🛡️🗡️🐉🎩📿⛑️🎓👑🔮🔨⚡🧪📖🏅👕🦺🥋👖🧵👢👟🥾💍🧠💪💛🤍🏡🌲💎🗼🌑🔥🌋🎲🏆🎁🟢🔴💰📊⭐🔒👋📷📜✎]/gu, '');
