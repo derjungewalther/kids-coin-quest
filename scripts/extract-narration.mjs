@@ -32,6 +32,37 @@ function push(bucket, lang, text) {
   bucket[id] = { id, lang, text: trimmed };
 }
 
+// Helper: walk an R3-S3 narration pool. Two shapes are supported,
+// matching getNarration() in index.html:
+//   1. Flat pools by kind:    { intro: [...], success: [...], fail: [...] }
+//   2. Locale-bucketed pools:  { de: { intro: [...] }, en: { intro: [...] } }
+// We also tolerate a string in place of an array (a single-variant pool).
+function walkNarrationPool(bucket, narration) {
+  if (!narration || typeof narration !== 'object') return;
+  // Detect shape: locale-bucketed first because the keys are 'de'/'en'.
+  if (narration.de || narration.en) {
+    for (const lang of ['de', 'en']) {
+      const b = narration[lang];
+      if (!b || typeof b !== 'object') continue;
+      walkPoolKinds(bucket, lang, b);
+    }
+    return;
+  }
+  // Flat pool — every kind contains an array of strings or a single string.
+  // Flat pools have no language information attached, so we push the same
+  // text into BOTH language buckets. The hash differs per language because
+  // the id includes the lang prefix; in practice flat pools should be
+  // avoided for bilingual apps.
+  for (const lang of ['de', 'en']) walkPoolKinds(bucket, lang, narration);
+}
+function walkPoolKinds(bucket, lang, kindMap) {
+  for (const kind of Object.keys(kindMap)) {
+    const v = kindMap[kind];
+    if (Array.isArray(v)) v.forEach(s => push(bucket, lang, s));
+    else if (typeof v === 'string') push(bucket, lang, v);
+  }
+}
+
 function walkAdventures(ADVENTURES) {
   const bucket = {};
   for (const adv of ADVENTURES) {
@@ -40,6 +71,9 @@ function walkAdventures(ADVENTURES) {
       push(bucket, lang, adv.victory && adv.victory[lang]);
       push(bucket, lang, adv.defeat && adv.defeat[lang]);
     });
+    // R3-S3 — adventure-level adventureNarration variant pools, used by
+    // some custom adventures for taglines/intros/outros.
+    walkNarrationPool(bucket, adv.adventureNarration);
     for (const sc of adv.scenes || []) {
       ['en', 'de'].forEach(lang => {
         push(bucket, lang, sc.text && sc.text[lang]);
@@ -58,6 +92,12 @@ function walkAdventures(ADVENTURES) {
           push(bucket, lang, task.failure && task.failure[lang]);
         }
       });
+      // R3-S3 — per-scene narration variant pools (Fischer Sebastian
+      // and any future pool-based adventure). Each variant string in
+      // every kind (intro / callToAction / success / fail) gets its
+      // own hash + mp3, so the kid hears a different recording on
+      // each replay even though the underlying scene is identical.
+      walkNarrationPool(bucket, sc.narration);
     }
   }
   return Object.values(bucket);
