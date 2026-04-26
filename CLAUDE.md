@@ -87,6 +87,26 @@ Each scene either:
 - **Choice (d20):** `{title:{de,en}, text:{de,en}, options:[{stat, dc, label, success, failure}]}`
 - **Mini-game:** `{id, minigame:'memory|sort|rhythm|count|maze|spot', title:{de,en}, minigameConfig:{...}, text:{de,en}, success:{de,en}, failure:{de,en}}`
 
+## Pricing model (Apr 2026 — final)
+
+Two-tier model. **No Family tier** (Sebastian decided single-parent
+single-account is enough).
+
+| Tier | Price | Limits |
+|---|---|---|
+| **Free** | €0 | 3 adventures, max 2 heroes, local-only storage |
+| **Pro** | **€3/mo** OR **€19.99/yr** (44% annual discount) | All 8 adventures, unlimited heroes, cloud sync, Nova narration |
+
+Schema: `subscriptions.plan ∈ ('free', 'pro')`, `billing_period ∈ ('monthly', 'yearly', null)`.
+- MRR: monthly Pro = €3 · yearly Pro = €19.99 / 12 ≈ €1.67
+- ARR: monthly Pro × 12 = €36 · yearly Pro = €19.99
+- These are calculated server-side in `admin_overview_stats()`.
+
+Feature gating is **NOT yet implemented in the client code** — the schema
++ admin dashboard are ready, but the actual "Free user can't recruit a
+3rd hero" enforcement is a separate task. When implementing, gate via
+`supaSubscription.plan === 'pro'` check.
+
 ## Admin dashboard (Settings → 🛡 Globaler Admin)
 
 Visible only when `supaProfile.is_admin === true`. Five tabs:

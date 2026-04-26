@@ -2667,6 +2667,16 @@
   .plan-pill.plan-pro    { background: rgba(244,211,94,0.18); color: var(--gold-bright); border-color: var(--gold-dark); }
   .plan-pill.plan-family { background: rgba(168,85,247,0.18); color: #c084fc; border-color: #a855f7; }
 
+  /* Compact admin form input (used by plan/period dropdowns in Plans tab). */
+  .admin-input {
+    font-size: 12px;
+    padding: 4px 8px;
+    background: var(--parchment);
+    border: 1px solid var(--wood-dark);
+    border-radius: 4px;
+    color: var(--ink);
+  }
+
   /* Compact icon button used in the Families table actions column. */
   .btn-admin-icon {
     background: transparent;
@@ -5283,11 +5293,15 @@ const TRANSLATIONS = {
     admin_h_plan_manage: 'Manage Plans',
     admin_stat_plan_free: 'Free',
     admin_stat_plan_pro: 'Pro',
-    admin_stat_plan_family: 'Family',
+    admin_stat_plan_pro_monthly: 'Pro · Monthly',
+    admin_stat_plan_pro_yearly: 'Pro · Yearly',
     admin_stat_plan_past_due: 'Past Due',
     admin_stat_plan_canceled: 'Canceled',
     admin_stat_mrr: 'MRR',
-    admin_estimated_mrr: 'estimated · $9 Pro · $19 Family',
+    admin_stat_arr: 'ARR',
+    admin_mrr_sub: 'monthly recurring (€)',
+    admin_arr_sub: 'annualized (€)',
+    admin_estimated_mrr: 'estimated · €3/mo · €19.99/yr',
     admin_col_plan: 'Plan',
     admin_col_plan_status: 'Status',
     admin_col_expires: 'Expires',
@@ -5884,11 +5898,15 @@ const TRANSLATIONS = {
     admin_h_plan_manage: 'Pläne verwalten',
     admin_stat_plan_free: 'Free',
     admin_stat_plan_pro: 'Pro',
-    admin_stat_plan_family: 'Family',
+    admin_stat_plan_pro_monthly: 'Pro · Monatlich',
+    admin_stat_plan_pro_yearly: 'Pro · Jährlich',
     admin_stat_plan_past_due: 'Überfällig',
     admin_stat_plan_canceled: 'Gekündigt',
     admin_stat_mrr: 'MRR',
-    admin_estimated_mrr: 'geschätzt · $9 Pro · $19 Family',
+    admin_stat_arr: 'ARR',
+    admin_mrr_sub: 'monatliche Einnahmen (€)',
+    admin_arr_sub: 'auf Jahr hochgerechnet (€)',
+    admin_estimated_mrr: 'geschätzt · €3/Mon · €19.99/Jahr',
     admin_col_plan: 'Plan',
     admin_col_plan_status: 'Status',
     admin_col_expires: 'Läuft ab',
@@ -16991,29 +17009,42 @@ function renderAdminPlans() {
   const o = adminDashboard.overview || {};
   const fams = adminDashboard.families || [];
   if (!Object.keys(o).length) return `<div class="admin-empty">${t('admin_no_data')}</div>`;
-  const free = Number(o.plan_free || 0);
-  const pro  = Number(o.plan_pro  || 0);
-  const family = Number(o.plan_family || 0);
-  const total = free + pro + family;
+  const free        = Number(o.plan_free || 0);
+  const proMonthly  = Number(o.plan_pro_monthly || 0);
+  const proYearly   = Number(o.plan_pro_yearly  || 0);
+  const proTotal    = Number(o.plan_pro_total   || (proMonthly + proYearly));
+  const total = free + proTotal;
   const pct = (n) => total > 0 ? Math.round((n / total) * 100) + '%' : '—';
-  const planRow = (key, label, count, color) => `
+  const fmtEur = (n) => '€' + Number(n || 0).toFixed(2);
+  const planRow = (label, count, color) => `
     <div class="admin-bar-row">
       <div>${escapeHtml(label)} <span style="color:${color}; font-weight:700;">●</span></div>
       <div class="admin-bar-track"><div class="admin-bar-fill" style="width:${total > 0 ? (count/total)*100 : 0}%; background: ${color};"></div></div>
       <div class="admin-bar-count">${count} (${pct(count)})</div>
     </div>`;
-  // Per-customer plan-management list
+  // Per-customer plan-management list. Plan + billing-period are
+  // separate dropdowns so they can be set in one save.
   const planRows = fams.map(f => {
-    const planClass = `plan-pill plan-${f.plan || 'free'}`;
+    const isPro = (f.plan || 'free') === 'pro';
+    const planClass = `plan-pill plan-${isPro ? 'pro' : 'free'}`;
+    const labelPlan = isPro
+      ? (f.billing_period === 'yearly' ? 'pro · €19.99/yr' : 'pro · €3/mo')
+      : 'free';
     const expires = f.current_period_end ? fmtDateTime(f.current_period_end) : '—';
     return `<tr>
       <td class="admin-cell-email">${escapeHtml(f.email || f.owner_user_id || '')}</td>
-      <td><span class="${planClass}">${escapeHtml(f.plan || 'free')}</span></td>
+      <td><span class="${planClass}">${escapeHtml(labelPlan)}</span></td>
       <td>${escapeHtml(f.plan_status || 'active')}</td>
       <td>${expires}</td>
-      <td>
-        <select class="admin-plan-select" data-uid="${escapeHtml(f.owner_user_id)}" style="font-size: 12px; padding: 4px 8px; background: var(--parchment); border: 1px solid var(--wood-dark); border-radius: 4px;">
-          ${['free','pro','family'].map(p => `<option value="${p}"${(f.plan || 'free') === p ? ' selected' : ''}>${p}</option>`).join('')}
+      <td style="display:flex; gap:4px; flex-wrap:wrap; align-items:center;">
+        <select class="admin-plan-select admin-input" data-uid="${escapeHtml(f.owner_user_id)}" data-which="plan">
+          <option value="free"${!isPro ? ' selected' : ''}>free</option>
+          <option value="pro"${isPro ? ' selected' : ''}>pro</option>
+        </select>
+        <select class="admin-period-select admin-input" data-uid="${escapeHtml(f.owner_user_id)}" data-which="period">
+          <option value=""        ${!isPro ? ' selected' : ''}>—</option>
+          <option value="monthly"  ${isPro && f.billing_period !== 'yearly' ? ' selected' : ''}>monthly · €3</option>
+          <option value="yearly"   ${isPro && f.billing_period === 'yearly' ? ' selected' : ''}>yearly · €19.99</option>
         </select>
         <button class="btn btn-primary btn-sm admin-plan-save" data-uid="${escapeHtml(f.owner_user_id)}">${t('admin_save')}</button>
       </td>
@@ -17023,19 +17054,20 @@ function renderAdminPlans() {
   return `
     <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 4px 0 6px;">${t('admin_h_plan_dist')}</h3>
     <div class="admin-stat-grid">
-      ${statCard(t('admin_stat_plan_free'),     free,   pct(free))}
-      ${statCard(t('admin_stat_plan_pro'),      pro,    pct(pro))}
-      ${statCard(t('admin_stat_plan_family'),   family, pct(family))}
-      ${statCard(t('admin_stat_plan_past_due'), o.plan_past_due || 0, '')}
-      ${statCard(t('admin_stat_plan_canceled'), o.plan_canceled || 0, '')}
-      ${statCard(t('admin_stat_mrr'),           '$' + fmtNumber(Math.round(Number(o.estimated_mrr || 0))), t('admin_estimated_mrr'))}
+      ${statCard(t('admin_stat_plan_free'),         free,        pct(free))}
+      ${statCard(t('admin_stat_plan_pro_monthly'),  proMonthly,  '€3/mo')}
+      ${statCard(t('admin_stat_plan_pro_yearly'),   proYearly,   '€19.99/yr')}
+      ${statCard(t('admin_stat_plan_past_due'),     o.plan_past_due || 0, '')}
+      ${statCard(t('admin_stat_plan_canceled'),     o.plan_canceled || 0, '')}
+      ${statCard(t('admin_stat_mrr'),               fmtEur(o.estimated_mrr_eur || 0), t('admin_mrr_sub'))}
+      ${statCard(t('admin_stat_arr'),               fmtEur(o.estimated_arr_eur || 0), t('admin_arr_sub'))}
     </div>
 
     <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 14px 0 8px;">${t('admin_h_plan_breakdown')}</h3>
     <div style="margin-bottom: 18px;">
-      ${planRow('free',   'Free',   free,   '#9ca3af')}
-      ${planRow('pro',    'Pro',    pro,    '#f4d35e')}
-      ${planRow('family', 'Family', family, '#a855f7')}
+      ${planRow('Free',                  free,        '#9ca3af')}
+      ${planRow('Pro · monthly (€3)',    proMonthly,  '#f4d35e')}
+      ${planRow('Pro · yearly (€19.99)', proYearly,   '#facc15')}
     </div>
 
     <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 14px 0 8px;">${t('admin_h_plan_manage')}</h3>
@@ -17056,14 +17088,21 @@ function renderAdminPlans() {
     </div>`;
 }
 
-async function adminUpdatePlan(userId, plan) {
+async function adminUpdatePlan(userId, plan, billingPeriod) {
   if (!supaClient || !isAdminUser()) return;
   try {
     const { data, error } = await supaClient.rpc('admin_set_plan', {
-      p_user_id: userId, p_plan: plan, p_status: 'active', p_period_end: null
+      p_user_id: userId,
+      p_plan: plan,
+      p_status: 'active',
+      p_billing_period: plan === 'pro' ? (billingPeriod || 'monthly') : null,
+      p_period_end: null
     });
     if (error) throw error;
-    toast(t('admin_plan_updated').replace('{plan}', plan), 'success');
+    const label = plan === 'pro'
+      ? `pro (${billingPeriod || 'monthly'})`
+      : 'free';
+    toast(t('admin_plan_updated').replace('{plan}', label), 'success');
     refreshAdminDashboard();
   } catch (e) {
     toast(e.message || String(e), 'error');
@@ -17313,8 +17352,12 @@ document.addEventListener('click', (e) => {
   if (!e.target || !e.target.classList) return;
   if (e.target.classList.contains('admin-plan-save')) {
     const uid = e.target.dataset.uid;
-    const select = document.querySelector(`.admin-plan-select[data-uid="${uid}"]`);
-    if (uid && select) adminUpdatePlan(uid, select.value);
+    const planSel   = document.querySelector(`.admin-plan-select[data-uid="${uid}"]`);
+    const periodSel = document.querySelector(`.admin-period-select[data-uid="${uid}"]`);
+    if (uid && planSel) {
+      const billingPeriod = periodSel && periodSel.value ? periodSel.value : null;
+      adminUpdatePlan(uid, planSel.value, billingPeriod);
+    }
   }
 });
 
