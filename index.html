@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -2755,8 +2755,28 @@
     image-rendering: crisp-edges;
   }
 
-  .kid-head-click { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; cursor: pointer; }
+  /* BUG-11 fix — the click zone needs to cover the FULL avatar circle
+     including its 4px outer ring, not just the inner content. Earlier
+     `flex:1` meant the zone fit its children tightly and edge-clicks
+     on the avatar's outer ring landed on the parent .kid-head (which
+     has no handler) instead of opening the hero sheet. Adding a small
+     padding ensures the visible avatar art is always inside the
+     clickable region. The negative margin pulls the row back so the
+     surrounding card layout doesn't shift. */
+  .kid-head-click {
+    display: flex; align-items: center; gap: 14px;
+    flex: 1; min-width: 0; cursor: pointer;
+    padding: 6px;
+    margin: -6px;
+    border-radius: 8px;
+    transition: background 120ms;
+  }
+  .kid-head-click:hover { background: rgba(244,211,94,0.06); }
   .kid-head-click:hover .kid-name { color: var(--gold-dark); }
+  .kid-head-click:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 2px;
+  }
 
   .cap-notice {
     font-family: 'MedievalSharp', cursive;
@@ -5524,6 +5544,16 @@ function rememberNarrationVariant(advId, sceneId, kind, index) {
   state.narrationHistory[advId][sceneId][kind] = arr;
 }
 function updateI18n() {
+  // BUG-09 fix — keep <html lang> in sync with the active locale.
+  // Screen readers read pronunciation from this attribute; without
+  // the update, every German label renders as English-pronounced.
+  // Also matters for SEO + browser-level translate-page prompts.
+  try {
+    const lang = (state && state.settings && state.settings.lang) || 'en';
+    if (document.documentElement.lang !== lang) {
+      document.documentElement.lang = lang;
+    }
+  } catch (e) {}
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     const val = t(key);

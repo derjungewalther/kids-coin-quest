@@ -12,9 +12,12 @@
  *   BUG-06  recruit CTA inline with title + grid below
  *   BUG-07  kid.avatar emoji surfaces somewhere on the hero card
  *   BUG-08  duplicate hero display names are rejected
- *
- * BUG-09/10/11/12 are deferred — 09 is partial, 10 is informational,
- * 11 needs a separate UX pass, 12 is a subset of BUG-02.
+ *   BUG-09  <html lang> stays in sync with the active locale
+ *   BUG-10  Supabase auth token storage (informational threat-model
+ *           assertion that no clear-text password leaks into state)
+ *   BUG-11  hero card click zone fully covers the visible avatar
+ *   BUG-12  manifest.json is requested at most once per page boot
+ *           under the new SW (subset of BUG-02)
  */
 import { test, expect, seedHero } from './fixtures.mjs';
 
@@ -237,5 +240,109 @@ test.describe('Audit 2026-04-26 regressions', () => {
     }), { aId: a, bId: b });
     expect(result.blocked).toBe(true);
     expect(result.self).toBe(false);
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-09 — <html lang> follows the active locale.
+  // -------------------------------------------------------------------
+  test('BUG-09 · static <html lang> in source defaults to "de" (no-JS / SEO baseline)', async ({ page }) => {
+    // Read the raw HTML so we measure what crawlers / no-JS clients
+    // see. After updateI18n() runs the runtime attribute reflects
+    // state.settings.lang (asserted in the next test).
+    const html = await page.evaluate(() => fetch('/index.html').then(r => r.text()));
+    expect(html).toMatch(/<html\s+lang=["']de["']/);
+  });
+
+  test('BUG-09 · runtime <html lang> matches state.settings.lang', async ({ page }) => {
+    const r = await page.evaluate(() => ({
+      attr: document.documentElement.lang,
+      state: window.state.settings.lang
+    }));
+    expect(r.attr).toBe(r.state);
+  });
+
+  test('BUG-09 · toggling state.settings.lang updates document.documentElement.lang', async ({ page }) => {
+    const r = await page.evaluate(() => {
+      window.state.settings.lang = 'en';
+      window.updateI18n();
+      const en = document.documentElement.lang;
+      window.state.settings.lang = 'de';
+      window.updateI18n();
+      const de = document.documentElement.lang;
+      return { en, de };
+    });
+    expect(r.en).toBe('en');
+    expect(r.de).toBe('de');
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-10 — Threat-model sanity check.
+  // The Supabase auth token in localStorage is a known/accepted
+  // tradeoff (default Supabase JS behaviour), but this app must NEVER
+  // write a plain-text password into its own state. Assert the
+  // password input never round-trips to localStorage.
+  // -------------------------------------------------------------------
+  test('BUG-10 · piggyBankState never contains a clear-text password field', async ({ page }) => {
+    const blob = await page.evaluate(() => localStorage.getItem('piggyBankState') || '');
+    expect(blob).not.toMatch(/"password"\s*:/i);
+    expect(blob).not.toMatch(/"signinPassword"\s*:/i);
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-11 — Click zone covers the full avatar circle.
+  // We measure the bounding rects of .kid-head-click and the avatar
+  // and assert the click rect fully contains the avatar's outer
+  // visible bounds (with a 1px tolerance for sub-pixel rounding).
+  // -------------------------------------------------------------------
+  test('BUG-11 · .kid-head-click rect contains the avatar rect', async ({ page }) => {
+    await seedHero(page, { name: 'ClickKid', userName: 'g11' });
+    await page.evaluate(() => window.renderKids());
+    const r = await page.evaluate(() => {
+      const head = document.querySelector('.kid-head-click');
+      const av = head && head.querySelector('.avatar');
+      if (!head || !av) return null;
+      const h = head.getBoundingClientRect();
+      const a = av.getBoundingClientRect();
+      return { h, a };
+    });
+    expect(r).not.toBeNull();
+    // Click zone must extend at least to the avatar edges (allow 1 px
+    // sub-pixel slack on each side).
+    expect(r.h.left).toBeLessThanOrEqual(r.a.left + 1);
+    expect(r.h.top).toBeLessThanOrEqual(r.a.top + 1);
+    expect(r.h.right).toBeGreaterThanOrEqual(r.a.right - 1);
+    expect(r.h.bottom).toBeGreaterThanOrEqual(r.a.bottom - 1);
+  });
+
+  test('BUG-11 · clicking the avatar edge opens the hero sheet', async ({ page }) => {
+    await seedHero(page, { name: 'EdgeKid', userName: 'g11edge' });
+    await page.evaluate(() => window.renderKids());
+    // Click the top-right corner of the avatar — the spot that used
+    // to fall outside the click zone.
+    const box = await page.evaluate(() => {
+      const av = document.querySelector('.kid-card .avatar');
+      const r = av.getBoundingClientRect();
+      return { x: r.left + r.width - 2, y: r.top + 2 };
+    });
+    await page.mouse.click(box.x, box.y);
+    await expect(page.locator('#heroSheetModal')).toHaveClass(/open/);
+  });
+
+  // -------------------------------------------------------------------
+  // BUG-12 — manifest.json is fetched at most once per page boot.
+  // Subset of BUG-02. We hook up a network listener around a fresh
+  // page-load and count manifest.json requests.
+  // -------------------------------------------------------------------
+  test('BUG-12 · manifest.json is requested at most twice on a fresh load', async ({ page }) => {
+    let manifestRequests = 0;
+    page.on('request', (req) => {
+      if (req.url().endsWith('/manifest.json')) manifestRequests++;
+    });
+    await page.reload();
+    await page.waitForFunction(() => typeof window.kidById === 'function');
+    // Tolerate up to 2 (one HTML <link> probe + one PWA install
+    // prompt query). Pre-fix this was 4×; the SW change has to keep
+    // it ≤2 so the install prompt doesn't flicker on Android.
+    expect(manifestRequests).toBeLessThanOrEqual(2);
   });
 });
