@@ -4171,6 +4171,15 @@
       <div class="stat-grid" id="statGrid"></div>
     </div>
     <div class="section">
+      <h2>🎙 <span data-i18n="narration_diag_title">Narration</span></h2>
+      <p style="color: var(--ink-muted); font-style: italic;" data-i18n="narration_diag_desc">Premium voice (OpenAI Nova) is loaded from a CDN. Tap "Test" to confirm it plays — if you only hear the robotic Web Speech voice, something's blocked the premium track.</p>
+      <div id="narrationDiagBox" style="margin: 10px 0; font-family: 'IBM Plex Mono', monospace; font-size: 0.85em; color: var(--ink-muted);">Loading…</div>
+      <div style="display:flex; gap:8px; flex-wrap: wrap;">
+        <button class="btn btn-primary btn-sm" onclick="testNarration()" data-i18n="narration_test">🔊 Test premium voice</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleNarratorDebug()" id="narratorDebugBtn">🐛 Debug log: <span id="narratorDebugState">off</span></button>
+      </div>
+    </div>
+    <div class="section">
       <h2>🎨 <span data-i18n="custom_adv_title">Custom Adventures</span></h2>
       <p style="color: var(--ink-muted); font-style: italic;" data-i18n="custom_adv_desc">Write your own adventures in JSON — they'll appear in the Adventure picker right next to the built-in ones.</p>
       <div id="customAdventureList" style="margin: 10px 0;"></div>
@@ -4592,6 +4601,10 @@ const TRANSLATIONS = {
     app_subtitle: 'A noble tale of gold, glory, and generosity',
     tab_heroes: 'Heroes', tab_quests: 'Quests', tab_adventure: 'Adventure', tab_chronicle: 'Chronicle', tab_council: 'Council',
     music: 'Music', narrator: 'Narrator',
+    narration_diag_title: 'Narration',
+    narration_diag_desc: 'Premium voice (OpenAI Nova) is loaded from a CDN. Tap "Test" to confirm it plays — if you only hear the robotic Web Speech voice, something has blocked the premium track.',
+    narration_test: '🔊 Test premium voice',
+    narration_blocked: 'Audio blocked — tap once and retry.',
     fellowship: '🛡 The Fellowship', recruit_hero: '⚔ Recruit New Hero',
     no_heroes_msg: 'No heroes walk these halls yet. Click <strong>Recruit New Hero</strong> to begin thy tale!',
     quest_board: '📜 Quest Board', quest_board_desc: 'Proclaim the tasks thy heroes may undertake to earn gold coin.',
@@ -5095,6 +5108,10 @@ const TRANSLATIONS = {
     app_subtitle: 'Eine edle Geschichte von Gold, Ruhm und Großzügigkeit',
     tab_heroes: 'Helden', tab_quests: 'Aufträge', tab_adventure: 'Abenteuer', tab_chronicle: 'Chronik', tab_council: 'Rat',
     music: 'Musik', narrator: 'Erzähler',
+    narration_diag_title: 'Vertonung',
+    narration_diag_desc: 'Die Premium-Stimme (OpenAI Nova) kommt von einem CDN. Tippe „Testen", um zu prüfen ob sie spielt — falls du nur die roboterhafte Browser-Stimme hörst, blockiert etwas die Premium-Spur.',
+    narration_test: '🔊 Premium-Stimme testen',
+    narration_blocked: 'Audio blockiert — einmal antippen und erneut versuchen.',
     fellowship: '🛡 Die Gefährten', recruit_hero: '⚔ Neuen Helden anwerben',
     no_heroes_msg: 'Noch wandeln keine Helden durch diese Hallen. Klicke <strong>Neuen Helden anwerben</strong>, um deine Geschichte zu beginnen!',
     quest_board: '📜 Auftragstafel', quest_board_desc: 'Verkünde die Aufgaben, die deine Helden erfüllen dürfen, um Goldmünzen zu verdienen.',
@@ -5839,28 +5856,39 @@ function pickBestVoice(lang) {
   return ranked[0] || voices[0] || null;
 }
 
-// Pre-rendered narration: generated once with OpenAI TTS (see scripts/),
-// hashed by (lang|text), served from a CDN. The audio bundle is ~130 MB
-// — keeping it on Netlify burned through the free-tier bandwidth in days.
-// jsDelivr serves any public GitHub repo for free, with global edge cache
-// and no quotas relevant to a project this size, so we point at it in
-// production. Local dev keeps relative paths so `npm run serve` works
-// offline. Filenames are content-hashed → safe to cache forever.
-const AUDIO_CDN_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:')
-  ? ''   // local dev / file:// — keep relative
-  : 'https://cdn.jsdelivr.net/gh/derjungewalther/kids-coin-quest@main/';
+// Pre-rendered narration v2 — split-origin pipeline (Apr 2026 rebuild).
+//
+// v1 served BOTH the manifest and the mp3s from jsDelivr. That CDN caches
+// raw GitHub files at the edge for ~7 days by default, so freshly
+// generated narration was invisible to users for days after a push: their
+// browser saw a stale manifest, hashed the new text → no entry → fell
+// back to Web Speech. Frustrating to debug, looked like the OpenAI Nova
+// audio "didn't work."
+//
+// v2 splits the responsibilities:
+//   • MANIFEST_BASE  = same-origin (Netlify ships audio/manifest.json
+//                      with Cache-Control: max-age=0). Always in sync
+//                      with the deployed code. ~40 KB, no bandwidth
+//                      concern.
+//   • AUDIO_BASE     = jsDelivr in production / same-origin in dev.
+//                      The mp3s are content-hashed, so cache-forever is
+//                      safe — and they're heavy (~130 MB total), so we
+//                      keep them off Netlify's bandwidth quota.
+const _isLocalAudio = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:');
+const MANIFEST_BASE = '';   // always same-origin; Netlify ships it, dev http-server too
+const AUDIO_BASE    = _isLocalAudio ? '' : 'https://cdn.jsdelivr.net/gh/derjungewalther/kids-coin-quest@main/';
 
 let narratorManifest = null;      // { en: { id: path }, de: { id: path } }
 let narratorManifestPromise = null;
 let narratorAudio = null;         // <audio> element currently playing
+let narratorUnlocked = false;     // primed by user gesture (mobile autoplay)
 
 async function loadNarratorManifest() {
   if (narratorManifest) return narratorManifest;
   if (narratorManifestPromise) return narratorManifestPromise;
-  // Manifest is small (~24 KB) and only needed once per session — fetching
-  // it from the same CDN as the audio keeps the dependency chain simple.
-  const manifestUrl = AUDIO_CDN_BASE + 'audio/manifest.json';
-  narratorManifestPromise = fetch(manifestUrl, { cache: 'default' })
+  // Same-origin fetch — bypasses jsDelivr edge cache entirely.
+  const manifestUrl = MANIFEST_BASE + 'audio/manifest.json';
+  narratorManifestPromise = fetch(manifestUrl, { cache: 'no-cache' })
     .then(r => r.ok ? r.json() : null)
     .catch(() => null)
     .then(m => { narratorManifest = m || { en: {}, de: {} }; return narratorManifest; });
@@ -5873,6 +5901,25 @@ async function hashNarrationKey(lang, text) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
 }
 
+// Unlock audio playback by priming a silent <audio> on the first user
+// gesture. iOS Safari + Chrome Mobile reject `audio.play()` until this
+// has happened at least once per session, even for served-cached files.
+// We attach this listener once at boot; it removes itself after firing.
+function unlockNarratorAudio() {
+  if (narratorUnlocked) return;
+  try {
+    // 1-frame silent mp3 — base64-inlined, no network round-trip.
+    const silent = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAACAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjU0AAAAAAAAAAAAAAAAJAQAAAAAAAAAASD/9NAxAAAAAAAAAAAAA==');
+    silent.volume = 0;
+    silent.play().then(() => { narratorUnlocked = true; }).catch(() => {});
+  } catch (e) {}
+}
+function bindNarratorUnlock() {
+  const opts = { once: true, capture: true, passive: true };
+  ['pointerdown', 'touchstart', 'keydown'].forEach(ev =>
+    document.addEventListener(ev, unlockNarratorAudio, opts));
+}
+
 function stopPrerenderedAudio() {
   if (narratorAudio) {
     try { narratorAudio.pause(); narratorAudio.src = ''; } catch (e) {}
@@ -5882,15 +5929,55 @@ function stopPrerenderedAudio() {
 
 async function playPrerenderedAudio(path) {
   stopPrerenderedAudio();
-  // Path in the manifest is repo-relative ("audio/<id>.mp3"). On production
-  // we prefix it with the jsDelivr CDN so Netlify never serves the bytes.
-  const fullUrl = AUDIO_CDN_BASE + path;
+  // Path in the manifest is repo-relative ("audio/<id>.mp3"). Prefix with
+  // jsDelivr in prod so Netlify never serves the bytes.
+  const fullUrl = AUDIO_BASE + path;
   const a = new Audio(fullUrl);
   a.preload = 'auto';
   narratorAudio = a;
   try { await a.play(); return true; }
   catch (e) { return false; }
 }
+
+// Pre-warm — fetch the mp3s for the next few scene texts into the HTTP
+// cache so that the first `play()` after a user gesture has the bytes
+// ready. Called from chooseAdventure() so the warm-up window is the
+// "intro → first scene" transition.
+// Architecture-v2 introspection — tests assert these are on window so a
+// future refactor can't silently regress to the v1 (jsDelivr-cached
+// manifest) behaviour. Keep `var` shape with explicit window assignment
+// because top-level `const` is lexical-only and unreachable from
+// page.evaluate().
+window.MANIFEST_BASE = MANIFEST_BASE;
+window.AUDIO_BASE = AUDIO_BASE;
+Object.defineProperty(window, 'narratorUnlocked', { get: () => narratorUnlocked });
+window.bindNarratorUnlock = bindNarratorUnlock;
+window.unlockNarratorAudio = unlockNarratorAudio;
+window.loadNarratorManifest = loadNarratorManifest;
+window.hashNarrationKey = hashNarrationKey;
+window.playPrerenderedAudio = playPrerenderedAudio;
+window.stopPrerenderedAudio = stopPrerenderedAudio;
+
+async function prewarmAdventureNarration(advId) {
+  if (!state.settings.narratorOn) return;
+  const adv = (window.ADVENTURES || []).find(a => a.id === advId);
+  if (!adv) return;
+  const lang = state.settings.lang === 'de' ? 'de' : 'en';
+  const texts = [];
+  if (adv.intro && adv.intro[lang]) texts.push(adv.intro[lang]);
+  for (const sc of (adv.scenes || []).slice(0, 3)) {
+    if (sc.text && sc.text[lang]) texts.push(sc.text[lang]);
+  }
+  const manifest = await loadNarratorManifest();
+  const bucket = manifest[lang] || {};
+  await Promise.all(texts.map(async t => {
+    const k = await hashNarrationKey(lang, t.trim());
+    const path = bucket[k];
+    if (!path) return;
+    try { await fetch(AUDIO_BASE + path, { mode: 'cors', cache: 'force-cache' }); } catch (e) {}
+  }));
+}
+window.prewarmAdventureNarration = prewarmAdventureNarration;
 
 // Narrates a piece of scene text exactly once per "scene context" (a scene
 // + its sub-state, e.g. puzzle question vs. result). Subsequent calls with
@@ -5948,6 +6035,63 @@ function narrate(text) {
     window.speechSynthesis.speak(u);
   })();
 }
+// Narration diagnostic helpers — wire-checked by the Settings panel.
+async function testNarration() {
+  const wasOn = state.settings.narratorOn;
+  state.settings.narratorOn = true;
+  // Make sure unlock happened (the click that fired this is the gesture).
+  unlockNarratorAudio();
+  const lang = state.settings.lang === 'de' ? 'de' : 'en';
+  const sample = lang === 'de'
+    ? 'Hallo. Das ist die Premium-Stimme.'
+    : 'Hello. This is the premium voice.';
+  // Pre-resolve so we can show the user exactly what happened.
+  const manifest = await loadNarratorManifest();
+  const key = await hashNarrationKey(lang, sample);
+  const path = manifest[lang] && manifest[lang][key];
+  const box = document.getElementById('narrationDiagBox');
+  if (path) {
+    const ok = await playPrerenderedAudio(AUDIO_BASE ? path : path);
+    if (box) box.textContent = ok
+      ? `✓ Premium audio plays. (${path})`
+      : `✗ play() rejected. Tap somewhere first to unlock audio, then retry.`;
+    if (!ok) toast(t('narration_blocked') || 'Audio blocked — tap once and retry.', 'error');
+  } else {
+    if (box) box.textContent = `✗ No manifest entry for hash ${key}. Manifest size: ${manifest[lang] ? Object.keys(manifest[lang]).length : 0} (${lang}). Sample text mismatch?`;
+    // Fall through to Web Speech so the user at least hears something.
+    narrate(sample);
+  }
+  state.settings.narratorOn = wasOn;
+}
+window.testNarration = testNarration;
+
+function toggleNarratorDebug() {
+  state.settings.narratorDebug = !state.settings.narratorDebug;
+  save();
+  renderNarrationDiag();
+  toast(state.settings.narratorDebug
+    ? 'Debug log on — open DevTools console.'
+    : 'Debug log off.', 'info');
+}
+window.toggleNarratorDebug = toggleNarratorDebug;
+
+async function renderNarrationDiag() {
+  const box = document.getElementById('narrationDiagBox');
+  const dbgState = document.getElementById('narratorDebugState');
+  if (dbgState) dbgState.textContent = state.settings.narratorDebug ? 'on' : 'off';
+  if (!box) return;
+  const lang = state.settings.lang === 'de' ? 'de' : 'en';
+  const manifest = await loadNarratorManifest();
+  const size = manifest[lang] ? Object.keys(manifest[lang]).length : 0;
+  const origin = AUDIO_BASE || '(same-origin)';
+  const unlocked = narratorUnlocked ? '✓ unlocked' : '⏳ awaiting first tap';
+  box.innerHTML =
+    `Manifest: ${size} entries (${lang}) · ` +
+    `Audio origin: ${origin} · ` +
+    `Audio unlock: ${unlocked}`;
+}
+window.renderNarrationDiag = renderNarrationDiag;
+
 function toggleNarrator() {
   state.settings.narratorOn = !state.settings.narratorOn;
   save();
@@ -9951,6 +10095,7 @@ function renderSettings() {
   if (iTried) iTried.checked = state.settings.iTriedBonus !== false;
   const paidPw = document.getElementById('setPaidPerWeek');
   if (paidPw) paidPw.value = state.settings.paidAdventuresPerWeek != null ? state.settings.paidAdventuresPerWeek : 1;
+  if (typeof renderNarrationDiag === 'function') renderNarrationDiag();
 }
 
 function saveSettings() {
@@ -11873,19 +12018,9 @@ const ADVENTURES = [
             { id: 'schnur',          icon: '🧵', label: { de: 'Schnur',       en: 'Line' } }
           ]
         },
-        narration: {
-          de: { intro: [
-            'Auf dem Steg liegen vier Knotenkarten verstreut. Sebastian hat sie selbst gemalt, mit Bleistift, ein bisschen schief.',
-            'Sebastian breitet ein Tuch aus. „Bevor du fischst, lernst du die Knoten. Sonst verlierst du den Fisch und die Schnur."',
-            'Acht kleine Karten klappern leise im Wind. Sebastian beschwert sie mit einem flachen Stein.',
-            '„Jeder Knoten hat einen Zwilling", sagt Sebastian und zeigt auf die Karten. „Finde sie."'
-          ] },
-          en: { intro: [
-            'Four knot cards lie scattered on the dock. Sebastian drew them himself, in pencil, a little crooked.',
-            'Sebastian spreads a cloth. "Before you fish, you learn the knots. Otherwise you lose the fish and the line."',
-            'Eight little cards rustle in the breeze. Sebastian weighs them down with a flat stone.',
-            '"Every knot has a twin," Sebastian says, pointing at the cards. "Find them."'
-          ] }
+        text: {
+          de: 'Auf dem Steg liegen vier Knotenkarten verstreut. Sebastian hat sie selbst gemalt, mit Bleistift, ein bisschen schief. „Jeder Knoten hat einen Zwilling", sagt er. „Finde sie."',
+          en: 'Four knot cards lie scattered on the dock. Sebastian drew them himself, in pencil, a little crooked. "Every knot has a twin," he says. "Find them."'
         },
         success: {
           de: 'Sebastian nickt. „Das hast du dir gemerkt."',
@@ -11914,17 +12049,9 @@ const ADVENTURES = [
           ],
           successThreshold: 0.8
         },
-        narration: {
-          de: { intro: [
-            'Sebastian zieht eine alte Holzkiste unter dem Steg hervor. Sie riecht nach See und Salz.',
-            '„Jeder Fisch hat seinen Lieblingshappen", sagt Sebastian. „Den kleinen reicht ein Wurm. Die großen wollen mehr."',
-            'In der Kiste rascheln Köder durcheinander. Eine Made krabbelt langsam über den Rand.'
-          ] },
-          en: { intro: [
-            'Sebastian pulls an old wooden box from under the dock. It smells of lake and salt.',
-            '"Every fish has its favourite snack," Sebastian says. "A worm is enough for the little ones. The big ones want more."',
-            'Bait jostles around in the box. A maggot crawls slowly over the rim.'
-          ] }
+        text: {
+          de: 'Sebastian zieht eine alte Holzkiste unter dem Steg hervor. „Jeder Fisch hat seinen Lieblingshappen", sagt er. „Den kleinen reicht ein Wurm. Die großen wollen mehr."',
+          en: 'Sebastian pulls an old wooden box from under the dock. "Every fish has its favourite snack," he says. "A worm is enough for the little ones. The big ones want more."'
         },
         success: { de: '„Das stimmt", sagt Sebastian. „Genau so habe ich es auch sortiert, als ich klein war."',
                    en: '"That\'s right," says Sebastian. "I sorted them just like that when I was small."' },
@@ -11943,15 +12070,9 @@ const ADVENTURES = [
           ],
           tempoBpm: 90
         },
-        narration: {
-          de: { intro: [
-            'Sebastian stellt sich neben dich, die Angel locker in der Hand. „Das Werfen ist wie ein Lied. Drei Schläge, immer in derselben Reihenfolge."',
-            '„Ausholen, schwingen, loslassen", murmelt Sebastian und nickt im Takt. „Mehr ist es nicht."'
-          ] },
-          en: { intro: [
-            'Sebastian stands beside you, rod loose in his hand. "Casting is like a song. Three beats, always in the same order."',
-            '"Pull back, swing, release," Sebastian murmurs, nodding to the beat. "That\'s all there is."'
-          ] }
+        text: {
+          de: 'Sebastian stellt sich neben dich, die Angel locker in der Hand. „Das Werfen ist wie ein Lied. Ausholen, schwingen, loslassen — drei Schläge, immer in derselben Reihenfolge."',
+          en: 'Sebastian stands beside you, rod loose in his hand. "Casting is like a song. Pull back, swing, release — three beats, always in the same order."'
         },
         success: { de: '„Hörst du? Genau so klingt ein guter Wurf", sagt Sebastian.',
                    en: '"Do you hear that? That\'s what a good cast sounds like," Sebastian says.' },
@@ -11962,15 +12083,9 @@ const ADVENTURES = [
         id: 'fs-4', minigame: 'count',
         title: { de: 'Die Schwarmzählung', en: 'The Schoolcount' },
         minigameConfig: { rounds: 3, min: 2, max: 6, flashDurationMs: 2000, objectIcon: '🐟' },
-        narration: {
-          de: { intro: [
-            'Sebastian beugt sich über das Wasser und legt einen Finger an die Lippen. „Schau genau hin. Da unten zieht ein Schwarm vorbei."',
-            'Das Wasser ist klar wie Glas. Schatten huschen unter dem Steg durch.'
-          ] },
-          en: { intro: [
-            'Sebastian leans over the water and lifts a finger to his lips. "Look closely. A school is passing below."',
-            'The water is clear as glass. Shadows dart under the dock.'
-          ] }
+        text: {
+          de: 'Sebastian beugt sich über das Wasser und legt einen Finger an die Lippen. „Schau genau hin. Da unten zieht ein Schwarm vorbei."',
+          en: 'Sebastian leans over the water and lifts a finger to his lips. "Look closely. A school is passing below."'
         },
         success: { de: 'Sebastian nickt zufrieden. „Genau so viele waren es."',
                    en: 'Sebastian nods. "That\'s exactly how many."' },
@@ -11991,15 +12106,9 @@ const ADVENTURES = [
           ],
           moveLimit: 14, diagonals: false
         },
-        narration: {
-          de: { intro: [
-            'Sebastian zeigt mit dem Ruder auf eine grüne Insel aus Halmen. „Da hinten beißen sie am besten. Aber der Weg ist eng."',
-            'Das kleine Holzboot schaukelt sanft. Schilf wiegt sich links und rechts.'
-          ] },
-          en: { intro: [
-            'Sebastian points with his oar at a green island of reeds. "They bite best back there. But the way is tight."',
-            'The small wooden boat sways gently. Reeds wave on either side.'
-          ] }
+        text: {
+          de: 'Sebastian zeigt mit dem Ruder auf eine grüne Insel aus Halmen. „Da hinten beißen sie am besten. Aber der Weg ist eng."',
+          en: 'Sebastian points with his oar at a green island of reeds. "They bite best back there. But the way is tight."'
         },
         success: { de: 'Sebastian zieht das Ruder ein. „Schön ruhig gefahren."',
                    en: 'Sebastian pulls in the oar. "Nice and quiet."' },
@@ -12023,15 +12132,9 @@ const ADVENTURES = [
           ],
           successThreshold: 0.8
         },
-        narration: {
-          de: { intro: [
-            'Sebastian hält den Korb auf und zeigt mit der Kelle auf die Fische. „Nicht jeder darf mit. Die Kleinen müssen erst groß werden."',
-            'Sebastian taucht die Hand kurz ins Wasser. „Wir nehmen nur, was wir brauchen."'
-          ] },
-          en: { intro: [
-            'Sebastian holds the basket open and points at the fish with his ladle. "Not all of them come along. The little ones must grow first."',
-            'Sebastian dips his hand briefly in the water. "We take only what we need."'
-          ] }
+        text: {
+          de: 'Sebastian hält den Korb auf und zeigt mit der Kelle auf die Fische. „Nicht jeder darf mit. Die Kleinen müssen erst groß werden. Wir nehmen nur, was wir brauchen."',
+          en: 'Sebastian holds the basket open and points at the fish with his ladle. "Not all of them come along. The little ones must grow first. We take only what we need."'
         },
         success: { de: 'Sebastian nickt langsam. „Genau richtig. Die Kleinen wachsen jetzt für nächstes Jahr."',
                    en: 'Sebastian nods slowly. "Just right. The little ones grow now for next year."' },
@@ -12049,15 +12152,9 @@ const ADVENTURES = [
           ],
           hintAfterMs: 30000
         },
-        narration: {
-          de: { intro: [
-            'Am Steg steht eine Wanderin mit leerem Rucksack. Sie schaut hungrig auf Sebastians Korb.',
-            '„Möchtest du einen Fisch?", fragt Sebastian. Dann hält er inne. „Oder soll ich dir lieber zeigen, wie man einen fängt?"'
-          ] },
-          en: { intro: [
-            'A traveler with an empty rucksack stands on the dock. She eyes Sebastian\'s basket hungrily.',
-            '"Would you like a fish?" Sebastian asks. Then he pauses. "Or shall I show you how to catch one?"'
-          ] }
+        text: {
+          de: 'Am Steg steht eine Wanderin mit leerem Rucksack. „Möchtest du einen Fisch?", fragt Sebastian. Dann hält er inne. „Oder soll ich dir lieber zeigen, wie man einen fängt?"',
+          en: 'A traveler with an empty rucksack stands on the dock. "Would you like a fish?" Sebastian asks. Then he pauses. "Or shall I show you how to catch one?"'
         },
         success: { de: 'Sebastian reicht der Wanderin alles, was du gefunden hast. „Jetzt kann sie selber."',
                    en: 'Sebastian hands the traveler everything you found. "Now she can do it herself."' },
@@ -12078,15 +12175,9 @@ const ADVENTURES = [
             { id: 'teilen-final',  icon: '🤝', label: { de: 'Teilen',  en: 'Sharing' } }
           ]
         },
-        narration: {
-          de: { intro: [
-            'Sebastian setzt sich mit der Wanderin auf den Steg. Er legt sechs kleine Holzplättchen vor sie hin, jedes mit einem Bild. „Das alles gehört zum Fischen", sagt er. „Hilfst du ihr, es sich zu merken?"',
-            'Auf dem Holz liegen zwölf umgedrehte Plättchen. Sebastian hat sie selbst geschnitzt, jedes ein Paar.'
-          ] },
-          en: { intro: [
-            'Sebastian sits down with the traveler on the dock. He lays six small wooden plates in front of her, each with a picture. "All of this is part of fishing," he says. "Will you help her remember?"',
-            'Twelve face-down plates lie on the wood. Sebastian carved them himself, each one a pair.'
-          ] }
+        text: {
+          de: 'Sebastian setzt sich mit der Wanderin auf den Steg. Er legt sechs kleine Holzplättchen vor sie hin, jedes mit einem Bild. „Das alles gehört zum Fischen", sagt er. „Hilfst du ihr, es sich zu merken?"',
+          en: 'Sebastian sits down with the traveler on the dock. He lays six small wooden plates in front of her, each with a picture. "All of this is part of fishing," he says. "Will you help her remember?"'
         },
         success: { de: 'Die Wanderin sammelt die Plättchen ein und legt sie in ihren Rucksack. Sebastian nickt langsam. „Jetzt kann sie es weitergeben."',
                    en: 'The traveler gathers the plates and puts them in her rucksack. Sebastian nods slowly. "Now she can pass it on."' },
@@ -12509,6 +12600,9 @@ function chooseAdventure(advId) {
   }
   adventureState.mode = 'intro';
   playFanfare();
+  // Pre-warm intro + first-3 scene narration mp3s into HTTP cache so
+  // playback is instant (no autoplay rejection from cold-fetch latency).
+  prewarmAdventureNarration(advId);
   renderAdventure();
 }
 
@@ -15861,6 +15955,11 @@ window.addEventListener('beforeinstallprompt', (e) => {
   deferredInstallPrompt = e;
   renderInstallChip();
 });
+
+// Bind the audio-unlock listener once at boot. First user tap (anywhere)
+// primes a silent <audio> so subsequent narrate() calls can play without
+// the iOS/Chrome-mobile autoplay block.
+if (typeof bindNarratorUnlock === 'function') bindNarratorUnlock();
 window.addEventListener('appinstalled', () => {
   deferredInstallPrompt = null;
   renderInstallChip();

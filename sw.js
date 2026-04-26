@@ -1,7 +1,7 @@
 // Kids Coin Quest — service worker
 // Bump CACHE_VERSION whenever index.html ships a change you want users to see
 // immediately after reload. Old caches are purged on activate.
-const CACHE_VERSION = 'kcq-v7';
+const CACHE_VERSION = 'kcq-v8';
 
 // `index.html` and `/` always need a fresh check so users pick up
 // new app code immediately. Everything else (assets, scripts, fonts)
@@ -57,6 +57,16 @@ self.addEventListener('fetch', (event) => {
   // next reload. Cache fallback covers offline.
   const isHtml = HTML_PATHS.some(p => url.pathname === p || url.pathname.endsWith('/index.html'));
   if (isHtml) {
+    event.respondWith(networkFirst(req));
+    return;
+  }
+
+  // Narration manifest: ALSO network-first. The manifest is the (hash →
+  // mp3) lookup table; if it's stale, freshly generated audio is
+  // invisible to the runtime. We keep a cache fallback so offline keeps
+  // working — but a live network always wins. (Was the v1 bug: stale
+  // manifest at the edge made new mp3s unreachable for days.)
+  if (url.pathname.endsWith('/audio/manifest.json')) {
     event.respondWith(networkFirst(req));
     return;
   }

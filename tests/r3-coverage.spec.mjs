@@ -921,17 +921,16 @@ test.describe('Fischer Sebastian adventure', () => {
     expect(r.minLevel).toBe(0);
   });
 
-  test('every scene has narration variant pools (R3-S3 wired up)', async ({ page }) => {
+  test('every scene has bilingual scene text (intro for the minigame)', async ({ page }) => {
+    // Narration variant pools were removed (Apr 2026) — Fischer Sebastian
+    // now uses plain `scene.text: { de, en }` like every other adventure.
+    // We'll rebuild premium narration from scratch later.
     const r = await page.evaluate(() => {
       const a = window.ADVENTURES.find(x => x.id === 'fischer-sebastian');
-      return a.scenes.map(s => {
-        const n = s.narration;
-        if (!n || typeof n !== 'object') return { id: s.id, ok: false };
-        // Either { intro: [...], ... } or { de: { intro: [...] }, en: ... }.
-        const hasFlat = Array.isArray(n.intro);
-        const hasBucketed = (n.de && Array.isArray(n.de.intro)) || (n.en && Array.isArray(n.en.intro));
-        return { id: s.id, ok: hasFlat || hasBucketed };
-      });
+      return a.scenes.map(s => ({
+        id: s.id,
+        ok: !!(s.text && typeof s.text === 'object' && s.text.de && s.text.en)
+      }));
     });
     for (const row of r) expect(row.ok).toBe(true);
   });

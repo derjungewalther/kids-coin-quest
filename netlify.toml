@@ -1,11 +1,24 @@
 # Netlify deploy config — Kids Coin Quest
-# Everything is static. The "build command" is just a one-liner that strips
-# the audio bundle out of the deploy: those ~130 MB of mp3s now come from
-# jsDelivr (free CDN over GitHub) so we don't burn Netlify free-tier
-# bandwidth on them. The files stay in git, just not in the Netlify deploy.
+# Everything is static. The "build command" strips the heavy audio bundle
+# out of the deploy: ~130 MB of mp3s ship from jsDelivr (free CDN over
+# GitHub) instead, so we don't burn Netlify free-tier bandwidth on them.
+#
+# CRITICAL: audio/manifest.json STAYS in the deploy. It's the (lang|text)
+# → mp3 lookup table, only ~40 KB, and serving it same-origin avoids the
+# multi-day jsDelivr edge cache that used to make freshly generated audio
+# invisible to clients for hours/days after a push (the v1 audio bug).
+# texts.json is the generator's source-of-truth — runtime never reads it.
 [build]
   publish = "."
-  command = "rm -rf audio/*.mp3 audio/manifest.json audio/texts.json || true"
+  command = "rm -rf audio/*.mp3 audio/texts.json || true"
+
+# Manifest is fetched once per session; revalidate on every load so a
+# fresh deploy picks up new entries instantly.
+[[headers]]
+  for = "/audio/manifest.json"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    Content-Type = "application/json; charset=utf-8"
 
 # Keep node_modules, tests, and Playwright artifacts out of the deploy bundle.
 [build.processing]
