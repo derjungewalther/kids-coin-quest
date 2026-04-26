@@ -20,10 +20,16 @@ security definer
 set search_path = public
 stable
 as $$
+-- #variable_conflict use_column resolves the "column reference is_admin
+-- is ambiguous" error: plpgsql functions with `returns table(... is_admin
+-- ...)` make the OUT parameter shadow column names by default, which
+-- breaks unqualified column refs inside SQL queries. use_column tells
+-- plpgsql to prefer the column whenever there's a conflict.
+#variable_conflict use_column
 declare
   result jsonb;
 begin
-  if not exists (select 1 from public.profiles where user_id = auth.uid() and is_admin) then
+  if not exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.is_admin) then
     raise exception 'forbidden' using errcode = '42501';
   end if;
 
@@ -41,29 +47,29 @@ begin
   prof as (
     select
       count(*) as total_users,
-      count(*) filter (where is_admin) as admin_users,
-      count(*) filter (where created_at > now() - interval '7 days')  as signups_7d,
-      count(*) filter (where created_at > now() - interval '30 days') as signups_30d
-    from public.profiles
+      count(*) filter (where p.is_admin) as admin_users,
+      count(*) filter (where p.created_at > now() - interval '7 days')  as signups_7d,
+      count(*) filter (where p.created_at > now() - interval '30 days') as signups_30d
+    from public.profiles p
   ),
   auth_stats as (
     select
-      count(*) filter (where last_sign_in_at > now() - interval '24 hours') as dau,
-      count(*) filter (where last_sign_in_at > now() - interval '7 days')   as wau,
-      count(*) filter (where last_sign_in_at > now() - interval '30 days')  as mau
-    from auth.users
+      count(*) filter (where u.last_sign_in_at > now() - interval '24 hours') as dau,
+      count(*) filter (where u.last_sign_in_at > now() - interval '7 days')   as wau,
+      count(*) filter (where u.last_sign_in_at > now() - interval '30 days')  as mau
+    from auth.users u
   )
   select jsonb_build_object(
     'total_families',     (select count(*) from fam),
-    'families_active_7d', (select count(*) from fam where updated_at > now() - interval '7 days'),
-    'families_active_30d',(select count(*) from fam where updated_at > now() - interval '30 days'),
-    'families_active_90d',(select count(*) from fam where updated_at > now() - interval '90 days'),
-    'inactive_90d',       (select count(*) from fam where updated_at < now() - interval '90 days'),
-    'total_heroes',       (select coalesce(sum(hero_count), 0) from fam),
-    'total_coins',        (select coalesce(sum(coin_total), 0) from fam),
-    'total_transactions', (select coalesce(sum(tx_count), 0) from fam),
-    'avg_heroes',         (select coalesce(round(avg(hero_count)::numeric, 2), 0) from fam where hero_count > 0),
-    'avg_coins_per_fam',  (select coalesce(round(avg(coin_total)::numeric, 2), 0) from fam where hero_count > 0),
+    'families_active_7d', (select count(*) from fam where fam.updated_at > now() - interval '7 days'),
+    'families_active_30d',(select count(*) from fam where fam.updated_at > now() - interval '30 days'),
+    'families_active_90d',(select count(*) from fam where fam.updated_at > now() - interval '90 days'),
+    'inactive_90d',       (select count(*) from fam where fam.updated_at < now() - interval '90 days'),
+    'total_heroes',       (select coalesce(sum(fam.hero_count), 0) from fam),
+    'total_coins',        (select coalesce(sum(fam.coin_total), 0) from fam),
+    'total_transactions', (select coalesce(sum(fam.tx_count), 0) from fam),
+    'avg_heroes',         (select coalesce(round(avg(fam.hero_count)::numeric, 2), 0) from fam where fam.hero_count > 0),
+    'avg_coins_per_fam',  (select coalesce(round(avg(fam.coin_total)::numeric, 2), 0) from fam where fam.hero_count > 0),
     'total_users',        (select total_users from prof),
     'admin_users',        (select admin_users from prof),
     'signups_7d',         (select signups_7d from prof),
@@ -109,8 +115,9 @@ security definer
 set search_path = public
 stable
 as $$
+#variable_conflict use_column
 begin
-  if not exists (select 1 from public.profiles where user_id = auth.uid() and is_admin) then
+  if not exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.is_admin) then
     raise exception 'forbidden' using errcode = '42501';
   end if;
   return query
@@ -157,8 +164,9 @@ security definer
 set search_path = public
 stable
 as $$
+#variable_conflict use_column
 begin
-  if not exists (select 1 from public.profiles where user_id = auth.uid() and is_admin) then
+  if not exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.is_admin) then
     raise exception 'forbidden' using errcode = '42501';
   end if;
   return query
