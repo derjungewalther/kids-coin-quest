@@ -12450,6 +12450,251 @@ const ADVENTURES = [
         ]
       }
     ]
+  },
+
+  // ===========================================================
+  // Aldwin und der Mondschein — Familien-/Freundschafts-Adventure
+  // (Apr 2026). Ein einsamer Ritter sucht sein verschwundenes Pferd.
+  // 4× Würfel + 4× Mini-Game gemischt, easy / Lvl 0. Kein Kampf,
+  // kein Drache — die Spannung kommt aus Zärtlichkeit, Geduld und
+  // dem Mut, einen Freund zu suchen statt am Fenster zu sitzen.
+  // ===========================================================
+  {
+    id: 'aldwin-mondschein', icon: '🐴', difficulty: 'easy', minLevel: 0, maxHp: 6,
+    title:   { de: 'Aldwin und der Mondschein',
+               en: 'Aldwin and the Moonshine' },
+    summary: { de: 'Der einsame Ritter hat seit dem Sturm sein Pferd nicht gesehen. Heute sind frische Hufspuren am Waldrand. Gehst du mit?',
+               en: "The lonely knight hasn't seen his horse since the storm. This morning, fresh hoofprints at the forest edge. Will you go with him?" },
+    intro: {
+      de: 'Auf dem Hügel über dem stillen Tal steht das Schloss von Ritter Aldwin. Ein Schloss mit zu vielen Türmen für einen Mann allein. Seit Mondschein im großen Sturm verschwand — schon bald ein Jahr ist es her — sitzt Aldwin meistens am Fenster, schaut hinaus, und schreibt Briefe an niemanden.\n\nHeute Morgen kam ein Bote angerannt. Er hatte am Waldrand frische Hufspuren gesehen. Schmale Hufe, wie ein Pferd das auf weichem Boden geht. Und ein einzelnes weißes Mähnenhaar an einem Zweig.\n\nAls du in den Hof reitest, steht Aldwin bereits an der Tür — Schwert und Helm hat er beiseite gelegt, statt dessen trägt er einen alten Mantel und einen Korb mit Möhren in der Hand. Er sieht müde aus, aber seine Augen sind das erste Mal seit langer Zeit lebendig.\n\n„Du bist gekommen", sagt er leise. „Ich… kann das nicht alleine. Hilfst du mir, ihn zu finden?"',
+      en: "On the hill above the quiet valley stands Sir Aldwin's castle. A castle with too many towers for one man alone. Since Moonshine vanished in the great storm — nearly a year ago now — Aldwin mostly sits by the window, looking out, and writing letters to no one.\n\nThis morning a messenger came running. He had seen fresh hoofprints at the forest edge. Narrow hooves, like a horse walking on soft ground. And a single white strand of mane caught on a twig.\n\nWhen you ride into the courtyard, Aldwin is already at the door — he has set his sword and helmet aside, instead he wears an old cloak and carries a basket of carrots in his hand. He looks tired, but his eyes are alive for the first time in a long while.\n\n\"You came,\" he says quietly. \"I… cannot do this alone. Will you help me find him?\""
+    },
+    victory: {
+      de: '🐴 Mondschein steht still in der Lichtung, kleine Atemwölkchen vor seinen Nüstern, das weiße Fell vom Morgenfrost glitzernd. Er erkennt Aldwin nicht sofort — er ist scheu geworden in dem langen Jahr. Aber als Aldwin den Korb mit Möhren auf den Boden stellt und sich hinkniet, ohne ein Wort, geht das Pferd langsam auf ihn zu.\n\nEs legt seine Stirn an Aldwins Stirn und bleibt so stehen, lange. Aldwin weint leise. Mondschein lässt es zu.\n\nAuf dem Rückweg geht Mondschein neben euch, ohne Sattel, ohne Zaumzeug — wie damals als sie noch jung waren. Aldwin schaut dich an, immer wieder, und schüttelt nur den Kopf. „Ich hätte ihn alleine nie gefunden", sagt er. „Du hast mich aus dem Schloss geholt. Das ist viel mehr als ein Pferd zurückzubringen."',
+      en: "🐴 Moonshine stands still in the clearing, small clouds of breath before his nostrils, white coat glittering with morning frost. He doesn't recognize Aldwin at first — he has grown shy over the long year. But when Aldwin sets the basket of carrots on the ground and kneels down, without a word, the horse walks slowly toward him.\n\nHe lays his forehead against Aldwin's forehead and stays there, a long time. Aldwin cries quietly. Moonshine lets him.\n\nOn the way home Moonshine walks beside you — no saddle, no bridle — the way it was when they were young. Aldwin looks at you, again and again, and just shakes his head. \"I would never have found him alone,\" he says. \"You got me out of the castle. That is much more than bringing a horse home.\""
+    },
+    defeat: {
+      de: '🌫 Der Nebel zieht sich über die Lichtung, und die Hufspuren werden dünner und verschwinden ganz. Mondschein ist heute nicht zu finden. Aldwin steht lange still, dann hebt er den Korb mit Möhren wieder auf und nickt leise.\n\n„Er war hier", sagt er. „Das ist mehr als gestern."\n\nAuf dem Rückweg geht ihr nebeneinander, schweigend. Im Schloss machst du heißen Tee, Aldwin legt zwei Möhren auf das Fenstersims — falls ein gewisser jemand sie sich nachts holen kommt — und setzt sich auf den Stuhl, auf dem er sonst sitzt. Aber heute schreibt er keine Briefe mehr.\n\n„Morgen früh wieder", sagt er. „Diesmal weiß ich, wo ich anfange."',
+      en: "🌫 The mist closes in over the clearing, and the hoofprints grow thinner, then vanish entirely. Moonshine is not to be found today. Aldwin stands still a long time, then picks up the basket of carrots again and gives a small nod.\n\n\"He was here,\" he says. \"That's more than yesterday.\"\n\nYou walk home side by side, silent. At the castle you make hot tea. Aldwin lays two carrots on the windowsill — in case a certain someone comes for them in the night — and sits down in the chair where he always sits. But today he writes no more letters.\n\n\"Tomorrow morning, again,\" he says. \"This time I know where to begin.\""
+    },
+    scenes: [
+      // ----- 1 · Würfel: Im stillen Schloss -------------------
+      {
+        title: { de: 'Im stillen Schloss', en: 'In the Quiet Castle' },
+        text: {
+          de: 'Aldwin bittet dich in die Halle. Die Tische sind staubig, ein einzelnes Gedeck steht bereit, an der Wand hängt ein altes Bild — Aldwin, jünger, lachend, neben einem weißen Fohlen. „Mondschein", sagt er und folgt deinem Blick. „Wir sind zusammen aufgewachsen. Mein Vater hat ihn mir geschenkt, an dem Tag, an dem ich laufen lernte." Er macht eine Pause. „Bevor wir gehen — was möchtest du wissen? Sonst weiß ich nicht, womit anfangen."',
+          en: 'Aldwin invites you into the hall. The tables are dusty, a single place setting is laid out, on the wall hangs an old painting — Aldwin, younger, laughing, beside a white foal. "Moonshine," he says, following your gaze. "We grew up together. My father gave him to me the day I learned to walk." He pauses. "Before we set out — what would you like to know? Otherwise I don\'t know where to begin."'
+        },
+        options: [
+          { stat: 'kind', dc: 8,
+            label:   { de: '💛 Frag wie es ihm geht. Wirklich.', en: '💛 Ask how he is. Really.' },
+            success: { de: 'Du fragst leise: „Wie geht es dir, Aldwin?" Er schaut auf, überrascht — als hätte er die Frage seit Monaten nicht gehört. Dann lacht er kurz, fast ungläubig, und sein Gesicht wird weicher. „Heute", sagt er, „heute zum ersten Mal wieder etwas wie hoffnungsvoll." Er steht auf. „Komm. Wir verlieren das Tageslicht."',
+                       en: 'You ask quietly: "How are you, Aldwin?" He looks up, surprised — as if no one has asked him that for months. Then he laughs briefly, almost in disbelief, and his face softens. "Today," he says, "today, for the first time, something like hopeful." He stands up. "Come. We\'re losing the daylight."' },
+            failure: { de: 'Du fragst, aber zu leise oder zu hastig. Aldwin antwortet nicht direkt — er steht auf, klopft sich den Staub vom Mantel und sagt nur: „Wir gehen besser." Aber er hat die Frage gehört. Das siehst du an seinem Schritt.',
+                       en: 'You ask, but too softly or too quickly. Aldwin doesn\'t answer directly — he stands up, brushes the dust from his cloak, and only says: "We had better go." But he heard the question. You can see it in the way he walks.' } },
+          { stat: 'brave', dc: 9,
+            label:   { de: '💪 Sag ihm: heute finden wir ihn.', en: "💪 Tell him: today we'll find him." },
+            success: { de: 'Du sagst es einfach, ohne Theater: „Heute finden wir ihn." Aldwin schaut dich kurz an, dann nickt er — ein langsamer, fester Nicken. Er nimmt den Korb auf, hebt das Schwert NICHT vom Tisch, und geht zur Tür. „Dann gehen wir", sagt er. Es klingt wie eine Erlaubnis an sich selbst.',
+                       en: 'You say it plainly, without theatre: "Today we will find him." Aldwin looks at you for a moment, then nods — a slow, firm nod. He picks up the basket, does NOT take the sword from the table, and walks to the door. "Then we go," he says. It sounds like permission given to himself.' },
+            failure: { de: 'Dein Versprechen kommt zu groß. Aldwin schüttelt den Kopf, freundlich. „Versprich nichts, was du nicht halten kannst. Aber komm — wir gehen es trotzdem." Er macht die Tür auf und lässt dich vorgehen.',
+                       en: 'Your promise comes too large. Aldwin shakes his head, kindly. "Don\'t promise what you can\'t keep. But come — we\'ll go anyway." He opens the door and lets you walk first.' } },
+          { stat: 'clever', dc: 10,
+            label:   { de: '🧠 Frag nach Mondscheins Lieblingsorten', en: '🧠 Ask after Moonshine\'s favourite places' },
+            success: { de: '„Wo war er am liebsten?", fragst du. Aldwin antwortet sofort, präzise, fast erleichtert: „Beim Bach hinter der alten Eiche. Auf der Lichtung mit den Heidelbeeren. Im hohen Gras am Westrand." Er holt eine Karte heraus und tippt drei Stellen an. Mit der Karte werden wir nicht stundenlang im Wald rumirren.',
+                       en: '"Where did he like best?" you ask. Aldwin answers at once, precisely, almost relieved: "By the brook behind the old oak. The clearing with the blueberries. The tall grass on the west edge." He pulls out a map and taps three spots. With the map you won\'t spend hours wandering the woods.' },
+            failure: { de: 'Du fragst, aber Aldwin überlegt zu lange — sein Erinnerung schmerzt. „Vielleicht der Bach", murmelt er. „Vielleicht die Lichtung. Ich weiß es heute nicht mehr." Wir suchen ohne Karte.',
+                       en: 'You ask, but Aldwin takes too long — the remembering pains him. "Maybe the brook," he murmurs. "Maybe the clearing. I can\'t recall today." You\'ll search without a map.' } }
+        ]
+      },
+      // ----- 2 · Mini-Game: Die Spurensuche (count) -----------
+      {
+        id: 'am-2', minigame: 'count',
+        title: { de: 'Die Spurensuche', en: 'The Trail of Hooves' },
+        minigameConfig: { rounds: 3, min: 3, max: 7, flashDurationMs: 2200, objectIcon: '🐾' },
+        text: {
+          de: 'Am Waldrand, wo der Bote die Spuren gesehen hat, glitzert der Reif noch dünn auf dem Boden. Aldwin kniet sich hin und zählt die Abdrücke. „Hilfst du mir?", fragt er. „Meine Augen sind nicht mehr so jung. Wenn wir wissen wieviele Schritte er gemacht hat, wissen wir ungefähr wie schnell er gegangen ist." Du beugst dich zu ihm hinunter und schaust auf die feinen Hufabdrücke im Frost.',
+          en: 'At the forest edge, where the messenger saw the prints, frost still glitters thinly on the ground. Aldwin kneels and counts the marks. "Will you help?" he asks. "My eyes aren\'t as young as they were. If we know how many steps he took, we know roughly how fast he was walking." You bend down beside him and look at the fine hoofprints in the frost.'
+        },
+        success: {
+          de: 'Du zählst sicher. Aldwin nickt zufrieden. „Er ist gegangen, nicht gerannt. Das heißt: er war nicht in Panik. Er kennt diesen Wald." Er hebt den Korb auf und geht voran, jetzt ein wenig leichter im Schritt.',
+          en: 'You count surely. Aldwin nods, satisfied. "He walked, he didn\'t run. That means: he wasn\'t in panic. He knows these woods." He picks up the basket and walks on, a little lighter in his step now.'
+        },
+        failure: {
+          de: 'Du zählst, aber der Frost flackert im Sonnenlicht und ein paar Spuren überschneiden sich. Aldwin lacht leise. „Schwierig, gell? Egal. Wir wissen jetzt: er war hier. Das reicht für den Anfang."',
+          en: 'You count, but the frost flickers in the sunlight and a few prints overlap. Aldwin laughs softly. "Tricky, eh? Never mind. We know now: he was here. That\'s enough to begin."'
+        }
+      },
+      // ----- 3 · Würfel: Der alte Stall -----------------------
+      {
+        title: { de: 'Der alte Stall', en: 'The Old Stable' },
+        text: {
+          de: 'Bevor ihr in den Wald geht, möchte Aldwin nochmal in den alten Stall — vielleicht ist Mondschein in der Nacht hier vorbeigekommen. Der Stall riecht nach Heu und nach einem ganzen Jahr ohne Pferd. An der Wand hängt noch sein altes Halfter. Drei Sachen kannst du tun.',
+          en: 'Before going into the woods, Aldwin wants to look in the old stable once more — perhaps Moonshine came by in the night. The stable smells of hay and of a whole year without a horse. His old halter still hangs on the wall. Three things you could do.'
+        },
+        options: [
+          { stat: 'clever', dc: 9,
+            label:   { de: '🧠 Den Boden auf frische Spuren absuchen', en: '🧠 Search the floor for fresh tracks' },
+            success: { de: 'Du gehst langsam mit gesenktem Kopf durch den Stall. In der Box ganz hinten findest du im Stroh einen einzelnen frischen Apfelkern und einen halben Hufabdruck. Mondschein war heute Nacht hier — kurz, aber er war hier.',
+                       en: 'You walk slowly through the stable, head bowed. In the back stall you find a single fresh apple seed in the straw, and half a hoofprint. Moonshine was here last night — briefly, but he was here.' },
+            failure: { de: 'Der Boden ist zu staubig und das Stroh überall durcheinander. Du findest nichts Klares. Aber an der Tür hängt das Halfter etwas anders als sonst — als wäre es leicht angestoßen worden.',
+                       en: 'The floor is too dusty and the straw scattered. You find nothing clear. But the halter at the door hangs slightly off — as if it was bumped, lightly.' } },
+          { stat: 'kind', dc: 8,
+            label:   { de: '💛 Das alte Halfter mitnehmen — er kennt den Geruch', en: '💛 Take the old halter — he knows its smell' },
+            success: { de: 'Du nimmst das Halfter behutsam vom Haken. Aldwin schluckt, sagt aber nichts. Im Wald wird das Halfter nützlich sein: ein Pferd erinnert sich an Gerüche länger als an Gesichter.',
+                       en: 'You lift the halter gently off the hook. Aldwin swallows but says nothing. In the woods the halter will be useful: a horse remembers a smell longer than a face.' },
+            failure: { de: 'Du nimmst das Halfter, aber etwas ungeschickt — der Lederriemen reißt an einer alten Stelle. Aldwin reicht dir wortlos den Korb mit Möhren stattdessen. „Auch gut", sagt er. „Möhren sind ehrlicher als Leder."',
+                       en: 'You take the halter but a little clumsily — the leather strap tears at an old spot. Aldwin silently hands you the basket of carrots instead. "Also fine," he says. "Carrots are more honest than leather."' } },
+          { stat: 'brave', dc: 10,
+            label:   { de: '💪 Auf das Dach klettern — vielleicht siehst du ihn von oben', en: '💪 Climb onto the roof — maybe you can see him from above' },
+            success: { de: 'Du kletterst die alte Leiter hoch und spähst über die Felder. Weit am Westrand, halb verdeckt von Nebel, siehst du eine weiße Bewegung. Es könnte ein Hirsch sein. Es könnte etwas anderes sein. Du steigst zurück und zeigst Aldwin die Richtung. Er holt tief Luft.',
+                       en: 'You climb the old ladder and look out over the fields. Far at the western edge, half veiled in mist, you see a white movement. It could be a deer. It could be something else. You climb down and point Aldwin in the direction. He takes a deep breath.' },
+            failure: { de: 'Du kletterst hoch, aber der Morgennebel hängt noch dicht über den Feldern. Du siehst Bäume, Bäume, mehr Bäume. Aldwin lacht von unten. „Komm runter, kleiner Späher. Wir gehen einfach in den Wald."',
+                       en: 'You climb up, but the morning mist still hangs thick over the fields. You see trees, trees, more trees. Aldwin laughs from below. "Come down, little scout. We\'ll just go into the woods."' } }
+        ]
+      },
+      // ----- 4 · Mini-Game: Die Wegegabelung (maze) -----------
+      {
+        id: 'am-4', minigame: 'maze',
+        title: { de: 'Die Wegegabelung', en: 'The Forking Paths' },
+        minigameConfig: {
+          width: 5, height: 5, start: [0,4], goal: [4,0], hero: '🐴',
+          obstacles: [
+            { pos: [1,3], icon: '🌳', kind: 'baum' },
+            { pos: [2,2], icon: '🌳', kind: 'baum' },
+            { pos: [3,3], icon: '🪵', kind: 'umgefallen' },
+            { pos: [3,1], icon: '🌳', kind: 'baum' },
+            { pos: [1,1], icon: '🌳', kind: 'baum' }
+          ],
+          moveLimit: 14, diagonals: false
+        },
+        text: {
+          de: 'Der Wald gabelt sich in viele Wege — alte Holzfällerpfade, Wildwechsel, vom Sturm umgefallene Stämme. Aldwin schaut dich an. „Du hast ein besseres Auge für Wege als ich. Welcher führt zur Lichtung mit den Heidelbeeren?" Du gehst voran und prüfst jeden Weg, ob frische Hufspuren in den Boden gedrückt sind.',
+          en: 'The wood forks into many paths — old loggers\' tracks, deer-trails, trees toppled in the storm. Aldwin looks at you. "You have a better eye for paths than I. Which leads to the blueberry clearing?" You walk ahead, checking each path for fresh hoofprints pressed into the soil.'
+        },
+        success: {
+          de: 'Du findest den richtigen Weg ohne Umweg. Aldwin folgt dir, immer wieder lächelt er ein kleines Lächeln, weil du am Boden Spuren liest, die er übersieht. „Du wirst noch ein guter Spurensucher", sagt er.',
+          en: 'You find the right path with no detours. Aldwin follows you, smiling a small smile every now and then because you read tracks on the ground he misses. "You\'ll be a fine tracker yet," he says.'
+        },
+        failure: {
+          de: 'Du gehst einen Pfad zu weit, dann zurück, dann einen anderen — der Wald ist verwirrend an diesem Morgen. Aldwin meckert nicht, aber ihr verliert eine halbe Stunde, bis ihr endlich bei der Lichtung ankommt.',
+          en: 'You take one path too far, then back, then another — the wood is confusing this morning. Aldwin doesn\'t complain, but you lose half an hour before you finally reach the clearing.'
+        }
+      },
+      // ----- 5 · Würfel: Der treue Hund -----------------------
+      {
+        title: { de: 'Der treue Hund', en: 'The Faithful Dog' },
+        text: {
+          de: 'Auf dem Pfad steht plötzlich ein dünner brauner Hund — verstrubbelt, alt, mit traurigen Augen. Er knurrt nicht. Er schaut dich nur an, dann hinter dich, als suche er jemanden. „Das ist Mondscheins Hund", flüstert Aldwin überrascht. „Bello. Er ist mit ihm im Sturm verschwunden. Er beschützt ihn anscheinend, das ganze Jahr." Bello tritt einen Schritt vor — nicht aggressiv, aber prüfend.',
+          en: 'On the path stands a thin brown dog — scruffy, old, with sad eyes. He doesn\'t growl. He just looks at you, then past you, as if searching for someone. "That\'s Moonshine\'s dog," Aldwin whispers, astonished. "Bello. He vanished with him in the storm. He must have been guarding him, all year." Bello takes one step forward — not aggressive, but appraising.'
+        },
+        options: [
+          { stat: 'kind', dc: 8,
+            label:   { de: '💛 Hinknien und ihm den Möhrenkorb hinhalten', en: '💛 Kneel and offer him the basket of carrots' },
+            success: { de: 'Du kniest dich hin und hältst ihm den Korb hin. Bello schnuppert, lange, und dann tritt er ganz langsam näher. Er nimmt eine Möhre, kaut sie bedächtig, und legt sich dann zwischen dich und Aldwin — als ob er jetzt dazu gehört. Er führt euch weiter.',
+                       en: 'You kneel and hold the basket out. Bello sniffs, long, then steps slowly closer. He takes a carrot, chews thoughtfully, and lies down between you and Aldwin — as if he belongs with you now. He leads you onward.' },
+            failure: { de: 'Du kniest dich, aber Bello bleibt skeptisch. Er nimmt nichts. Aber er weicht auch nicht — er trabt einfach wenige Schritte vor euch her, als wolle er den Weg zeigen. Das reicht.',
+                       en: 'You kneel, but Bello stays skeptical. He takes nothing. But he doesn\'t back away either — he just trots a few steps ahead of you, as if showing the way. That\'s enough.' } },
+          { stat: 'brave', dc: 11,
+            label:   { de: '💪 Stehen bleiben, ruhig, bis er dich akzeptiert', en: '💪 Stand still, calm, until he accepts you' },
+            success: { de: 'Du bleibst stehen, lässt die Arme locker, atmest tief. Bello kommt näher, schnuppert an deinen Stiefeln, an deiner Hand, und dann — fast feierlich — stupst er dich mit der Schnauze. Er hat dich angenommen. Er folgt euch jetzt überall hin.',
+                       en: 'You stand still, arms loose, breathing slowly. Bello comes closer, sniffs your boots, your hand, and then — almost ceremonially — bumps you with his nose. He has accepted you. He will follow you anywhere now.' },
+            failure: { de: 'Du bleibst stehen, aber Bello verliert das Interesse und trabt davon ins Gebüsch. Aldwin schaut ihm nach. „Vielleicht treffen wir ihn später wieder", sagt er. Aber er klingt enttäuscht.',
+                       en: 'You stand still, but Bello loses interest and trots off into the underbrush. Aldwin watches him go. "Maybe we\'ll meet him again later," he says. But he sounds disappointed.' } },
+          { stat: 'clever', dc: 10,
+            label:   { de: '🧠 Mondscheins Namen ruhig aussprechen', en: '🧠 Speak Moonshine\'s name calmly' },
+            success: { de: '„Mondschein", sagst du, ruhig und klar. Bellos Ohren stellen sich auf. Er bellt einmal — kurz, hoffnungsvoll — und dreht sich um. Er führt euch direkt los, als hättet ihr das Passwort gesagt.',
+                       en: '"Moonshine," you say, calm and clear. Bello\'s ears prick up. He barks once — short, hopeful — and turns. He leads you off at once, as if you said the password.' },
+            failure: { de: 'Du sprichst den Namen, aber leise. Bello kippt den Kopf zur Seite, beobachtet dich noch einen Moment, und trabt dann weiter. Er schaut hin und wieder zurück, ob ihr ihm folgt.',
+                       en: 'You say the name, but quietly. Bello tilts his head, watches you another moment, then trots on. He glances back now and then to see if you\'re following.' } }
+        ]
+      },
+      // ----- 6 · Mini-Game: Der Weidenwald (memory) -----------
+      {
+        id: 'am-6', minigame: 'memory',
+        title: { de: 'Der Weidenwald', en: 'The Willow Wood' },
+        minigameConfig: {
+          pairs: 4,
+          items: [
+            { id: 'apfel',      icon: '🍎', label: { de: 'Apfel',          en: 'Apple' } },
+            { id: 'moehre',     icon: '🥕', label: { de: 'Möhre',          en: 'Carrot' } },
+            { id: 'heidelbeere',icon: '🫐', label: { de: 'Heidelbeere',    en: 'Blueberry' } },
+            { id: 'mistel',     icon: '🌿', label: { de: 'Mistel',         en: 'Mistletoe' } }
+          ]
+        },
+        text: {
+          de: 'Im Weidenwald hat Mondschein eine Spur aus Lieblings-Snacks hinterlassen — er ist ein eitles Pferd, das gerne sammelt was ihm schmeckt. Aldwin zeigt zwischen die Weiden. „Da liegen sie. Wenn wir die Paare finden, sehen wir wo er am längsten gestanden hat — denn dort hat er seine Sachen verteilt." Du beugst dich hinunter und drehst den ersten Stein um.',
+          en: 'In the willow wood Moonshine has left a trail of favourite snacks — he\'s a vain horse, fond of gathering what he likes. Aldwin points among the willows. "There they lie. If we find the pairs, we\'ll see where he stood longest — because that\'s where he scattered his things." You bend down and turn over the first stone.'
+        },
+        success: {
+          de: 'Du findest alle Paare. Aldwin nickt langsam. „Hier hat er gegessen, hier hat er geschlafen. Er ist nicht weit weg." Bello bellt einmal zur Bestätigung.',
+          en: 'You find all the pairs. Aldwin nods slowly. "Here he ate, here he slept. He isn\'t far." Bello barks once in confirmation.'
+        },
+        failure: {
+          de: 'Du findest die meisten Paare, aber zwei bleiben verstreut. Aldwin sammelt sie auf und steckt sie in die Tasche. „Macht nichts. Genug für eine Spur."',
+          en: 'You find most of the pairs, but two stay scattered. Aldwin gathers them and pockets them. "Never mind. Enough for a trail."'
+        }
+      },
+      // ----- 7 · Mini-Game: Der eisige Bach (sort) ------------
+      {
+        id: 'am-7', minigame: 'sort',
+        title: { de: 'Der eisige Bach', en: 'The Icy Brook' },
+        minigameConfig: {
+          buckets: [
+            { id: 'mondschein',  label: { de: 'Mondscheins Sachen', en: "Moonshine's things" }, icon: '🐴' },
+            { id: 'waldsachen',  label: { de: 'Sachen vom Wald',    en: 'Forest things' },      icon: '🌲' }
+          ],
+          items: [
+            { id: 'satteldecke',  icon: '🟫', correctBucket: 'mondschein' },
+            { id: 'huf-eisen',    icon: '🧲', correctBucket: 'mondschein' },
+            { id: 'maehne-haar',  icon: '🤍', correctBucket: 'mondschein' },
+            { id: 'tannenzapfen', icon: '🌰', correctBucket: 'waldsachen' },
+            { id: 'wurzel',       icon: '🪵', correctBucket: 'waldsachen' },
+            { id: 'pilz',         icon: '🍄', correctBucket: 'waldsachen' }
+          ],
+          successThreshold: 0.7
+        },
+        text: {
+          de: 'Am eisigen Bach hat Mondschein anscheinend viel Zeit verbracht — und einiges verloren. Im klaren Wasser liegen seine Satteldecke, ein verbogener Hufeisen-Rest, ein Büschel weißer Mähnenhaare, aber auch Tannenzapfen, Wurzeln und Pilze, die der Bach mitgespült hat. „Sammeln wir nur seine Sachen ein", sagt Aldwin. „Die Walddinger gehören zum Wald."',
+          en: 'At the icy brook Moonshine has clearly spent some time — and lost some things. In the clear water lie his saddle blanket, a bent fragment of horseshoe, a tuft of white mane hair, but also pine cones, roots, and mushrooms the stream has washed in. "Let\'s pick up only his things," Aldwin says. "The forest things belong to the forest."'
+        },
+        success: {
+          de: 'Du sortierst sicher. Mondscheins Sachen wandern in Aldwins Tasche, der Rest bleibt im Bach. Aldwin betrachtet den weißen Haarbüschel besonders lang. „Er hat sich gepflegt. Es geht ihm gut."',
+          en: 'You sort surely. Moonshine\'s things go into Aldwin\'s pouch, the rest stays in the brook. Aldwin looks especially long at the tuft of white hair. "He\'s been grooming himself. He\'s well."'
+        },
+        failure: {
+          de: 'Du sortierst, aber ein paar Pilze landen in Aldwins Tasche. Er lacht zum ersten Mal heute laut. „Pilze für Mondschein? Er würde sie verschmähen." Er schüttet sie zurück in den Bach.',
+          en: 'You sort, but a few mushrooms end up in Aldwin\'s pouch. He laughs aloud for the first time today. "Mushrooms for Moonshine? He\'d turn his nose up at them." He tips them back into the brook.'
+        }
+      },
+      // ----- 8 · Würfel: Die Lichtung -------------------------
+      {
+        title: { de: 'Die Lichtung', en: 'The Clearing' },
+        text: {
+          de: 'Hinter den letzten Weiden öffnet sich eine kleine Lichtung — und da steht er. Mondschein. Weißes Fell, schmal geworden, aber gesund. Er hebt den Kopf und schaut euch an, lange, ohne sich zu bewegen. Er erkennt Aldwin nicht sofort. Bello bleibt sitzen, ganz still. Aldwin schaut dich an, hilflos. „Was machen wir jetzt?"',
+          en: 'Beyond the last willows a small clearing opens — and there he stands. Moonshine. White coat, grown thinner, but healthy. He lifts his head and looks at you, long, without moving. He doesn\'t recognize Aldwin at once. Bello stays seated, completely still. Aldwin looks at you, helpless. "What do we do now?"'
+        },
+        options: [
+          { stat: 'kind', dc: 8,
+            label:   { de: '💛 Aldwin soll sich hinknien, ohne ein Wort, mit dem Korb', en: '💛 Have Aldwin kneel, without a word, with the basket' },
+            success: { de: 'Aldwin kniet sich hin, stellt den Korb auf den Boden, und schweigt. Du legst eine Hand auf seine Schulter, sagst nichts. Mondschein zögert lange — dann macht er den ersten Schritt. Den zweiten. Den dritten. Er kommt.',
+                       en: 'Aldwin kneels, sets the basket on the ground, and is silent. You lay a hand on his shoulder, say nothing. Moonshine hesitates a long time — then takes the first step. The second. The third. He comes.' },
+            failure: { de: 'Aldwin kniet sich, aber zu schnell — Mondschein ruckt zurück. Aldwin bleibt unten, atmet ruhig. Nach einer Weile kommt Mondschein wieder einen Schritt näher. Es dauert lange, aber es klappt.',
+                       en: 'Aldwin kneels, but too quickly — Moonshine starts back. Aldwin stays down, breathing slow. After a while Moonshine takes another step closer. It takes long, but it works.' } },
+          { stat: 'clever', dc: 10,
+            label:   { de: '🧠 Bello vorschicken — er kennt Mondschein am besten', en: '🧠 Send Bello first — he knows Moonshine best' },
+            success: { de: 'Du schickst Bello mit einem leisen Wort vor. Er trabt zu Mondschein, springt hoch, leckt ihm die Nase. Mondschein wiehert leise. Er erkennt seinen Hund — und durch den Hund auch den Menschen, der hinten steht. Er kommt von selbst.',
+                       en: 'You send Bello forward with a quiet word. He trots to Moonshine, jumps up, licks his nose. Moonshine whickers softly. He recognizes his dog — and through the dog the man waiting behind. He comes of his own accord.' },
+            failure: { de: 'Bello will nicht von dir weg. Er bleibt sitzen, schaut dich an, schaut Mondschein an. Aldwin muss es selbst versuchen. Es dauert länger, aber Mondschein kommt.',
+                       en: 'Bello won\'t leave your side. He sits, looks at you, looks at Moonshine. Aldwin will have to try himself. It takes longer, but Moonshine comes.' } },
+          { stat: 'brave', dc: 9,
+            label:   { de: '💪 Den alten Pfeifruf, den Aldwin als Junge benutzt hat', en: '💪 The old whistle Aldwin used as a boy' },
+            success: { de: 'Du forderst Aldwin auf, den alten Ruf zu pfeifen. Er versucht es zaghaft, dann fester — drei Töne, hoch-tief-hoch. Mondscheins Ohren zucken sofort. Er stellt sich auf, schüttelt die Mähne, und kommt direkt im Trab. Es ist als wäre keine Zeit vergangen.',
+                       en: 'You urge Aldwin to whistle the old call. He tries shyly, then firmer — three notes, high-low-high. Moonshine\'s ears twitch at once. He stands up tall, shakes his mane, and comes straight at a trot. As if no time had passed.' },
+            failure: { de: 'Aldwin versucht den Ruf, aber die Stimme bricht ihm an der zweiten Note. Er schluckt, lacht ein bisschen über sich selbst, und versucht es nochmal — leiser, aber richtig. Mondschein schaut auf, kommt langsam, vorsichtig.',
+                       en: 'Aldwin tries the call, but his voice cracks at the second note. He swallows, laughs a little at himself, and tries again — quieter, but right. Moonshine looks up, comes slowly, carefully.' } }
+        ]
+      }
+    ]
   }
 ];
 
