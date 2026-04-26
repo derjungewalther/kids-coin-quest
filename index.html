@@ -14254,6 +14254,12 @@ function finishMinigameOutcome(outcome, scene) {
   if (slot) {
     const successText = scene.success ? L(scene.success) : '';
     const failureText = scene.failure ? L(scene.failure) : '';
+    // Speak the outcome out loud. Was missing — the banner was painted
+    // but the success/failure text stayed silent, so winning a mini-game
+    // looked like "✓ Erfolg" with mute body text. (Apr 2026 fix, paired
+    // with the renderAdventureEnd narrate() addition.)
+    const outcomeText = success ? successText : failureText;
+    if (outcomeText) narrateOnce('mg-outcome:' + adventureState.sceneIdx, outcomeText);
     const isLast = adventureState.sceneIdx >= a.scenes.length - 1;
     const wiped = adventureState.hp <= 0;
     const continueBtn = wiped
@@ -15269,6 +15275,11 @@ function renderAdventureEnd() {
     endTier = 'home';    endTitle = t('end_home');          endSub = t('home_sub');
   }
   const endText = L(won ? a.victory : a.defeat);
+  // Speak the victory/defeat finale. Was missing — adventure-end was
+  // rendered to the DOM but never voiced, so kids who got Brunhild's
+  // soot-grey nod or Sebastian's "morgen ist auch ein See" only saw
+  // the words on the page. (Apr 2026 fix.)
+  narrate(endText);
   let treasureHtml = '';
   if (won && adventureState.treasureRewards && adventureState.treasureRewards.length) {
     const meta = adventureState.treasureMeta || {};
