@@ -2651,6 +2651,39 @@
     .admin-cell-email { font-size: 10px; word-break: break-all; }
   }
 
+  /* Plan badge pills (free/pro/family) — colour-coded for quick scan. */
+  .plan-pill {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border: 1px solid;
+  }
+  .plan-pill.plan-free   { background: rgba(156,163,175,0.15); color: #9ca3af; border-color: #9ca3af; }
+  .plan-pill.plan-pro    { background: rgba(244,211,94,0.18); color: var(--gold-bright); border-color: var(--gold-dark); }
+  .plan-pill.plan-family { background: rgba(168,85,247,0.18); color: #c084fc; border-color: #a855f7; }
+
+  /* Compact icon button used in the Families table actions column. */
+  .btn-admin-icon {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--ink-muted);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.15s;
+  }
+  .btn-admin-icon:hover {
+    color: var(--gold-bright);
+    background: rgba(244,211,94,0.1);
+    border-color: var(--gold-dark);
+  }
+
   /* BUG-05/06 fix — heroes view header row.
      The old layout stacked title / ornament / recruit-CTA vertically,
      which made the empty section read as broken slot placeholders.
@@ -4402,6 +4435,7 @@
         <button class="admin-tab"        data-admin-tab="families"   onclick="switchAdminTab('families')"   data-i18n="admin_tab_families">👨‍👩‍👧 Families</button>
         <button class="admin-tab"        data-admin-tab="logins"     onclick="switchAdminTab('logins')"     data-i18n="admin_tab_logins">🔑 Logins</button>
         <button class="admin-tab"        data-admin-tab="engagement" onclick="switchAdminTab('engagement')" data-i18n="admin_tab_engagement">🎯 Engagement</button>
+        <button class="admin-tab"        data-admin-tab="plans"      onclick="switchAdminTab('plans')"      data-i18n="admin_tab_plans">💳 Plans</button>
       </div>
       <div id="adminTabBody"><div style="color: var(--ink-muted); font-style: italic;">…</div></div>
     </div>
@@ -5240,6 +5274,46 @@ const TRANSLATIONS = {
     admin_col_last_active: 'Last active',
     admin_col_signup: 'Signed up',
     admin_sql_hint: 'If you see "function … does not exist": run the supabase-migration-2026-04-26-admin-dashboard.sql in your Supabase SQL editor.',
+    admin_tab_plans: '💳 Plans',
+    admin_h_trends: 'Trends',
+    admin_chart_signups: 'Signups per day',
+    admin_chart_logins: 'Logins per day',
+    admin_h_plan_dist: 'Plan Distribution',
+    admin_h_plan_breakdown: 'Plan Breakdown',
+    admin_h_plan_manage: 'Manage Plans',
+    admin_stat_plan_free: 'Free',
+    admin_stat_plan_pro: 'Pro',
+    admin_stat_plan_family: 'Family',
+    admin_stat_plan_past_due: 'Past Due',
+    admin_stat_plan_canceled: 'Canceled',
+    admin_stat_mrr: 'MRR',
+    admin_estimated_mrr: 'estimated · $9 Pro · $19 Family',
+    admin_col_plan: 'Plan',
+    admin_col_plan_status: 'Status',
+    admin_col_expires: 'Expires',
+    admin_col_actions: 'Actions',
+    admin_save: 'Save',
+    admin_plan_updated: 'Plan updated to {plan}.',
+    admin_plan_stripe_note: 'Manual plan changes work today. Stripe webhook integration is wired into the schema (stripe_customer_id, stripe_subscription_id columns); see the migration SQL header for the next-step guide.',
+    admin_show_archived: 'Show archived',
+    admin_hidden_archived: 'archived hidden',
+    admin_drill_down: 'Drill down',
+    admin_archive: 'Archive',
+    admin_unarchive: 'Unarchive',
+    admin_archive_confirm: 'Archive this family? Their data stays untouched in the database — they just disappear from the active view. You can unarchive any time.',
+    admin_archived_toast: '🗄 Family archived.',
+    admin_unarchived_toast: '↩ Family unarchived.',
+    admin_no_heroes: 'No heroes recruited yet.',
+    admin_no_tx: 'No transactions yet.',
+    admin_h_heroes: 'Heroes',
+    admin_h_recent_tx: 'Recent transactions',
+    admin_col_name: 'Name',
+    admin_col_balance: 'Balance',
+    admin_col_achievements: 'Achievements',
+    admin_col_inventory: 'Items',
+    admin_stat_streak: 'Streak',
+    admin_stat_quests: 'Quests',
+    admin_drill_meta: 'IDs',
     session_expired_title: 'Your session has expired',
     session_expired_desc: 'You were signed in as {email}, but the session is no longer valid. Your data is safe locally — sign in again to keep syncing to the cloud.',
     session_expired_signin: '👤 Sign in again',
@@ -5801,6 +5875,46 @@ const TRANSLATIONS = {
     admin_col_last_active: 'Letzte Aktivität',
     admin_col_signup: 'Registriert',
     admin_sql_hint: 'Falls du „function … does not exist" siehst: führe supabase-migration-2026-04-26-admin-dashboard.sql im Supabase-SQL-Editor aus.',
+    admin_tab_plans: '💳 Pläne',
+    admin_h_trends: 'Trends',
+    admin_chart_signups: 'Anmeldungen pro Tag',
+    admin_chart_logins: 'Logins pro Tag',
+    admin_h_plan_dist: 'Plan-Verteilung',
+    admin_h_plan_breakdown: 'Plan-Aufteilung',
+    admin_h_plan_manage: 'Pläne verwalten',
+    admin_stat_plan_free: 'Free',
+    admin_stat_plan_pro: 'Pro',
+    admin_stat_plan_family: 'Family',
+    admin_stat_plan_past_due: 'Überfällig',
+    admin_stat_plan_canceled: 'Gekündigt',
+    admin_stat_mrr: 'MRR',
+    admin_estimated_mrr: 'geschätzt · $9 Pro · $19 Family',
+    admin_col_plan: 'Plan',
+    admin_col_plan_status: 'Status',
+    admin_col_expires: 'Läuft ab',
+    admin_col_actions: 'Aktionen',
+    admin_save: 'Speichern',
+    admin_plan_updated: 'Plan auf {plan} geändert.',
+    admin_plan_stripe_note: 'Manuelle Plan-Änderungen funktionieren bereits. Stripe-Webhook-Integration ist im Schema vorbereitet (stripe_customer_id, stripe_subscription_id Spalten); siehe Migration-SQL-Header für die nächsten Schritte.',
+    admin_show_archived: 'Archivierte zeigen',
+    admin_hidden_archived: 'archiviert ausgeblendet',
+    admin_drill_down: 'Details',
+    admin_archive: 'Archivieren',
+    admin_unarchive: 'Wiederherstellen',
+    admin_archive_confirm: 'Diese Familie archivieren? Die Daten bleiben in der Datenbank unangetastet — sie verschwinden nur aus der aktiven Ansicht. Du kannst jederzeit wiederherstellen.',
+    admin_archived_toast: '🗄 Familie archiviert.',
+    admin_unarchived_toast: '↩ Familie wiederhergestellt.',
+    admin_no_heroes: 'Noch keine Helden rekrutiert.',
+    admin_no_tx: 'Noch keine Transaktionen.',
+    admin_h_heroes: 'Helden',
+    admin_h_recent_tx: 'Letzte Transaktionen',
+    admin_col_name: 'Name',
+    admin_col_balance: 'Guthaben',
+    admin_col_achievements: 'Erfolge',
+    admin_col_inventory: 'Items',
+    admin_stat_streak: 'Streak',
+    admin_stat_quests: 'Quests',
+    admin_drill_meta: 'IDs',
     session_expired_title: 'Deine Sitzung ist abgelaufen',
     session_expired_desc: 'Du warst angemeldet als {email}, aber die Sitzung ist nicht mehr gültig. Deine Daten sind lokal sicher — melde dich neu an, um wieder mit der Cloud zu synchronisieren.',
     session_expired_signin: '👤 Erneut anmelden',
@@ -16728,10 +16842,12 @@ function renderAdminVisibility() {
 const adminDashboard = {
   tab: 'overview',
   overview: null,        // jsonb stats blob
-  families: null,        // detailed family rows
+  families: null,        // detailed family rows (incl. archived_at + plan)
   loginActivity: null,   // per-day sign-in counts
+  signupActivity: null,  // per-day signup counts
   search: '',
-  sort: { col: 'family_updated', dir: 'desc' }
+  sort: { col: 'family_updated', dir: 'desc' },
+  showArchived: false    // filter: include soft-deleted families
 };
 
 function switchAdminTab(tab) {
@@ -16747,16 +16863,18 @@ async function loadAdminDashboard() {
   if (!body || !supaClient || !isAdminUser()) return;
   body.innerHTML = `<div class="admin-empty">${t('admin_loading')}</div>`;
   try {
-    const [ovR, famR, loginR] = await Promise.all([
+    const [ovR, famR, loginR, signupR] = await Promise.all([
       supaDedupe('admin-overview',     () => supaClient.rpc('admin_overview_stats')),
       supaDedupe('admin-fam-detail',   () => supaClient.rpc('admin_families_detail')),
-      supaDedupe('admin-login-30d',    () => supaClient.rpc('admin_login_activity', { days: 30 }))
+      supaDedupe('admin-login-30d',    () => supaClient.rpc('admin_login_activity', { days: 30 })),
+      supaDedupe('admin-signup-30d',   () => supaClient.rpc('admin_signups_per_day', { days: 30 }))
     ]);
     if (ovR.error)  throw ovR.error;
     if (famR.error) throw famR.error;
     adminDashboard.overview = ovR.data || {};
     adminDashboard.families = famR.data || [];
     adminDashboard.loginActivity = (loginR && loginR.data) || [];
+    adminDashboard.signupActivity = (signupR && signupR.data) || [];
     renderAdminTab();
   } catch (e) {
     body.innerHTML = `<div style="color:#ff8080;">${escapeHtml(e.message || String(e))}<br>
@@ -16766,7 +16884,7 @@ async function loadAdminDashboard() {
 window.loadAdminDashboard = loadAdminDashboard;
 
 function refreshAdminDashboard() {
-  ['admin-overview', 'admin-fam-detail', 'admin-login-30d',
+  ['admin-overview', 'admin-fam-detail', 'admin-login-30d', 'admin-signup-30d',
    'admin-all-families', 'admin-all-profiles'].forEach(supaInvalidate);
   loadAdminDashboard();
 }
@@ -16780,7 +16898,28 @@ function renderAdminTab() {
     case 'families':   body.innerHTML = renderAdminFamilies();   wireAdminFamilyHandlers(); break;
     case 'logins':     body.innerHTML = renderAdminLogins();     break;
     case 'engagement': body.innerHTML = renderAdminEngagement(); break;
+    case 'plans':      body.innerHTML = renderAdminPlans();      break;
   }
+}
+
+// SVG sparkline. Renders an inline path that fills its container width.
+// Used in Overview (signups) and Logins (sign-ins) cards. Lightweight,
+// no external chart library — we already ship enough JS.
+function renderSparkline(values, opts = {}) {
+  const w = opts.width  || 260;
+  const h = opts.height || 50;
+  const stroke = opts.stroke || 'var(--gold-bright)';
+  const fill = opts.fill || 'rgba(244,211,94,0.18)';
+  if (!Array.isArray(values) || values.length === 0) return '';
+  const max = Math.max(1, ...values);
+  const stepX = w / Math.max(1, values.length - 1);
+  const points = values.map((v, i) => [i * stepX, h - (v / max) * (h - 2) - 1]);
+  const path = points.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const area = path + ` L${(w).toFixed(1)},${h} L0,${h} Z`;
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width:100%; height:${h}px; display:block;">
+    <path d="${area}" fill="${fill}" stroke="none"/>
+    <path d="${path}" fill="none" stroke="${stroke}" stroke-width="1.5"/>
+  </svg>`;
 }
 
 function statCard(label, value, sub) {
@@ -16797,6 +16936,10 @@ function renderAdminOverview() {
   const fmtCoin = (n) => fmtNumber(Math.round(Number(n) * 100) / 100);
   const totalFam = Number(o.total_families || 0);
   const pct = (n) => totalFam > 0 ? Math.round((Number(n) / totalFam) * 100) + '%' : '—';
+  const signups = (adminDashboard.signupActivity || []).map(d => Number(d.signups) || 0);
+  const logins  = (adminDashboard.loginActivity  || []).map(d => Number(d.sign_ins) || 0);
+  const signupSpark = signups.some(v => v > 0) ? renderSparkline(signups) : '';
+  const loginSpark  = logins.some(v => v > 0)  ? renderSparkline(logins)  : '';
   return `
     <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 4px 0 6px;">${t('admin_h_customer_base')}</h3>
     <div class="admin-stat-grid">
@@ -16823,14 +16966,117 @@ function renderAdminOverview() {
       ${statCard(t('admin_stat_tx'),         o.total_transactions || 0,      '')}
     </div>
 
+    ${signupSpark || loginSpark ? `
+      <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 14px 0 6px;">${t('admin_h_trends')}</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+        ${signupSpark ? `<div class="admin-stat" style="padding: 10px 12px;">
+          <div class="admin-stat-label">${escapeHtml(t('admin_chart_signups'))}</div>
+          ${signupSpark}
+          <div class="admin-stat-sub">${t('admin_last_30_days')}</div>
+        </div>` : ''}
+        ${loginSpark ? `<div class="admin-stat" style="padding: 10px 12px;">
+          <div class="admin-stat-label">${escapeHtml(t('admin_chart_logins'))}</div>
+          ${loginSpark}
+          <div class="admin-stat-sub">${t('admin_last_30_days')}</div>
+        </div>` : ''}
+      </div>
+    ` : ''}
+
     <div style="font-size: 11px; color: var(--ink-muted); margin-top: 14px; font-style: italic;">
       ${t('admin_generated_at')}: ${fmtDateTime(o.generated_at || new Date().toISOString())}
     </div>`;
 }
 
+function renderAdminPlans() {
+  const o = adminDashboard.overview || {};
+  const fams = adminDashboard.families || [];
+  if (!Object.keys(o).length) return `<div class="admin-empty">${t('admin_no_data')}</div>`;
+  const free = Number(o.plan_free || 0);
+  const pro  = Number(o.plan_pro  || 0);
+  const family = Number(o.plan_family || 0);
+  const total = free + pro + family;
+  const pct = (n) => total > 0 ? Math.round((n / total) * 100) + '%' : '—';
+  const planRow = (key, label, count, color) => `
+    <div class="admin-bar-row">
+      <div>${escapeHtml(label)} <span style="color:${color}; font-weight:700;">●</span></div>
+      <div class="admin-bar-track"><div class="admin-bar-fill" style="width:${total > 0 ? (count/total)*100 : 0}%; background: ${color};"></div></div>
+      <div class="admin-bar-count">${count} (${pct(count)})</div>
+    </div>`;
+  // Per-customer plan-management list
+  const planRows = fams.map(f => {
+    const planClass = `plan-pill plan-${f.plan || 'free'}`;
+    const expires = f.current_period_end ? fmtDateTime(f.current_period_end) : '—';
+    return `<tr>
+      <td class="admin-cell-email">${escapeHtml(f.email || f.owner_user_id || '')}</td>
+      <td><span class="${planClass}">${escapeHtml(f.plan || 'free')}</span></td>
+      <td>${escapeHtml(f.plan_status || 'active')}</td>
+      <td>${expires}</td>
+      <td>
+        <select class="admin-plan-select" data-uid="${escapeHtml(f.owner_user_id)}" style="font-size: 12px; padding: 4px 8px; background: var(--parchment); border: 1px solid var(--wood-dark); border-radius: 4px;">
+          ${['free','pro','family'].map(p => `<option value="${p}"${(f.plan || 'free') === p ? ' selected' : ''}>${p}</option>`).join('')}
+        </select>
+        <button class="btn btn-primary btn-sm admin-plan-save" data-uid="${escapeHtml(f.owner_user_id)}">${t('admin_save')}</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 4px 0 6px;">${t('admin_h_plan_dist')}</h3>
+    <div class="admin-stat-grid">
+      ${statCard(t('admin_stat_plan_free'),     free,   pct(free))}
+      ${statCard(t('admin_stat_plan_pro'),      pro,    pct(pro))}
+      ${statCard(t('admin_stat_plan_family'),   family, pct(family))}
+      ${statCard(t('admin_stat_plan_past_due'), o.plan_past_due || 0, '')}
+      ${statCard(t('admin_stat_plan_canceled'), o.plan_canceled || 0, '')}
+      ${statCard(t('admin_stat_mrr'),           '$' + fmtNumber(Math.round(Number(o.estimated_mrr || 0))), t('admin_estimated_mrr'))}
+    </div>
+
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 14px 0 8px;">${t('admin_h_plan_breakdown')}</h3>
+    <div style="margin-bottom: 18px;">
+      ${planRow('free',   'Free',   free,   '#9ca3af')}
+      ${planRow('pro',    'Pro',    pro,    '#f4d35e')}
+      ${planRow('family', 'Family', family, '#a855f7')}
+    </div>
+
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:13px; letter-spacing:1px; text-transform: uppercase; margin: 14px 0 8px;">${t('admin_h_plan_manage')}</h3>
+    <div style="overflow-x: auto;">
+      <table class="admin-table">
+        <thead><tr>
+          <th>${t('admin_col_email')}</th>
+          <th>${t('admin_col_plan')}</th>
+          <th>${t('admin_col_plan_status')}</th>
+          <th>${t('admin_col_expires')}</th>
+          <th>${t('admin_col_actions')}</th>
+        </tr></thead>
+        <tbody>${planRows}</tbody>
+      </table>
+    </div>
+    <div style="font-size: 11px; color: var(--ink-muted); margin-top: 12px; font-style: italic;">
+      ${t('admin_plan_stripe_note')}
+    </div>`;
+}
+
+async function adminUpdatePlan(userId, plan) {
+  if (!supaClient || !isAdminUser()) return;
+  try {
+    const { data, error } = await supaClient.rpc('admin_set_plan', {
+      p_user_id: userId, p_plan: plan, p_status: 'active', p_period_end: null
+    });
+    if (error) throw error;
+    toast(t('admin_plan_updated').replace('{plan}', plan), 'success');
+    refreshAdminDashboard();
+  } catch (e) {
+    toast(e.message || String(e), 'error');
+  }
+}
+window.adminUpdatePlan = adminUpdatePlan;
+
 function renderAdminFamilies() {
-  const rows = adminDashboard.families || [];
-  if (!rows.length) return `<div class="admin-empty">${t('admin_no_families')}</div>`;
+  const allRows = adminDashboard.families || [];
+  if (!allRows.length) return `<div class="admin-empty">${t('admin_no_families')}</div>`;
+  // Filter: hide archived unless user toggled showArchived.
+  let rows = adminDashboard.showArchived ? allRows : allRows.filter(r => !r.archived_at);
+  const archivedCount = allRows.filter(r => r.archived_at).length;
   const q = adminDashboard.search.toLowerCase();
   const filtered = rows.filter(r =>
     !q || (r.email || '').toLowerCase().includes(q) ||
@@ -16852,37 +17098,58 @@ function renderAdminFamilies() {
   const tableHead = `
     <thead><tr>
       ${head('email',          t('admin_col_email'))}
+      <th>${escapeHtml(t('admin_col_plan'))}</th>
       ${head('hero_count',     t('admin_col_heroes'))}
       ${head('coin_total',     t('admin_col_coins'))}
       ${head('tx_count',       t('admin_col_tx'))}
       ${head('current_streak', t('admin_col_streak'))}
       ${head('last_sign_in_at',t('admin_col_last_login'))}
       ${head('family_updated', t('admin_col_last_active'))}
-      ${head('user_created',   t('admin_col_signup'))}
+      <th>${escapeHtml(t('admin_col_actions'))}</th>
     </tr></thead>`;
   const body = filtered.map(r => {
     const adminPill = r.is_admin ? `<span class="admin-pill">admin</span>` : '';
     const coin = fmtNumber(Math.round(Number(r.coin_total || 0) * 100) / 100);
-    return `<tr>
-      <td class="admin-cell-email">${escapeHtml(r.email || r.owner_user_id || '')}${adminPill}</td>
+    const planClass = `plan-pill plan-${r.plan || 'free'}`;
+    const archivedClass = r.archived_at ? ' style="opacity:0.55;"' : '';
+    const archivedBadge = r.archived_at ? ` <span class="admin-pill" style="background:rgba(180,180,180,0.15); color:#888;">archived</span>` : '';
+    return `<tr${archivedClass}>
+      <td class="admin-cell-email">
+        <a href="#" onclick="event.preventDefault(); openAdminFamilyModal('${escapeHtml(r.family_id)}')" style="color: var(--gold-bright); text-decoration: none;">
+          ${escapeHtml(r.email || r.owner_user_id || '')}
+        </a>${adminPill}${archivedBadge}
+      </td>
+      <td><span class="${planClass}">${escapeHtml(r.plan || 'free')}</span></td>
       <td class="admin-cell-num">${r.hero_count}</td>
       <td class="admin-cell-num">🪙 ${coin}</td>
       <td class="admin-cell-num">${r.tx_count}</td>
       <td class="admin-cell-num">${r.current_streak ? '🔥 ' + r.current_streak : '—'}</td>
       <td>${r.last_sign_in_at ? fmtDateTime(r.last_sign_in_at) : '—'}</td>
       <td>${r.family_updated ? fmtDateTime(r.family_updated) : '—'}</td>
-      <td>${r.user_created ? fmtDateTime(r.user_created) : '—'}</td>
+      <td>
+        <button class="btn-admin-icon" title="${escapeHtml(t('admin_drill_down'))}" onclick="openAdminFamilyModal('${escapeHtml(r.family_id)}')">🔍</button>
+        ${r.archived_at
+          ? `<button class="btn-admin-icon" title="${escapeHtml(t('admin_unarchive'))}" onclick="adminToggleArchive('${escapeHtml(r.family_id)}', false)">↩</button>`
+          : `<button class="btn-admin-icon" title="${escapeHtml(t('admin_archive'))}" onclick="adminToggleArchive('${escapeHtml(r.family_id)}', true)">🗄</button>`
+        }
+      </td>
     </tr>`;
   }).join('');
   return `
-    <input type="text" class="admin-search" id="adminFamSearch"
-           placeholder="${escapeHtml(t('admin_search_placeholder'))}"
-           value="${escapeHtml(adminDashboard.search)}" />
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px;">
+      <input type="text" class="admin-search" id="adminFamSearch" style="flex: 1; min-width: 200px; margin-bottom: 0;"
+             placeholder="${escapeHtml(t('admin_search_placeholder'))}"
+             value="${escapeHtml(adminDashboard.search)}" />
+      <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink); white-space: nowrap;">
+        <input type="checkbox" id="adminShowArchived" ${adminDashboard.showArchived ? 'checked' : ''}>
+        ${escapeHtml(t('admin_show_archived'))} ${archivedCount > 0 ? `(${archivedCount})` : ''}
+      </label>
+    </div>
     <div style="overflow-x: auto;">
       <table class="admin-table">${tableHead}<tbody>${body}</tbody></table>
     </div>
     <div style="font-size: 11px; color: var(--ink-muted); margin-top: 8px;">
-      ${filtered.length} / ${rows.length} ${t('admin_families_shown')}
+      ${filtered.length} / ${rows.length} ${t('admin_families_shown')}${archivedCount > 0 && !adminDashboard.showArchived ? ` · ${archivedCount} ${t('admin_hidden_archived')}` : ''}
     </div>`;
 }
 
@@ -16891,13 +17158,21 @@ function wireAdminFamilyHandlers() {
   if (search) {
     search.addEventListener('input', (e) => {
       adminDashboard.search = e.target.value;
-      // Re-render only the table body — full rerender re-creates the
-      // input and we lose focus.
       const body = document.getElementById('adminTabBody');
       const cursor = e.target.selectionStart;
       body.innerHTML = renderAdminFamilies();
+      wireAdminFamilyHandlers();
       const fresh = document.getElementById('adminFamSearch');
       if (fresh) { fresh.focus(); fresh.setSelectionRange(cursor, cursor); }
+    });
+  }
+  const showArch = document.getElementById('adminShowArchived');
+  if (showArch) {
+    showArch.addEventListener('change', () => {
+      adminDashboard.showArchived = showArch.checked;
+      const body = document.getElementById('adminTabBody');
+      body.innerHTML = renderAdminFamilies();
+      wireAdminFamilyHandlers();
     });
   }
   document.querySelectorAll('.admin-table th[data-sort-col]').forEach(th => {
@@ -16914,6 +17189,134 @@ function wireAdminFamilyHandlers() {
     });
   });
 }
+
+// Archive / unarchive a family (soft-delete). The row stays in the DB
+// but is filtered out of the dashboard unless "Show archived" is on.
+async function adminToggleArchive(familyId, archive) {
+  if (!supaClient || !isAdminUser()) return;
+  if (archive && !confirm(t('admin_archive_confirm'))) return;
+  try {
+    const { error } = await supaClient.rpc('admin_archive_family', {
+      p_family_id: familyId, p_archive: !!archive
+    });
+    if (error) throw error;
+    toast(archive ? t('admin_archived_toast') : t('admin_unarchived_toast'), 'success');
+    refreshAdminDashboard();
+  } catch (e) {
+    toast(e.message || String(e), 'error');
+  }
+}
+window.adminToggleArchive = adminToggleArchive;
+
+// Drill-down modal: full state of one family. Pulls fresh data so the
+// admin sees current heroes / transactions / achievements rather than
+// the cached snapshot from the families table.
+async function openAdminFamilyModal(familyId) {
+  if (!supaClient || !isAdminUser()) return;
+  let modal = document.getElementById('adminFamilyModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'adminFamilyModal';
+    modal.className = 'modal-backdrop';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.innerHTML = `
+      <div class="modal" style="max-width: 720px;">
+        <div id="adminFamilyModalBody"><div class="admin-empty">${t('admin_loading')}</div></div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+          <button class="btn btn-ghost" onclick="closeAdminFamilyModal()">${t('close_btn')}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  try {
+    const { data, error } = await supaClient.rpc('admin_family_detail', { p_family_id: familyId });
+    if (error) throw error;
+    const body = document.getElementById('adminFamilyModalBody');
+    body.innerHTML = renderAdminFamilyDetail(data);
+  } catch (e) {
+    document.getElementById('adminFamilyModalBody').innerHTML =
+      `<div style="color:#ff8080;">${escapeHtml(e.message || String(e))}</div>`;
+  }
+}
+window.openAdminFamilyModal = openAdminFamilyModal;
+function closeAdminFamilyModal() {
+  const m = document.getElementById('adminFamilyModal');
+  if (m) { m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); }
+}
+window.closeAdminFamilyModal = closeAdminFamilyModal;
+
+function renderAdminFamilyDetail(d) {
+  if (!d) return `<div class="admin-empty">${t('admin_no_data')}</div>`;
+  const s = d.state || {};
+  const kids = Array.isArray(s.kids) ? s.kids : [];
+  const tx   = Array.isArray(s.transactions) ? s.transactions : [];
+  const acts = Array.isArray(s.activities) ? s.activities : [];
+  const streak = (s.streak && Number(s.streak.current)) || 0;
+  const longest = (s.streak && Number(s.streak.longest)) || 0;
+  const lastTx = tx.slice(0, 8).map(x => `
+    <div style="display: grid; grid-template-columns: 110px 1fr 80px; gap: 8px; padding: 4px 0; font-size: 12px; border-bottom: 1px solid var(--parchment-darker);">
+      <div style="color: var(--ink-muted);">${x.at ? new Date(x.at).toLocaleDateString() : '—'}</div>
+      <div>${escapeHtml(x.note || x.type || '')}</div>
+      <div style="text-align: right; font-family: 'IBM Plex Mono', monospace; color: ${Number(x.amount) >= 0 ? 'var(--gold-bright)' : '#ff8080'};">
+        ${Number(x.amount) >= 0 ? '+' : ''}${fmtNumber(Number(x.amount) || 0)}
+      </div>
+    </div>`).join('');
+  const kidsHtml = kids.length ? kids.map(k => `
+    <div style="display: grid; grid-template-columns: 1fr 80px 80px 80px; gap: 8px; padding: 6px 0; font-size: 13px; border-bottom: 1px solid var(--parchment-darker);">
+      <div><strong>${escapeHtml(k.name || k.userName || '?')}</strong> <span style="color: var(--ink-muted); font-size: 11px;">· ${escapeHtml(k.class || '')}</span></div>
+      <div class="admin-cell-num">🪙 ${fmtNumber(Math.round(Number(k.balance || 0) * 100) / 100)}</div>
+      <div class="admin-cell-num">${(k.achievements || []).length} 🏆</div>
+      <div class="admin-cell-num">${(k.inventory || []).length} 🎒</div>
+    </div>`).join('') : `<div class="admin-empty">${t('admin_no_heroes')}</div>`;
+  const planClass = `plan-pill plan-${d.plan || 'free'}`;
+  return `
+    <h3 style="font-family:'Cinzel',serif; color: var(--gold-bright); margin: 0 0 4px;">
+      ${escapeHtml(d.email || d.owner_user_id || '')} ${d.is_admin ? '<span class="admin-pill">admin</span>' : ''}
+    </h3>
+    <div style="font-size: 12px; color: var(--ink-muted); margin-bottom: 14px;">
+      ${escapeHtml(d.family_name || '')}
+      · <span class="${planClass}">${escapeHtml(d.plan || 'free')}</span>
+      · ${d.archived_at ? `<span class="admin-pill" style="background:rgba(180,180,180,0.2); color:#888;">archived ${fmtDateTime(d.archived_at)}</span>` : ''}
+    </div>
+
+    <div class="admin-stat-grid" style="margin-bottom: 14px;">
+      ${statCard(t('admin_stat_heroes'), kids.length, '')}
+      ${statCard(t('admin_stat_tx'), tx.length, '')}
+      ${statCard(t('admin_stat_streak'), streak ? '🔥 ' + streak : '—', longest ? 'best ' + longest : '')}
+      ${statCard(t('admin_stat_quests'), acts.length, '')}
+    </div>
+
+    <h4 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:12px; letter-spacing:1px; text-transform: uppercase; margin: 12px 0 4px;">${t('admin_h_heroes')}</h4>
+    <div style="font-size: 11px; color: var(--ink-muted); padding: 4px 0; display: grid; grid-template-columns: 1fr 80px 80px 80px; gap: 8px;">
+      <div>${t('admin_col_name')}</div>
+      <div class="admin-cell-num">${t('admin_col_balance')}</div>
+      <div class="admin-cell-num">${t('admin_col_achievements')}</div>
+      <div class="admin-cell-num">${t('admin_col_inventory')}</div>
+    </div>
+    ${kidsHtml}
+
+    <h4 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:12px; letter-spacing:1px; text-transform: uppercase; margin: 16px 0 4px;">${t('admin_h_recent_tx')}</h4>
+    ${lastTx || `<div class="admin-empty">${t('admin_no_tx')}</div>`}
+
+    <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--parchment-darker); font-size: 11px; color: var(--ink-muted);">
+      ${t('admin_drill_meta')}: ${d.family_id} · ${escapeHtml(d.owner_user_id || '')}<br>
+      ${t('admin_col_signup')}: ${d.user_created ? fmtDateTime(d.user_created) : '—'} ·
+      ${t('admin_col_last_login')}: ${d.last_sign_in_at ? fmtDateTime(d.last_sign_in_at) : '—'}
+    </div>`;
+}
+
+// Wire up the plan-update buttons in the Plans tab.
+document.addEventListener('click', (e) => {
+  if (!e.target || !e.target.classList) return;
+  if (e.target.classList.contains('admin-plan-save')) {
+    const uid = e.target.dataset.uid;
+    const select = document.querySelector(`.admin-plan-select[data-uid="${uid}"]`);
+    if (uid && select) adminUpdatePlan(uid, select.value);
+  }
+});
 
 function renderAdminLogins() {
   const days = adminDashboard.loginActivity || [];
