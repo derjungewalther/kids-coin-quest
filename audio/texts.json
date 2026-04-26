@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-26T16:44:51.887Z",
+  "generatedAt": "2026-04-26T16:53:02.529Z",
   "texts": [
     {
       "id": "019fc05ff733e6ae",
@@ -47,11 +47,6 @@
       "text": "Das Wiegenlied ist etwas schief, doch dem Herzen gefällt es, besungen zu werden. Es wird ein Haar langsamer. Ein Haar ist auch etwas!"
     },
     {
-      "id": "098481f7dd6c701e",
-      "lang": "de",
-      "text": "Am Steg steht eine Wanderin mit leerem Rucksack. „Möchtest du einen Fisch?\", fragt Sebastian. Dann hält er inne. „Oder soll ich dir lieber zeigen, wie man einen fängt?\""
-    },
-    {
       "id": "09a9aba5cfae6d6d",
       "lang": "de",
       "text": "Sebastian lacht leise. „Die Köder springen heute durcheinander. Probier nochmal.\""
@@ -97,6 +92,11 @@
       "text": "Vor einer Woche gingen die Sterne durcheinander.\n\nEs begann leise. Am Montag glitt der Große Bär am Himmel ein wenig zur Seite und kehrte nicht zurück. Am Dienstag erstickten die Kerzen in jeder Küche des Königreichs, als der Mond aufging. Am Mittwoch saß eine ganz gewöhnliche alte Krähe auf einem Zaun in einer ganz gewöhnlichen Stadt und sagte plötzlich „Entschuldigung\" in perfekter altmodischer Sprache und flog dann davon. Die Bäckersfrau, die zuhörte, weinte eine ganze Stunde und wusste nicht, warum.\n\nAm Donnerstag erschien etwas ganz am Rand jeder Karte des Königreichs — an einem Ort, an dem vorher nur weißes Papier war. Ein sehr, sehr hoher schwarzer Turm. Keine Fenster. Keine sichtbare Tür. Kein Pfad, der hinaufführt. Nur eine dünne Gestalt ganz oben, unbewegt, nicht einmal ein wenig.\n\nAlte Geschichten sagen, dies sei Vorgaths Turm. Vorgath — dessen voller Name Vorgath, der Bibliothekar der Letzten Stunde ist — ist der älteste Zauberer, der je gelebt hat. Manche sagen, er habe jedes Buch in jeder Bibliothek in jedem Land in jedem Jahrhundert gelesen. Er sitzt seit dreihundert Jahren allein an der Spitze seines Turms, rührt sich nicht, spricht nicht, denkt Gedanken, die niemand sonst denken kann.\n\nUnd nun, nach dreihundert Jahren des Stillsitzens, hat Vorgath beschlossen, dass die Welt zu laut ist. Er vermisst die Ruhe von früher. Er will das Buch der Welt schließen wie ein müder Leser, der die Lampe auslöscht.\n\nEr meint es nicht böse. Er ist nur so sehr, sehr einsam, dass er vergessen hat, dass andere Menschen überhaupt wichtig sind.\n\nDer Rote König ritt selbst bis zum Fuß des Berges. Er brachte eure Helden auf seinen schnellsten Pferden her, denn niemand sonst war mutig genug. Bevor er heimritt, um seine Kinder zu sehen, kniete er sich hin und sprach sehr leise. „Wenn ihr nicht wiederkommt\", sagte er, „wird niemand wiederkommen. Doch ich glaube an euch. Steigt den Turm hinauf. Findet Vorgath. Und erinnert ihn — bitte, bitte erinnert ihn — daran, dass es sich lohnt, für die Welt wach zu bleiben.\"\n\nDie Sterne über euch drehen sich langsam in die falsche Richtung. Der Turm durchbohrt die Wolken wie eine lange schwarze Nadel. Jeder Schritt, den ihr klettert, wird zählen. Jeder Schritt wird euch etwas kosten.\n\nAtmet tief ein. Euer schwerstes, wichtigstes Abenteuer beginnt jetzt."
     },
     {
+      "id": "0fdcd44023ce1349",
+      "lang": "de",
+      "text": "Schritte auf dem Steg. Eine Wanderin tritt heran, mit dem Rucksack einer, die viele Tage unterwegs ist. Ihre Schuhe sind staubig, ihr Hut weit. Sie schaut auf Sebastians Korb wie jemand, der seit gestern nichts gegessen hat. Sebastian setzt sich aufrecht hin und nimmt einen Fisch in die Hand — den größten. Aber dann hält er inne, mitten in der Bewegung, und legt ihn langsam zurück. „Möchtest du einen Fisch?\", fragt er die Wanderin. Pause. „Oder soll ich dir lieber zeigen, wie man einen fängt?\" Er schaut dich an, abwartend. „Das ist heute deine Aufgabe.\""
+    },
+    {
       "id": "109a9b0bf80b8652",
       "lang": "de",
       "text": "Die Steine wackeln — einer rutscht weg. Ihr müsst ihn mit matschigen Fingern bergen und den langen Weg nehmen."
@@ -105,6 +105,11 @@
       "id": "10e5f10f25718096",
       "lang": "de",
       "text": "Nicht jede Kammer hat sauber aufgemacht. Ihr zwängt euch trotzdem durch, etwas zerknittert, und die Moral sinkt ein wenig."
+    },
+    {
+      "id": "124194cc06b419dd",
+      "lang": "de",
+      "text": "Sebastian stellt sich neben dich und drückt dir den abgegriffenen Bambusstab in die Hand. Er ist überraschend leicht und biegt sich, wenn du ihn bewegst, wie ein Atemzug. „Das Werfen ist wie ein Lied\", sagt Sebastian. „Drei Schläge, immer in derselben Reihenfolge. Ausholen — schwingen — loslassen. Nicht schneller, nicht langsamer. Wenn du den Takt verlierst, landet die Schnur am Steg und nicht im See.\" Er nickt im Rhythmus, leise summend, und schaut dich an. „Jetzt du.\""
     },
     {
       "id": "12cd0b8b2c729acc",
@@ -177,11 +182,6 @@
       "text": "Jedes Paar leuchtet golden auf, sobald ihr es findet, und die ganze Wand öffnet sich wie ein Buch. „Gut gemacht, Sternenwanderer\", flüstert eine Stimme aus dem Nichts."
     },
     {
-      "id": "2067bd12cd560b30",
-      "lang": "de",
-      "text": "Sebastian beugt sich über das Wasser und legt einen Finger an die Lippen. „Schau genau hin. Da unten zieht ein Schwarm vorbei.\""
-    },
-    {
       "id": "222af3b15f662b1e",
       "lang": "de",
       "text": "„Bitte, liebe Tür\", sagt euer Held, „wir wollen deinem Drachen helfen.\" Das Eisen errötet ein wenig. Die Münder kichern, und das Tor springt auf wie ein fröhliches Kind beim Geburtstag."
@@ -205,11 +205,6 @@
       "id": "241b865d160333a6",
       "lang": "de",
       "text": "Ein schmaler Durchgang wird von einem steinernen Hüter in Form einer Maus mit Gelehrtenhut versperrt. „Vor der inneren Kammer beweist euren Wert\", piept er. „Wählt die Stärke, die eure Gruppe am meisten hat. Lügt, bleibt die Tür zu. Sagt die Wahrheit, öffnet sie sich.\""
-    },
-    {
-      "id": "2445e37601f6b9f2",
-      "lang": "de",
-      "text": "Auf dem Steg liegen vier Knotenkarten verstreut. Sebastian hat sie selbst gemalt, mit Bleistift, ein bisschen schief. „Jeder Knoten hat einen Zwilling\", sagt er. „Finde sie.\""
     },
     {
       "id": "24adf6edf3389a19",
@@ -320,11 +315,6 @@
       "id": "39295f3622194a90",
       "lang": "de",
       "text": "Der Zug klemmt auf halbem Weg. Der Ofen wärmt ungleich, doch das Brot wird fast perfekt — nur unten etwas gerösteter."
-    },
-    {
-      "id": "3a396a1bf2ef250e",
-      "lang": "de",
-      "text": "Sebastian setzt sich mit der Wanderin auf den Steg. Er legt sechs kleine Holzplättchen vor sie hin, jedes mit einem Bild. „Das alles gehört zum Fischen\", sagt er. „Hilfst du ihr, es sich zu merken?\""
     },
     {
       "id": "3adde6af772ff1b7",
@@ -472,11 +462,6 @@
       "text": "Euer Held stellt sich heldenhaft hin. „Ich, tapferer Verteidiger, beschütze deine Ehre!\" Das Törtchen lacht so sehr, dass eine Erdbeere abplatzt, und Lachen heilt mehr als jedes Versprechen."
     },
     {
-      "id": "4fc0fc88f61faff4",
-      "lang": "de",
-      "text": "Sebastian stellt sich neben dich, die Angel locker in der Hand. „Das Werfen ist wie ein Lied. Ausholen, schwingen, loslassen — drei Schläge, immer in derselben Reihenfolge.\""
-    },
-    {
       "id": "502bc659818634ff",
       "lang": "de",
       "text": "Die Muster wechseln, sobald man hinsieht. Euer Held gibt das Lesen auf und schleicht normal. Es dauert länger, doch ihr schafft es atemlos hinauf."
@@ -507,6 +492,11 @@
       "text": "„Wenn du Freunde besuchen willst\", sagt euer Held, „kannst du einfach einen Brief schicken!\" Euer Held zeigt ihr, wie man einen riesigen Stift hält. Xyryth ist so begeistert, dass sie dem ganzen Dorf sofort Dankesbriefe schreibt."
     },
     {
+      "id": "55d5699daff8c018",
+      "lang": "de",
+      "text": "Sebastian zieht eine kleine Holzkiste unter dem Steg hervor und legt vier Knotenkarten auf das morgenfeuchte Holz. Sie sind alt, mit Bleistift gezeichnet, an den Ecken vom Wasser leicht gewellt. „Bevor du fischst\", sagt er, „musst du die Knoten kennen. Ohne Knoten verlierst du die Schnur. Ohne Schnur verlierst du den Fisch. Ohne Fisch — naja, ist es nur eine Wanderung.\" Er legt seinen flachen Stein auf die Karten, damit der Wind sie nicht verweht, und sieht dich erwartungsvoll an. „Jeder Knoten hat einen Zwilling. Finde sie.\""
+    },
+    {
       "id": "56e6cc77c542d779",
       "lang": "de",
       "text": "Am Rand der fernsten Karte liegt ein Berg. Die Menschen, die in seiner Nähe wohnen, nennen ihn den Aschenberg, denn er hat immer geraucht, jeden Tag, solange sich irgendjemand erinnert.\n\nHundert Großmütterleben lang hatte das Dorf am Fuß dieses Berges ein freundliches Abkommen mit dem großen Drachen, der darin wohnt: In der längsten Nacht des Jahres legten die Dorfbewohner ihr einen Korb goldener Früchte und einen Kranz aus Wildblumen vor die Höhle. Dafür blieb der Drache — ihr Name ist Xyryth die Rote — ruhig und hielt die Winterstürme fern.\n\nHundert Leben lang funktionierte das.\n\nDoch in diesem Winter änderte sich etwas. Eines Morgens fehlte die kleine Tamsin in ihrem Bett. Auf ihrem Kissen lag nur eine warme, glänzende Drachenschuppe. Am nächsten Morgen war es Jorik, der Sohn des Müllers. Am dritten kam Bäckerin Pel angerannt mit einer weiteren warmen Schuppe in der zitternden Hand. Drei Kinder, drei Winternächte, drei leere Betten.\n\nDie Dorfbewohner saßen lange am Feuer und redeten. Ein durchreisender Kesselflicker sprach schließlich aus, was alle zu sagen fürchteten: „Xyryth ist einsam geworden.\" Drachen leben, müsst ihr wissen, tausende Jahre, doch sie werden traurig, wenn nie jemand kommt. Xyryth hat nirgendwo auf der Welt noch Familie.\n\nDie Kinder sind sicher — Xyryth würde niemals einem Kind wehtun — aber sie will Gesellschaft, und sie weiß nicht, wie man wie ein Mensch fragt. Sie fragte wie ein Drache.\n\nSo sammelte das Dorf jedes mutige Kind und jeden Erwachsenen, die wollten, und sie zogen Strohhalme. Eure Helden wurden gewählt. Eine liebe alte Großmutter drückte dem Jüngsten eine winzige Holzeule in die Hand, zum Glück. Der Dorfälteste gab euch einen in Tuch gewickelten Laib dunkles Brot. Das ganze Dorf begleitete euch bis zum ersten Meilenstein und blieb dann stehen und winkte und weinte ein wenig.\n\n„Bringt heim, wen ihr könnt\", flüsterten sie. „Und vielleicht… bringt Xyryth einen Freund.\"\n\nDer Weg den Berg hinauf ist lang und kalt. Der Rauch aus dem Aschenberg kräuselt sich wie eine langsame Frage in den Himmel. Dort oben sind drei Kinder sicher, doch möchten nach Hause. Dort oben versucht ein einsamer Drache, herauszufinden, wie man sich entschuldigt. Dort oben beginnt euer Abenteuer."
@@ -535,11 +525,6 @@
       "id": "5a6463606d95fd18",
       "lang": "de",
       "text": "Etwas Chaos bleibt, doch die Bäckerei ist außer Gefahr. Frau Honigwabe gibt jedem eine saubere Schürze und ein Augenzwinkern."
-    },
-    {
-      "id": "5b7af9c72abbde26",
-      "lang": "de",
-      "text": "Sebastian zieht eine alte Holzkiste unter dem Steg hervor. „Jeder Fisch hat seinen Lieblingshappen\", sagt er. „Den kleinen reicht ein Wurm. Die großen wollen mehr.\""
     },
     {
       "id": "5d7d35f6a45cff36",
@@ -707,11 +692,6 @@
       "text": "Drei rundliche Frösche hüpfen heran, stolz zu helfen. „Quak, springt auf!\" Ihr reitet Froschrücken-Taxi über die Wiese und singt mit den Marienkäfern ein kleines Hüpflied."
     },
     {
-      "id": "7db990f75ff8873e",
-      "lang": "de",
-      "text": "Sebastian zeigt mit dem Ruder auf eine grüne Insel aus Halmen. „Da hinten beißen sie am besten. Aber der Weg ist eng.\""
-    },
-    {
       "id": "7e7dd24ee068113b",
       "lang": "de",
       "text": "Manche Eier brummen schläfrig, weil ihr sie durcheinander gebracht habt. Xyryth lässt euch trotzdem durch, doch die Gruppe fühlt sich kleinlaut, und die Moral sinkt."
@@ -792,6 +772,11 @@
       "text": "Die Runen verschwimmen. Euer Held rät, und das Schloss seufzt statt zu klicken — nur halb auf."
     },
     {
+      "id": "927d994a6e4f39e2",
+      "lang": "de",
+      "text": "Sebastian zieht eine zweite, schwerere Holzkiste unter dem Steg hervor. Sie riecht nach See, nach Salz, nach etwas Lebendigem. Als er den Deckel hebt, krabbelt eine Made gemächlich über den Rand, und Sebastian schiebt sie mit dem Daumen sanft zurück. „Jeder Fisch hat seinen Lieblingshappen\", sagt er. „Den kleinen reicht ein Wurm. Die großen wollen mehr Mühe — einen Krebs, einen Frosch, etwas das sich wehrt. Wenn du den falschen Köder nimmst, schwimmt der Fisch vorbei und schaut nicht einmal hin.\" Er hält dir die Kiste hin. „Sortier sie.\""
+    },
+    {
       "id": "92a56dbab225773e",
       "lang": "de",
       "text": "Euer Held holt ein großes staubiges Buch aus dem Regal und liest darin ein Rätsel. Er löst es in weniger als einer Minute! Die Bibliothekarin klatscht — klatsch, klatsch, klatsch — lautlos, weil sie ein Geist ist, aber so glücklich, dass die Kerzen auf dem Pult auf und ab hüpfen."
@@ -832,6 +817,11 @@
       "text": "Ein Teil passt nicht richtig. Euer Held drückt es mit einem Zucken hinein. Immer noch ein Drache, so ungefähr."
     },
     {
+      "id": "995f925cc194c5ff",
+      "lang": "de",
+      "text": "Sebastian hält den Korb auf, in dem schon einige Fische silbern aufblitzen. Aber als du den nächsten heraufziehst — einen winzigen, kaum länger als dein Daumen — schüttelt Sebastian langsam den Kopf. „Nicht jeder darf mit\", sagt er. „Die Kleinen müssen erst groß werden. Sonst gibt es nächstes Jahr nichts mehr zu fangen, und den Sommer drauf gar nichts mehr. Wir nehmen nur, was wir brauchen — und lassen, was kommen soll.\" Er zeigt mit der Kelle auf den Korb und auf das Wasser. „Sortier sie.\""
+    },
+    {
       "id": "9972fce6552ff5af",
       "lang": "de",
       "text": "Fast! Das Buch wackelt freundlich mit den Seiten und zeigt auf eine Kerze am Fensterbrett. Jetzt seht ihr's. Die Seite kehrt trotzdem zurück, etwas sanfter als sonst."
@@ -850,6 +840,11 @@
       "id": "9acd13253982100f",
       "lang": "de",
       "text": "Manches ging schief. Die Gruppe findet sich etwas staubig und leicht mürrisch wieder zusammen — doch gemeinsam, das zählt am meisten."
+    },
+    {
+      "id": "9b022ab7db4f1d0a",
+      "lang": "de",
+      "text": "Sebastian löst das Tau vom Pflock und zeigt mit dem Ruder auf eine grüne Insel aus Halmen weiter draußen. „Da hinten\", sagt er, „beißen sie heute am besten. Das Wasser ist tiefer, der Schatten kühler. Aber der Weg ist eng — Schilf, Treibholz, eine Seerose, die einen ganzen Sommer lang gewartet hat um zu blühen.\" Das kleine Holzboot schaukelt unter euch, als ihr einsteigt. Schilf wiegt sich rechts und links. „Ruder ruhig\", sagt Sebastian. „Wer das Schilf knickt, verscheucht die Fische auf eine halbe Stunde.\""
     },
     {
       "id": "9b6247e0354a4a96",
@@ -1090,6 +1085,11 @@
       "id": "bf62de628964fb6d",
       "lang": "de",
       "text": "Das Eulengesicht legt den Kopf schief. „Ihr denkt, doch so weise seid ihr nicht. Noch nicht.\" Das Siegel schiebt sich zögernd nur halb auf."
+    },
+    {
+      "id": "bf679ef8aae7bd4f",
+      "lang": "de",
+      "text": "Sebastian setzt sich mit der Wanderin auf den Steg und legt sechs kleine Holzplättchen vor sie hin — jedes mit einem Bild: Knoten, Köder, Wurf, Geduld, Auswahl, Teilen. Er hat sie selbst geschnitzt, jedes ein Paar, vor langer Zeit. „Das alles\", sagt er zur Wanderin, „gehört zum Fischen. Nicht nur die Rute, nicht nur der See — das alles.\" Dann dreht er sich zu dir. „Und du\", sagt er leise, „hilfst ihr, es sich zu merken. Sonst ist es kein Lehren. Sonst ist es nur Reden.\""
     },
     {
       "id": "bf81a7db85b00678",
@@ -1362,11 +1362,6 @@
       "text": "Im kopfsteingepflasterten Dorf Marzipan, an der Ecke Zimtgasse und Honigstraße, gibt es einen winzigen Laden mit einer gestreiften Markise und einer Türklingel in Form eines Butterstücks. Das Schild draußen sagt „Die Zucker-Bäckerei\", und der Duft aus der Tür reicht, um einer Steinstatue ein Lächeln zu entlocken.\n\nDie Besitzerin ist eine runde, fröhliche Frau namens Frau Honigwabe. Ihre Schürze ist immer mit Mehl bestaubt, ihre Wangen immer rosig. Sie backt die besten Apfeltörtchen im ganzen Königreich, und sie hat ein magisches Rezeptbuch, das ihre Ur-Ur-Großmutter ihr geschenkt hat — ein Buch, das dem Bäcker den nächsten Schritt ins Ohr flüstert.\n\nDoch heute stimmt etwas ganz und gar nicht.\n\nAls eure Helden den Laden betreten, huscht eine Schar Zimtschnecken kichernd zwischen ihren Füßen hindurch. Ein Brotlaib summt in der Ecke ein Lied. Durch die Küchentür hört man etwas sehr Großes und sehr Wütendes Töpfe gegeneinanderschlagen.\n\nFrau Honigwabe eilt hinter der Theke hervor, Mehl im Haar, einen Holzlöffel in jeder Hand. „Oh, dem Himmel sei Dank, Helfer! Mein Rezeptbuch hat Schluckauf, und jetzt ist alles in der Küche lebendig und ein bisschen frech. Das Honigwaben-Herz — das ist der magische Anhänger, der die Bäckerei am Leben hält — wird schwächer. Wenn wir es nicht bis Sonnenuntergang reparieren, wird die Bäckerei zu einem gewöhnlichen Laden, und alle Magie verlässt Marzipan für immer.\"\n\nSie drückt eurem Helden eine kleine, mehlbestäubte Schürze in die Hand. „Wollt ihr mir helfen, die Ausreißer einzusammeln und die verlorene Rezeptseite zu finden? Ich bezahle euch mit frischem Gebäck und Abenteuer!\"\n\nEure Helden schauen sich an. Backwaren-Chaos. Singendes Brot. Ein magisches Herz, das geheilt werden muss. Was gibt es Schöneres für einen Nachmittag?\n\nSie binden sich die Schürzen um. Die Zucker-Bäckerei wartet."
     },
     {
-      "id": "e6a7d1d26730bfda",
-      "lang": "de",
-      "text": "Sebastian hält den Korb auf und zeigt mit der Kelle auf die Fische. „Nicht jeder darf mit. Die Kleinen müssen erst groß werden. Wir nehmen nur, was wir brauchen.\""
-    },
-    {
       "id": "e736cc7d0f5598c6",
       "lang": "de",
       "text": "Euer Held hebt einen scharfen Feuerstein auf und arbeitet langsam und ruhig. Schnipp, schnapp, schnipp! Eine Ranke nach der anderen fällt ab. Der Hirsch küsst euren Helden mit seiner samtigen Nase auf die Wange und galoppiert davon, um es dem Wald zu erzählen."
@@ -1395,6 +1390,11 @@
       "id": "eabc28c86a9a229d",
       "lang": "de",
       "text": "„Lieber Wind\", flüstert euer Held, „wir wollen zu Xyryth, die einsam ist.\" Der Wind hört zu, wird sanfter und bläht die Umhänge wie Segel — der Aufstieg wird leicht wie Drachensteigen."
+    },
+    {
+      "id": "eb05c11e538473d9",
+      "lang": "de",
+      "text": "Sebastian legt einen Finger an die Lippen und beugt sich weit über das Wasser. Die Sonne klettert höher, und der See ist plötzlich klar wie Glas. Schatten huschen unter dem Steg hindurch — schnell, gleich groß, in einer dichten Wolke. „Ein Schwarm\", flüstert Sebastian. „Ein guter Fischer weiß ungefähr wie viele. Nicht, weil er eine Liste führt — sondern weil er gelernt hat, schnell zu schauen, bevor sie wieder weg sind.\" Er zwinkert dir zu. „Versuch es. Schau genau hin.\""
     },
     {
       "id": "eb66dadc89a2fa74",
@@ -1717,6 +1717,11 @@
       "text": "\"Do you hear that? That's what a good cast sounds like,\" Sebastian says."
     },
     {
+      "id": "2586c1a9043a12d2",
+      "lang": "en",
+      "text": "Sebastian unties the rope from the post and points with his oar at a green island of reeds further out. \"Out there,\" he says, \"they bite best today. The water is deeper, the shadows cooler. But the way is narrow — reeds, driftwood, a water-lily that has been waiting all summer to open.\" The small wooden boat rocks under you as you step in. Reeds wave on either side. \"Row quietly,\" Sebastian says. \"Snap a reed and you scare the fish away for half an hour.\""
+    },
+    {
       "id": "2733a9b82dadefa3",
       "lang": "en",
       "text": "Your hero picks up the scariest book on the shelf — the one covered in goose-bumps — and reads a chapter out loud in a big strong voice. The librarian flutters her hand to her mouth in delight. \"Goodness me! That was thrilling!\" She claps you through."
@@ -1755,6 +1760,11 @@
       "id": "2fa0ed60d748f81d",
       "lang": "en",
       "text": "Your hero lifts the latch without asking for anything in return. The little goblin's eyes fill with tears. \"Nobody's ever just helped me before,\" he whispers, then tells you every single secret about the dragon, from her favorite cake to her shyness about her name."
+    },
+    {
+      "id": "3007575dbac520db",
+      "lang": "en",
+      "text": "Sebastian steps in beside you and presses the worn bamboo rod into your hand. It is surprisingly light, and it bends when you move it, like a held breath. \"Casting is like a song,\" Sebastian says. \"Three beats, always in the same order. Pull back — swing — release. No faster, no slower. Lose the tempo and the line lands on the dock instead of in the lake.\" He nods to a rhythm, humming softly, and looks at you. \"Now you.\""
     },
     {
       "id": "30b3df9f97d16d3b",
@@ -1942,11 +1952,6 @@
       "text": "Your hero finds the head behind a flour sack, gently hums a calming song, and dabs icing as glue. The guard salutes happily."
     },
     {
-      "id": "53182659303ba7fc",
-      "lang": "en",
-      "text": "A traveler with an empty rucksack stands on the dock. \"Would you like a fish?\" Sebastian asks. Then he pauses. \"Or shall I show you how to catch one?\""
-    },
-    {
       "id": "572e327342b500d0",
       "lang": "en",
       "text": "In the back of the kitchen squats the bakery's ancient brick oven, named Old Brick by everyone. Today Old Brick is sulking — its door creaks shut every time someone opens it, and it refuses to heat above lukewarm. Mrs. Honeycomb whispers: \"Each of you has a different way with stubborn things. Pick the way that suits your fellowship best.\""
@@ -1992,9 +1997,9 @@
       "text": "Three runes, one story. Your hero reads them in order, and the lock clicks politely open."
     },
     {
-      "id": "5fd7feafe23eeb8a",
+      "id": "5eb9b7beea6b8b60",
       "lang": "en",
-      "text": "Sebastian points with his oar at a green island of reeds. \"They bite best back there. But the way is tight.\""
+      "text": "Sebastian sits down with the traveler on the dock and lays six small wooden plates before her — each with a picture: knot, bait, cast, patience, choice, sharing. He carved them himself, each one a pair, a long time ago. \"All of this,\" he says to the traveler, \"is part of fishing. Not just the rod, not just the lake — all of this.\" Then he turns to you. \"And you,\" he says quietly, \"will help her remember it. Otherwise it is not teaching. It is just talking.\""
     },
     {
       "id": "5fe4140718ae4bdb",
@@ -2087,11 +2092,6 @@
       "text": "Your hero leaps like a goalkeeper, basket in hand, and scoops up six rolls in one heroic dive. The other six laugh so hard they fall over and surrender on their own."
     },
     {
-      "id": "6e8edaa26320a0d4",
-      "lang": "en",
-      "text": "Sebastian holds the basket open and points at the fish with his ladle. \"Not all of them come along. The little ones must grow first. We take only what we need.\""
-    },
-    {
       "id": "6ea54de83b5a8549",
       "lang": "en",
       "text": "The troll is really, really strong! Your hero huffs and puffs but can't budge him. The troll chuckles and lets you pass anyway, because he had fun trying."
@@ -2145,6 +2145,11 @@
       "id": "72ad17721a43a753",
       "lang": "en",
       "text": "Your hero spots a row of flat stepping stones just below the bridge. The whole party hops from stone to stone, dry and safe. Easy peasy!"
+    },
+    {
+      "id": "73303083c02d48b7",
+      "lang": "en",
+      "text": "Sebastian holds the basket open. A few fish flash silver inside it already. But when you lift the next one — a tiny one, barely longer than your thumb — Sebastian slowly shakes his head. \"Not every one comes along,\" he says. \"The little ones have to grow up first. Otherwise there is nothing to catch next year, and the summer after that, nothing at all. We take only what we need — and we leave what is meant to come.\" He points his ladle at the basket and at the water. \"Sort them.\""
     },
     {
       "id": "757dcf06a703d18c",
@@ -2422,11 +2427,6 @@
       "text": "Your hero sings softly — a song about starlight and sleepy bears. Huge tears roll down the troll's mossy cheeks. \"My mother used to sing that one,\" he sniffles. He steps aside and hums along."
     },
     {
-      "id": "9a30b60424d98b61",
-      "lang": "en",
-      "text": "Sebastian leans over the water and lifts a finger to his lips. \"Look closely. A school is passing below.\""
-    },
-    {
       "id": "9c29c06a6e156904",
       "lang": "en",
       "text": "The rolls eat the trail before following it. Your hero has to start over with sprinkles, which works — but takes a while."
@@ -2460,6 +2460,11 @@
       "id": "a31d74d7f0658eaa",
       "lang": "en",
       "text": "Your hero sits right down and tells Xyryth about the tiny wooden owl in their pocket, about the village grandmother, about the blueberry meadow, and about a cat named Puddle. Xyryth laughs so hard the mountain shakes. \"Friends,\" she rumbles happily. \"FRIENDS.\""
+    },
+    {
+      "id": "a42f0bdbb62e13a3",
+      "lang": "en",
+      "text": "Sebastian raises a finger to his lips and leans far out over the water. The sun is climbing higher now, and suddenly the lake is clear as glass. Shadows dart under the dock — fast, identical in size, in a dense cloud. \"A school,\" Sebastian whispers. \"A good fisher knows roughly how many. Not because he keeps a list — but because he has learned to look quickly, before they are gone again.\" He winks at you. \"Try it. Look carefully.\""
     },
     {
       "id": "a5723a6ec4bc10f3",
@@ -2612,6 +2617,11 @@
       "text": "The fourth floor is completely impossible. There is no fourth floor — there is a garden. A perfect warm summer garden, with soft grass and fat bees and a tiny stream that sings. A single apple tree stands in the middle, its one red apple the size of a soccer ball. A sign in curling golden letters reads: \"Rest here as long as you need. The tower waits.\""
     },
     {
+      "id": "b709da46ad173696",
+      "lang": "en",
+      "text": "Footsteps on the dock. A traveler steps up — with the rucksack of someone who has been walking many days. Her shoes are dusty, her hat wide. She eyes Sebastian's basket the way someone does who has not eaten since yesterday. Sebastian sits up straight and picks up a fish — the largest one. But then he pauses mid-motion and slowly puts it back. \"Would you like a fish?\" he asks the traveler. A pause. \"Or shall I show you how to catch one?\" He looks at you, waiting. \"That is your task today.\""
+    },
+    {
       "id": "b7701907df9dabc3",
       "lang": "en",
       "text": "The flint slips and the stag flinches. Your hero drops the stone and apologizes. \"I'm sorry, sweet friend!\" The stag twitches, wiggles himself free, and trots away without looking back."
@@ -2630,11 +2640,6 @@
       "id": "b97325e109fb9a16",
       "lang": "en",
       "text": "The hat is nowhere in sight. The raccoon pouts and puts a leaf on his head instead."
-    },
-    {
-      "id": "b9d94497e705a537",
-      "lang": "en",
-      "text": "Four knot cards lie scattered on the dock. Sebastian drew them himself, in pencil, a little crooked. \"Every knot has a twin,\" he says. \"Find them.\""
     },
     {
       "id": "ba8891c0aff8d46c",
@@ -2722,6 +2727,11 @@
       "text": "\"Guard. Forever. Child.\" Your hero reads them aloud, then says, \"But the child is happy now, sir. You can rest.\" The runes dim one by one, and the guardian sighs a long sigh before sitting back down in a rattly heap."
     },
     {
+      "id": "cbad973f6b9d725e",
+      "lang": "en",
+      "text": "Sebastian draws out a second, heavier wooden box from under the dock. It smells of lake, of salt, of something alive. When he lifts the lid, a maggot ambles slowly over the rim and Sebastian gently thumbs it back inside. \"Every fish has its favourite snack,\" he says. \"A worm is enough for the little ones. The big ones want more effort — a crayfish, a frog, something that fights back. Pick the wrong bait and the fish swims right past without even a glance.\" He holds the box out to you. \"Sort them.\""
+    },
+    {
       "id": "cc0340ae75bcd243",
       "lang": "en",
       "text": "The weeping angel smiles through her tears. \"Compassion is what Vorgath forgot. Go — be his reminder.\" The seal melts like morning snow."
@@ -2740,11 +2750,6 @@
       "id": "cedbf6c7734267bb",
       "lang": "en",
       "text": "The lullaby is a bit off-key, but the heart still likes being sung to. It slows by just a hair. A hair is still something!"
-    },
-    {
-      "id": "cf2f25b146075fcb",
-      "lang": "en",
-      "text": "Sebastian pulls an old wooden box from under the dock. \"Every fish has its favourite snack,\" he says. \"A worm is enough for the little ones. The big ones want more.\""
     },
     {
       "id": "cfa451041a5a0828",
@@ -2792,11 +2797,6 @@
       "text": "Your hero turns one small gear clockwise, then another counter-clockwise, then reads the spring pressure and turns a third. The heart slows from tick-tick-tick to tick… tick… tick… to a whisper."
     },
     {
-      "id": "d60da00b9a49058e",
-      "lang": "en",
-      "text": "Sebastian sits down with the traveler on the dock. He lays six small wooden plates in front of her, each with a picture. \"All of this is part of fishing,\" he says. \"Will you help her remember?\""
-    },
-    {
       "id": "d6520bb24df2d55c",
       "lang": "en",
       "text": "Your hero sees a half-closed flue, opens it carefully, and Old Brick whooshes to a perfect baking temperature. \"Ah, finally a baker who reads my chimney!\" it grumbles fondly."
@@ -2805,6 +2805,11 @@
       "id": "d6d139b42b478270",
       "lang": "en",
       "text": "Heave-ho! The slab lifts, revealing a silver key beneath."
+    },
+    {
+      "id": "d74a49f8dddb2ef3",
+      "lang": "en",
+      "text": "Sebastian pulls a small wooden box from under the dock and lays four knot cards on the dew-damp boards. They are old, pencil-drawn, lightly warped at the edges from years of water. \"Before you fish,\" he says, \"you have to know the knots. Without knots you lose the line. Without the line you lose the fish. Without the fish — well, then it is just a walk.\" He sets his flat stone on the cards so the wind cannot scatter them, and looks at you expectantly. \"Every knot has a twin. Find them.\""
     },
     {
       "id": "d7744816c83c3486",
@@ -2855,11 +2860,6 @@
       "id": "dcea02d6e277ed32",
       "lang": "en",
       "text": "On the very edge of the kingdom stands a mountain called Thornwatch. If you walk around it on a quiet night, you can hear the mountain itself singing — low and slow, like a sleeping giant humming a lullaby.\n\nLong, long ago — four hundred years ago, in fact — there lived inside that mountain a gentle boy named Prince Alric. He was only eleven years old, but he was wiser than most grown-ups and kinder than a hundred grandmothers. The whole kingdom loved him, because whenever a child scraped a knee or lost a kitten, Alric was the first to help.\n\nOne sad winter, his own teacher became jealous of how much everyone loved the little prince. That teacher, whose name was Corvus Dunn, did something terrible: he stole Alric away and hid him deep inside Thornwatch Mountain. The whole kingdom wept for two whole weeks.\n\nBut here is the thing about kindness — it never really goes away. For four hundred years, every winter, the people of the village would climb up to a little shrine near the mountain and light a candle for Alric. And every year the candle would burn bright all night long.\n\nThis winter, the candle did not burn.\n\nThe villagers climbed up to see why. They found the shrine all broken, the iron doors of the old crypt torn open, and a thin, tired voice floating out from the dark: \"Let no one rob my student's rest.\" It is old Corvus Dunn, they whispered — the jealous teacher, still there after all these years, still watching over what he stole.\n\nNow your company of heroes stands at the mouth of the crypt. A cold wind smells of iron and old flowers. Inside, you can hear those singing crystal walls — slow, low, like a mountain still humming its lullaby. Somewhere deep down, a small silver crown waits on a small bone chair. And somewhere between you and that crown, a tired old ghost-teacher waits, too.\n\nTake a breath. Step in. The mountain is watching."
-    },
-    {
-      "id": "dda0fc5a3459e5db",
-      "lang": "en",
-      "text": "Sebastian stands beside you, rod loose in his hand. \"Casting is like a song. Pull back, swing, release — three beats, always in the same order.\""
     },
     {
       "id": "ddd5d25ec3b00253",
