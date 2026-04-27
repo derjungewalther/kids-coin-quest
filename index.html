@@ -2689,8 +2689,10 @@
     box-shadow: 0 0 16px rgba(244,211,94,0.18);
     position: relative;
   }
-  .pricing-tier-pro::before {
-    content: 'RECOMMENDED';
+  /* Pricing-tier "RECOMMENDED" ribbon — was a CSS ::before with
+     hardcoded English content. Now i18n-driven via the
+     .pricing-recommended-badge child element. */
+  .pricing-recommended-badge {
     position: absolute;
     top: -10px;
     right: 16px;
@@ -4551,14 +4553,14 @@
         <button class="btn btn-ghost btn-sm" onclick="refreshAdminDashboard()" data-i18n="admin_refresh">↻ Refresh</button>
         <button class="btn btn-ghost btn-sm" onclick="exportAdminCsv()" data-i18n="admin_export_csv">📥 Export CSV</button>
       </div>
-      <div class="admin-tabs" role="tablist">
-        <button class="admin-tab active" data-admin-tab="overview"   onclick="switchAdminTab('overview')"   data-i18n="admin_tab_overview">📊 Overview</button>
-        <button class="admin-tab"        data-admin-tab="families"   onclick="switchAdminTab('families')"   data-i18n="admin_tab_families">👨‍👩‍👧 Families</button>
-        <button class="admin-tab"        data-admin-tab="logins"     onclick="switchAdminTab('logins')"     data-i18n="admin_tab_logins">🔑 Logins</button>
-        <button class="admin-tab"        data-admin-tab="engagement" onclick="switchAdminTab('engagement')" data-i18n="admin_tab_engagement">🎯 Engagement</button>
-        <button class="admin-tab"        data-admin-tab="plans"      onclick="switchAdminTab('plans')"      data-i18n="admin_tab_plans">💳 Plans</button>
+      <div class="admin-tabs" role="tablist" aria-label="Admin sections" onkeydown="onAdminTabKeydown(event)">
+        <button class="admin-tab active" data-admin-tab="overview"   id="adminTabBtn-overview"   role="tab" aria-selected="true"  aria-controls="adminTabBody" tabindex="0"  onclick="switchAdminTab('overview')"   data-i18n="admin_tab_overview">📊 Overview</button>
+        <button class="admin-tab"        data-admin-tab="families"   id="adminTabBtn-families"   role="tab" aria-selected="false" aria-controls="adminTabBody" tabindex="-1" onclick="switchAdminTab('families')"   data-i18n="admin_tab_families">👨‍👩‍👧 Families</button>
+        <button class="admin-tab"        data-admin-tab="logins"     id="adminTabBtn-logins"     role="tab" aria-selected="false" aria-controls="adminTabBody" tabindex="-1" onclick="switchAdminTab('logins')"     data-i18n="admin_tab_logins">🔑 Logins</button>
+        <button class="admin-tab"        data-admin-tab="engagement" id="adminTabBtn-engagement" role="tab" aria-selected="false" aria-controls="adminTabBody" tabindex="-1" onclick="switchAdminTab('engagement')" data-i18n="admin_tab_engagement">🎯 Engagement</button>
+        <button class="admin-tab"        data-admin-tab="plans"      id="adminTabBtn-plans"      role="tab" aria-selected="false" aria-controls="adminTabBody" tabindex="-1" onclick="switchAdminTab('plans')"      data-i18n="admin_tab_plans">💳 Plans</button>
       </div>
-      <div id="adminTabBody"><div style="color: var(--ink-muted); font-style: italic;">…</div></div>
+      <div id="adminTabBody" role="tabpanel" aria-labelledby="adminTabBtn-overview" tabindex="0"><div style="color: var(--ink-muted); font-style: italic;">…</div></div>
     </div>
     <div class="section">
       <h2 data-i18n="pin_backup_title">🔒 Backup & PIN</h2>
@@ -4890,6 +4892,7 @@
       </div>
 
       <div class="pricing-tier pricing-tier-pro">
+        <span class="pricing-recommended-badge" data-i18n="pricing_recommended">RECOMMENDED</span>
         <div class="pricing-tier-name">⭐ <span data-i18n="pricing_pro_name">Pro</span></div>
         <div class="pricing-period-toggle" id="pricingPeriodToggle">
           <button class="pricing-period-btn active" data-period="monthly" onclick="setPricingPeriod('monthly')">€3<span data-i18n="pricing_per_month"> /mo</span></button>
@@ -4915,8 +4918,8 @@
       </button>
     </div>
 
-    <div style="font-size: 11px; color: var(--ink-muted); text-align: center; margin-top: 14px; font-style: italic;" data-i18n="pricing_stripe_coming_soon">
-      Stripe-powered checkout coming soon. Want to upgrade today? Email support.
+    <div style="font-size: 11px; color: var(--ink-muted); text-align: center; margin-top: 14px; font-style: italic;" data-i18n="pricing_stripe_footer">
+      Secure checkout via Stripe · cancel anytime in your account.
     </div>
   </div>
 </div>
@@ -5478,7 +5481,7 @@ const TRANSLATIONS = {
     admin_col_actions: 'Actions',
     admin_save: 'Save',
     admin_plan_updated: 'Plan updated to {plan}.',
-    admin_plan_stripe_note: 'Manual plan changes work today. Stripe webhook integration is wired into the schema (stripe_customer_id, stripe_subscription_id columns); see the migration SQL header for the next-step guide.',
+    admin_plan_stripe_note: 'Live Stripe sync is active — webhook keeps these rows current. Manual changes here override what Stripe knows; use only for comps or emergency rescue.',
     admin_show_archived: 'Show archived',
     admin_hidden_archived: 'archived hidden',
     admin_drill_down: 'Drill down',
@@ -5519,11 +5522,12 @@ const TRANSLATIONS = {
     pricing_feature_custom: 'Unlimited custom adventures',
     pricing_upgrade_btn: 'Upgrade to Pro',
     pricing_maybe_later: 'Maybe later',
-    pricing_stripe_coming_soon: 'Stripe-powered checkout coming soon. The Upgrade button opens an email — we\'ll set you up manually until then.',
+    pricing_stripe_footer: 'Secure checkout via Stripe · cancel anytime in your account.',
+    pricing_recommended: 'RECOMMENDED',
     pricing_already_pro: '⭐ You already have Pro!',
     pricing_view_plans: 'View plans',
-    pricing_email_sent: 'Email opened. Send it and we\'ll activate Pro for your account.',
     pricing_manage_btn: 'Manage subscription',
+    pricing_admin_comp_hint: 'Pro granted by support · contact us to change',
     pricing_stripe_not_configured: 'Stripe checkout is not deployed yet. Ping support@kidscoinquest.app.',
     pricing_upgrade_success: 'Welcome to Pro! Your features are unlocked.',
     pricing_upgrade_canceled: 'Upgrade canceled. You can come back any time.',
@@ -6116,7 +6120,7 @@ const TRANSLATIONS = {
     admin_col_actions: 'Aktionen',
     admin_save: 'Speichern',
     admin_plan_updated: 'Plan auf {plan} geändert.',
-    admin_plan_stripe_note: 'Manuelle Plan-Änderungen funktionieren bereits. Stripe-Webhook-Integration ist im Schema vorbereitet (stripe_customer_id, stripe_subscription_id Spalten); siehe Migration-SQL-Header für die nächsten Schritte.',
+    admin_plan_stripe_note: 'Live-Stripe-Sync ist aktiv — der Webhook hält diese Zeilen automatisch aktuell. Manuelle Änderungen hier überschreiben das, was Stripe weiß; nur für Comps oder Notfälle.',
     admin_show_archived: 'Archivierte zeigen',
     admin_hidden_archived: 'archiviert ausgeblendet',
     admin_drill_down: 'Details',
@@ -6157,11 +6161,12 @@ const TRANSLATIONS = {
     pricing_feature_custom: 'Unbegrenzte eigene Abenteuer',
     pricing_upgrade_btn: 'Auf Pro upgraden',
     pricing_maybe_later: 'Vielleicht später',
-    pricing_stripe_coming_soon: 'Stripe-Checkout kommt bald. Bis dahin öffnet der Upgrade-Knopf eine E-Mail — wir schalten dich manuell frei.',
+    pricing_stripe_footer: 'Sicherer Checkout über Stripe · jederzeit im Konto kündbar.',
+    pricing_recommended: 'EMPFOHLEN',
     pricing_already_pro: '⭐ Du hast bereits Pro!',
     pricing_view_plans: 'Pläne ansehen',
-    pricing_email_sent: 'E-Mail geöffnet. Schick sie ab und wir aktivieren Pro für dich.',
     pricing_manage_btn: 'Abo verwalten',
+    pricing_admin_comp_hint: 'Pro vom Support gewährt · Änderung über Support',
     pricing_stripe_not_configured: 'Stripe-Checkout ist noch nicht deployed. Wende dich an support@kidscoinquest.app.',
     pricing_upgrade_success: 'Willkommen bei Pro! Deine Features sind freigeschaltet.',
     pricing_upgrade_canceled: 'Upgrade abgebrochen. Du kannst jederzeit wiederkommen.',
@@ -16820,6 +16825,11 @@ function renderSessionExpiredBanner() {
     banner = document.createElement('div');
     banner.id = 'sessionExpiredBanner';
     banner.className = 'session-expired-banner';
+    // role="alert" + aria-live="assertive" so screen readers announce
+    // the banner the moment it appears — without these, AT users only
+    // notice when they happen to navigate to it.
+    banner.setAttribute('role', 'alert');
+    banner.setAttribute('aria-live', 'assertive');
     // Insert at the very top of <main>, above all views.
     const main = document.querySelector('main');
     if (main) main.insertBefore(banner, main.firstChild);
@@ -17047,6 +17057,13 @@ async function submitNewPassword() {
 async function signOutAccount() {
   if (!supaClient) return;
   if (!confirm(t('sign_out_confirm'))) return;
+  // Clear the session-expired-banner marker BEFORE we sign out, so the
+  // post-signout re-render doesn't paint "your session expired" — the
+  // user just clicked the button on purpose. (Apr 2026 fix.)
+  if (state && state.settings) {
+    state.settings.cloudLinkedEmail = null;
+    try { save(); } catch (e) {}
+  }
   await supaClient.auth.signOut();
   toast(t('sign_out'), 'success');
 }
@@ -17230,9 +17247,19 @@ function renderAccountPanel() {
   const planBadge = plan === 'pro'
     ? `<span class="plan-pill plan-pro">⭐ Pro${period === 'yearly' ? ' · €19.99/yr' : period === 'monthly' ? ' · €3/mo' : ''}</span>`
     : `<span class="plan-pill plan-free">Free</span>`;
+  // Pro users have two render paths:
+  //   1. Real Stripe subscriber → has stripe_customer_id → "Manage" button
+  //      opens the Stripe Customer Portal.
+  //   2. Admin-comp'd user (set via the admin RPC, no Stripe customer) →
+  //      "Manage" button would crash the Edge Function with "no stripe
+  //      customer". Render a small grey hint instead so they know how to
+  //      change it.
+  const stripeCustomerId = supaSubscription && supaSubscription.stripe_customer_id;
   const upgradeBtn = plan === 'free'
     ? `<button class="btn btn-primary btn-sm" onclick="openPricingModal('account')">⭐ ${t('pricing_upgrade_btn')}</button>`
-    : `<button class="btn btn-primary btn-sm" onclick="openManageSubscription()">💳 ${t('pricing_manage_btn')}</button>`;
+    : stripeCustomerId
+      ? `<button class="btn btn-primary btn-sm" onclick="openManageSubscription()">💳 ${t('pricing_manage_btn')}</button>`
+      : `<span style="font-size: 12px; color: var(--ink-muted); font-style: italic;">${escapeHtml(t('pricing_admin_comp_hint'))}</span>`;
   panel.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:10px;">
       <div><strong>${escapeHtml(t('signed_in_as'))}:</strong> ${escapeHtml(email)} ${adminBadge} ${planBadge}</div>
@@ -17320,11 +17347,40 @@ const adminDashboard = {
 
 function switchAdminTab(tab) {
   adminDashboard.tab = tab;
-  document.querySelectorAll('.admin-tab').forEach(b =>
-    b.classList.toggle('active', b.dataset.adminTab === tab));
+  document.querySelectorAll('.admin-tab').forEach(b => {
+    const active = b.dataset.adminTab === tab;
+    b.classList.toggle('active', active);
+    b.setAttribute('aria-selected', active ? 'true' : 'false');
+    b.setAttribute('tabindex', active ? '0' : '-1');
+  });
+  // Tabpanel labelled-by points at the active tab so screen readers
+  // describe the new content with the right tab name.
+  const panel = document.getElementById('adminTabBody');
+  if (panel) panel.setAttribute('aria-labelledby', 'adminTabBtn-' + tab);
   renderAdminTab();
 }
 window.switchAdminTab = switchAdminTab;
+
+// Arrow-Left / Arrow-Right move between tabs, Home / End jump to ends.
+// Standard WAI-ARIA tablist pattern. Click handlers still work as
+// before — this just makes the keyboard path discoverable.
+function onAdminTabKeydown(e) {
+  const tabs = ['overview', 'families', 'logins', 'engagement', 'plans'];
+  const idx = tabs.indexOf(adminDashboard.tab);
+  if (idx < 0) return;
+  let next = null;
+  if (e.key === 'ArrowRight') next = tabs[(idx + 1) % tabs.length];
+  else if (e.key === 'ArrowLeft') next = tabs[(idx - 1 + tabs.length) % tabs.length];
+  else if (e.key === 'Home') next = tabs[0];
+  else if (e.key === 'End') next = tabs[tabs.length - 1];
+  if (next) {
+    e.preventDefault();
+    switchAdminTab(next);
+    const btn = document.getElementById('adminTabBtn-' + next);
+    if (btn) btn.focus();
+  }
+}
+window.onAdminTabKeydown = onAdminTabKeydown;
 
 async function loadAdminDashboard() {
   const body = document.getElementById('adminTabBody');

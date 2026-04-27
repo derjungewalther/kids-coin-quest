@@ -22,11 +22,14 @@ from jsDelivr-over-GitHub for the heavy mp3s, same-origin for the manifest.
 - **Project ref:** `dyfomoaxreoaceaakusg`
 - **SQL editor link (always paste-and-run here):**
   https://supabase.com/dashboard/project/dyfomoaxreoaceaakusg/sql/new
-- **Schema files (idempotent, run in order):**
+- **Schema files (idempotent, run in order — ALL FIVE are required):**
   1. `supabase-schema.sql` (base tables + RLS + delete_my_account)
   2. `supabase-migration-2026-04-25-rpc.sql` (get_my_profile, list_my_families, admin_list_*)
   3. `supabase-migration-2026-04-26-admin-dashboard.sql` (admin_overview_stats, admin_families_detail, admin_login_activity)
-  4. `supabase-migration-2026-04-26-admin-extensions.sql` (drill-down, charts, soft-delete, subscriptions)
+  4. `supabase-migration-2026-04-26-admin-extensions.sql` (drill-down, charts, soft-delete, subscriptions table — adds 'family' tier temporarily)
+  5. `supabase-migration-2026-04-26-pricing-update.sql` **(MANDATORY — drops 'family' tier, adds billing_period, finalizes 2-tier €3/€19.99 pricing)**
+
+  Skipping #5 leaves the schema in an inconsistent 3-tier state where `admin_set_plan` still accepts `'family'` but the client expects 2 tiers — silent data drift on signup.
 
 ## Workflow when Sebastian needs to run SQL
 
