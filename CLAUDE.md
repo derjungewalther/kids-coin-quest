@@ -102,10 +102,30 @@ Schema: `subscriptions.plan ∈ ('free', 'pro')`, `billing_period ∈ ('monthly'
 - ARR: monthly Pro × 12 = €36 · yearly Pro = €19.99
 - These are calculated server-side in `admin_overview_stats()`.
 
-Feature gating is **NOT yet implemented in the client code** — the schema
-+ admin dashboard are ready, but the actual "Free user can't recruit a
-3rd hero" enforcement is a separate task. When implementing, gate via
-`supaSubscription.plan === 'pro'` check.
+**Feature gating is live** in the client code (Apr 2026):
+- `isPro()` helper — true iff signed in AND `plan==='pro'` AND `status` in `('active','trialing')`
+- Hero recruit: max 2 for free users (gate in `addKid()`)
+- Adventure picker: free can only play `grove`, `bakery`, `fischer-sebastian` (rest show ⭐ Pro lock)
+- Narration: free skips premium audio path → Web Speech only
+
+**Stripe integration is wired up** via Supabase Edge Functions:
+- `supabase/functions/create-checkout-session/` — creates Stripe Checkout, redirects user
+- `supabase/functions/create-portal-session/` — opens Stripe Customer Portal for self-serve cancellation/plan change
+- `supabase/functions/stripe-webhook/` — receives subscription events, syncs to `public.subscriptions`
+
+Setup is one-time and documented in `STRIPE-SETUP.md`. The user (Sebastian)
+must:
+1. Create the Stripe product + prices + webhook endpoint
+2. Set the 5 secrets via `supabase secrets set ...`
+3. Deploy the 3 functions via `supabase functions deploy ...` (webhook needs `--no-verify-jwt`)
+
+Until that's done, the "Upgrade to Pro" button shows the
+`pricing_stripe_not_configured` toast. Admin manual plan-set via the
+dashboard still works as a fallback.
+
+When debugging Stripe:
+- `supabase functions logs stripe-webhook --follow`
+- Check `subscriptions` table directly in Supabase Table Editor
 
 ## Admin dashboard (Settings → 🛡 Globaler Admin)
 

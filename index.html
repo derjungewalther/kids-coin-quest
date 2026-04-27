@@ -5523,6 +5523,10 @@ const TRANSLATIONS = {
     pricing_already_pro: '⭐ You already have Pro!',
     pricing_view_plans: 'View plans',
     pricing_email_sent: 'Email opened. Send it and we\'ll activate Pro for your account.',
+    pricing_manage_btn: 'Manage subscription',
+    pricing_stripe_not_configured: 'Stripe checkout is not deployed yet. Ping support@kidscoinquest.app.',
+    pricing_upgrade_success: 'Welcome to Pro! Your features are unlocked.',
+    pricing_upgrade_canceled: 'Upgrade canceled. You can come back any time.',
     pricing_reason_hero_limit: 'Free includes 2 heroes. Upgrade to Pro for unlimited heroes.',
     pricing_reason_adventure_locked: 'This adventure is part of Pro. Upgrade to unlock all 8.',
     pricing_reason_account: 'Compare plans below.',
@@ -6157,6 +6161,10 @@ const TRANSLATIONS = {
     pricing_already_pro: '⭐ Du hast bereits Pro!',
     pricing_view_plans: 'Pläne ansehen',
     pricing_email_sent: 'E-Mail geöffnet. Schick sie ab und wir aktivieren Pro für dich.',
+    pricing_manage_btn: 'Abo verwalten',
+    pricing_stripe_not_configured: 'Stripe-Checkout ist noch nicht deployed. Wende dich an support@kidscoinquest.app.',
+    pricing_upgrade_success: 'Willkommen bei Pro! Deine Features sind freigeschaltet.',
+    pricing_upgrade_canceled: 'Upgrade abgebrochen. Du kannst jederzeit wiederkommen.',
     pricing_reason_hero_limit: 'Free umfasst 2 Helden. Pro für unbegrenzte Helden.',
     pricing_reason_adventure_locked: 'Dieses Abenteuer gehört zu Pro. Upgrade für alle 8.',
     pricing_reason_account: 'Vergleiche die Pläne unten.',
@@ -16555,26 +16563,91 @@ function setPricingPeriod(period) {
 }
 window.setPricingPeriod = setPricingPeriod;
 
-function onPricingUpgradeClick() {
-  // Stripe checkout isn't wired yet. Two friendly fallback paths:
-  // 1. Not signed in → push to sign in first (so we have a user_id to
-  //    attach the future subscription to).
-  // 2. Signed in → open mailto: with a pre-filled body for now.
+async function onPricingUpgradeClick() {
+  // Not signed in: push to sign in first (need a user_id for Stripe).
   if (!supaSession) {
     closeModal('pricingModal');
     if (typeof openSignInModal === 'function') openSignInModal();
     return;
   }
-  const subject = encodeURIComponent('Kids Coin Quest — Upgrade to Pro');
-  const body = encodeURIComponent(
-    `Hi,\n\nI'd like to upgrade to Pro (${_pricingPeriod === 'yearly' ? '€19.99/year' : '€3/month'}).\n\n` +
-    `My account: ${(supaSession.user && supaSession.user.email) || ''}\n\n` +
-    `Thanks!`
-  );
-  window.location.href = `mailto:support@kidscoinquest.app?subject=${subject}&body=${body}`;
-  toast(t('pricing_email_sent'), 'info');
+  const btn = document.getElementById('pricingUpgradeBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  try {
+    // Calls the Supabase Edge Function that creates a Stripe Checkout
+    // session; on success we redirect into Stripe-hosted checkout.
+    const { data, error } = await supaClient.functions.invoke('create-checkout-session', {
+      body: { period: _pricingPeriod },
+    });
+    if (error) throw error;
+    if (!data || !data.url) {
+      // Function returned a JSON error body in `data` instead of throwing.
+      throw new Error((data && data.error) || 'no checkout URL returned');
+    }
+    window.location.href = data.url;
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.innerHTML = '⭐ ' + escapeHtml(t('pricing_upgrade_btn')); }
+    const msg = (e && e.message) || String(e);
+    // Friendly hint when the Edge Function isn't deployed yet.
+    if (/not[\s-]?found|404|FunctionsRelayError/i.test(msg)) {
+      toast(t('pricing_stripe_not_configured'), 'error');
+    } else {
+      toast(msg, 'error');
+    }
+  }
 }
 window.onPricingUpgradeClick = onPricingUpgradeClick;
+
+// Pro user clicks "Manage subscription" → opens Stripe Customer Portal.
+async function openManageSubscription() {
+  if (!supaSession) return;
+  try {
+    const { data, error } = await supaClient.functions.invoke('create-portal-session', {});
+    if (error) throw error;
+    if (!data || !data.url) throw new Error((data && data.error) || 'no portal URL returned');
+    window.location.href = data.url;
+  } catch (e) {
+    toast((e && e.message) || String(e), 'error');
+  }
+}
+window.openManageSubscription = openManageSubscription;
+
+// Handle return from Stripe Checkout. URL has ?upgrade=success or
+// ?upgrade=cancel. Show a toast, refetch the subscription (the webhook
+// may already have written the new state), strip the query so a reload
+// doesn't re-trigger the toast.
+function handleStripeReturn() {
+  const params = new URLSearchParams(location.search);
+  const upgrade = params.get('upgrade');
+  if (!upgrade) return;
+  // Strip the upgrade params so a reload doesn't re-fire the toast.
+  params.delete('upgrade'); params.delete('session_id');
+  const newUrl = location.pathname + (params.toString() ? '?' + params.toString() : '') + location.hash;
+  history.replaceState(null, '', newUrl);
+  if (upgrade === 'success') {
+    setTimeout(() => toast('🎉 ' + t('pricing_upgrade_success'), 'success'), 600);
+    // Refetch subscription a moment later — the webhook may need a
+    // few seconds to land. Try twice with backoff.
+    setTimeout(refetchSubscription, 2000);
+    setTimeout(refetchSubscription, 8000);
+  } else if (upgrade === 'cancel') {
+    setTimeout(() => toast(t('pricing_upgrade_canceled'), 'info'), 600);
+  }
+}
+async function refetchSubscription() {
+  if (!supaSession || !supaClient) return;
+  try {
+    const { data } = await supaClient
+      .from('subscriptions')
+      .select('user_id, plan, status, billing_period, current_period_end')
+      .eq('user_id', supaSession.user.id)
+      .maybeSingle();
+    if (data) supaSubscription = data;
+    renderAccountPanel();
+    if (typeof renderAdventure === 'function') renderAdventure();
+  } catch (e) { /* silent */ }
+}
+window.handleStripeReturn = handleStripeReturn;
+window.refetchSubscription = refetchSubscription;
 let cloudFamilyId = null;
 let cloudLastRemoteUpdatedAt = null;
 let cloudSyncTimer = null;
@@ -17159,7 +17232,7 @@ function renderAccountPanel() {
     : `<span class="plan-pill plan-free">Free</span>`;
   const upgradeBtn = plan === 'free'
     ? `<button class="btn btn-primary btn-sm" onclick="openPricingModal('account')">⭐ ${t('pricing_upgrade_btn')}</button>`
-    : '';
+    : `<button class="btn btn-primary btn-sm" onclick="openManageSubscription()">💳 ${t('pricing_manage_btn')}</button>`;
   panel.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:10px;">
       <div><strong>${escapeHtml(t('signed_in_as'))}:</strong> ${escapeHtml(email)} ${adminBadge} ${planBadge}</div>
@@ -17899,6 +17972,9 @@ updateI18n();
 // stale localStorage but no session sees their auth state without
 // having to wait for initSupabase() to complete.
 try { renderSessionExpiredBanner(); } catch (e) {}
+// Handle Stripe Checkout return: ?upgrade=success or ?upgrade=cancel.
+// Triggers a toast + subscription refetch. No-op if no upgrade param.
+try { handleStripeReturn(); } catch (e) {}
 // Show any pending reward that survived a previous session, after the
 // landing/intro UI has settled.
 setTimeout(() => { try { updateFamilyStreakBadge(); updateLegendaryRecruitButton(); maybeShowNextReward(); } catch (e) {} }, 1500);
