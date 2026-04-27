@@ -78,6 +78,7 @@ Deno.serve(async (req) => {
           status: 'canceled',
           billing_period: null,
           stripe_subscription_id: null,
+          cancel_at_period_end: false,
         }, { onConflict: 'user_id' });
         break;
       }
@@ -122,6 +123,12 @@ async function upsertFromStripeSubscription(sub: Stripe.Subscription) {
     stripe_customer_id: customerId,
     stripe_subscription_id: sub.id,
     current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
+    // cancel_at_period_end: when the user clicks "cancel" in the Stripe
+    // Customer Portal, Stripe leaves status='active' until the period
+    // actually ends but flips this flag to true. We surface it in the
+    // admin dashboard so a Pro user with scheduled cancellation shows
+    // a "cancels on {date}" pill instead of just looking active.
+    cancel_at_period_end: !!sub.cancel_at_period_end,
   }, { onConflict: 'user_id' });
 }
 

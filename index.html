@@ -2667,6 +2667,20 @@
   .plan-pill.plan-pro    { background: rgba(244,211,94,0.18); color: var(--gold-bright); border-color: var(--gold-dark); }
   .plan-pill.plan-family { background: rgba(168,85,247,0.18); color: #c084fc; border-color: #a855f7; }
 
+  /* Visually-hidden but screen-reader-readable. Standard pattern from
+     WCAG techniques. Used for hidden form labels where the visible
+     placeholder is enough for sighted users but AT users need explicit
+     <label>. */
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* === Pricing Modal (Apr 2026) — comparison table + upgrade CTA. */
   .pricing-grid {
     display: grid;
@@ -2756,12 +2770,16 @@
   }
   .pricing-features li { padding: 2px 0; color: var(--ink); }
 
-  /* "⭐ Pro" badge shown on tier-locked adventure cards. */
+  /* "⭐ Pro" badge shown on tier-locked adventure cards.
+     Was a wide gold-bright → gold-dark gradient; the dark end (#8b6914)
+     gave only ~3.1:1 contrast with the dark-brown text — fails WCAG AA
+     for normal text. Narrowed the gradient endpoints so contrast stays
+     ≥ 4.5:1 across the whole pill. (Apr 2026 a11y fix.) */
   .pro-badge {
     position: absolute;
     top: 8px;
     right: 8px;
-    background: linear-gradient(135deg, var(--gold-bright), var(--gold-dark));
+    background: linear-gradient(135deg, #f4d35e, #d4a747);
     color: #2b1810;
     font-family: 'Cinzel', serif;
     font-size: 11px;
@@ -4894,9 +4912,9 @@
       <div class="pricing-tier pricing-tier-pro">
         <span class="pricing-recommended-badge" data-i18n="pricing_recommended">RECOMMENDED</span>
         <div class="pricing-tier-name">⭐ <span data-i18n="pricing_pro_name">Pro</span></div>
-        <div class="pricing-period-toggle" id="pricingPeriodToggle">
-          <button class="pricing-period-btn active" data-period="monthly" onclick="setPricingPeriod('monthly')">€3<span data-i18n="pricing_per_month"> /mo</span></button>
-          <button class="pricing-period-btn"        data-period="yearly"  onclick="setPricingPeriod('yearly')">€19.99<span data-i18n="pricing_per_year"> /yr</span></button>
+        <div class="pricing-period-toggle" id="pricingPeriodToggle" role="group" aria-label="Billing period">
+          <button class="pricing-period-btn active" data-period="monthly" aria-pressed="true"  onclick="setPricingPeriod('monthly')">€3<span data-i18n="pricing_per_month"> /mo</span></button>
+          <button class="pricing-period-btn"        data-period="yearly"  aria-pressed="false" onclick="setPricingPeriod('yearly')">€19.99<span data-i18n="pricing_per_year"> /yr</span></button>
         </div>
         <div class="pricing-tier-period" id="pricingTierSubLabel"><span data-i18n="pricing_yearly_save">Save 44% with yearly</span></div>
         <ul class="pricing-features">
@@ -5445,6 +5463,7 @@ const TRANSLATIONS = {
     admin_last_30_days: 'last 30 days',
     admin_generated_at: 'Snapshot taken',
     admin_search_placeholder: 'Search by email, family name, or user id…',
+    admin_search_label: 'Search families',
     admin_families_shown: 'shown',
     admin_logins_per_day: 'Sign-ins per Day (last 30)',
     admin_logins_caveat: 'Note: shows last sign-in per user only — Supabase free tier doesn\'t expose the full audit log. Good as an engagement pulse, not exact daily totals.',
@@ -5510,7 +5529,7 @@ const TRANSLATIONS = {
     pricing_per_year: ' /yr',
     pricing_yearly_save: 'Save 44% with yearly · billed €19.99 once',
     pricing_yearly_billed: 'Billed €19.99 once a year · cancel anytime',
-    pricing_feature_3_adv: '3 adventures (Grove, Bakery, Sebastian)',
+    pricing_feature_3_adv: '3 adventures (Grove, Bakery, Fischer Sebastian)',
     pricing_feature_8_adv: 'All 8 adventures',
     pricing_feature_2_heroes: '2 heroes',
     pricing_feature_unlimited_heroes: 'Unlimited heroes',
@@ -5528,6 +5547,8 @@ const TRANSLATIONS = {
     pricing_view_plans: 'View plans',
     pricing_manage_btn: 'Manage subscription',
     pricing_admin_comp_hint: 'Pro granted by support · contact us to change',
+    account_cancels_on: 'cancels {date}',
+    admin_cancels_at_tooltip: 'User scheduled cancellation via Stripe portal — Pro until period end',
     pricing_stripe_not_configured: 'Stripe checkout is not deployed yet. Ping support@kidscoinquest.app.',
     pricing_upgrade_success: 'Welcome to Pro! Your features are unlocked.',
     pricing_upgrade_canceled: 'Upgrade canceled. You can come back any time.',
@@ -6084,6 +6105,7 @@ const TRANSLATIONS = {
     admin_last_30_days: 'letzte 30 Tage',
     admin_generated_at: 'Stand',
     admin_search_placeholder: 'Suche nach E-Mail, Familienname oder User-ID…',
+    admin_search_label: 'Familien suchen',
     admin_families_shown: 'angezeigt',
     admin_logins_per_day: 'Anmeldungen pro Tag (letzte 30)',
     admin_logins_caveat: 'Hinweis: zeigt nur den letzten Login pro Nutzer — Supabase-Free-Tier exportiert das vollständige Audit-Log nicht. Gut als Engagement-Puls, nicht als exakte Tageszahl.',
@@ -6149,7 +6171,7 @@ const TRANSLATIONS = {
     pricing_per_year: ' /Jahr',
     pricing_yearly_save: '44% sparen · einmal €19.99 jährlich',
     pricing_yearly_billed: 'Einmal €19.99 pro Jahr · jederzeit kündbar',
-    pricing_feature_3_adv: '3 Abenteuer (Hain, Bäckerei, Sebastian)',
+    pricing_feature_3_adv: '3 Abenteuer (Hain, Bäckerei, Fischer Sebastian)',
     pricing_feature_8_adv: 'Alle 8 Abenteuer',
     pricing_feature_2_heroes: '2 Helden',
     pricing_feature_unlimited_heroes: 'Unbegrenzte Helden',
@@ -6167,10 +6189,12 @@ const TRANSLATIONS = {
     pricing_view_plans: 'Pläne ansehen',
     pricing_manage_btn: 'Abo verwalten',
     pricing_admin_comp_hint: 'Pro vom Support gewährt · Änderung über Support',
+    account_cancels_on: 'läuft {date} aus',
+    admin_cancels_at_tooltip: 'User hat über Stripe-Portal gekündigt — Pro bis Periodenende',
     pricing_stripe_not_configured: 'Stripe-Checkout ist noch nicht deployed. Wende dich an support@kidscoinquest.app.',
     pricing_upgrade_success: 'Willkommen bei Pro! Deine Features sind freigeschaltet.',
     pricing_upgrade_canceled: 'Upgrade abgebrochen. Du kannst jederzeit wiederkommen.',
-    pricing_reason_hero_limit: 'Free umfasst 2 Helden. Pro für unbegrenzte Helden.',
+    pricing_reason_hero_limit: 'Free umfasst 2 Helden. Mit Pro bekommst du unbegrenzt viele.',
     pricing_reason_adventure_locked: 'Dieses Abenteuer gehört zu Pro. Upgrade für alle 8.',
     pricing_reason_account: 'Vergleiche die Pläne unten.',
     pro_required: 'Pro erforderlich',
@@ -16527,9 +16551,18 @@ function isPro() {
   if (!['active', 'trialing'].includes(supaSubscription.status)) return false;
   return true;
 }
+// Returns the EFFECTIVE plan — the one that drives badges and feature
+// gates. Mirror isPro()'s status check: a row that says plan='pro' but
+// status='canceled' isn't really Pro anymore, so report 'free'. (Apr
+// 2026 fix from ultrareview — was causing the Account-panel "⭐ Pro"
+// pill to show for canceled subs while feature gates correctly locked,
+// confusing users.)
 function getMyPlan() {
   if (!supaSession) return 'free';
-  return (supaSubscription && supaSubscription.plan) || 'free';
+  if (!supaSubscription) return 'free';
+  if (supaSubscription.plan !== 'pro') return supaSubscription.plan || 'free';
+  if (!['active', 'trialing'].includes(supaSubscription.status)) return 'free';
+  return 'pro';
 }
 window.isPro = isPro;
 window.getMyPlan = getMyPlan;
@@ -16559,8 +16592,14 @@ window.openPricingModal = openPricingModal;
 
 function setPricingPeriod(period) {
   _pricingPeriod = period === 'yearly' ? 'yearly' : 'monthly';
-  document.querySelectorAll('.pricing-period-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.period === _pricingPeriod));
+  document.querySelectorAll('.pricing-period-btn').forEach(b => {
+    const isActive = b.dataset.period === _pricingPeriod;
+    b.classList.toggle('active', isActive);
+    // aria-pressed announces "selected" state to screen readers — the
+    // .active class is visual-only and AT users couldn't tell which
+    // option was chosen. (Apr 2026 a11y fix.)
+    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
   const sub = document.getElementById('pricingTierSubLabel');
   if (sub) sub.innerHTML = _pricingPeriod === 'yearly'
     ? `<span>${t('pricing_yearly_billed')}</span>`
@@ -16643,7 +16682,7 @@ async function refetchSubscription() {
   try {
     const { data } = await supaClient
       .from('subscriptions')
-      .select('user_id, plan, status, billing_period, current_period_end')
+      .select('user_id, plan, status, billing_period, current_period_end, cancel_at_period_end, stripe_customer_id')
       .eq('user_id', supaSession.user.id)
       .maybeSingle();
     if (data) supaSubscription = data;
@@ -16786,7 +16825,7 @@ async function applySession(session) {
   try {
     const { data: subRow } = await supaClient
       .from('subscriptions')
-      .select('user_id, plan, status, billing_period, current_period_end')
+      .select('user_id, plan, status, billing_period, current_period_end, cancel_at_period_end, stripe_customer_id')
       .eq('user_id', supaSession.user.id)
       .maybeSingle();
     if (subRow) supaSubscription = subRow;
@@ -17244,8 +17283,11 @@ function renderAccountPanel() {
   // Plan badge: shown next to email so user always knows their tier.
   const plan = getMyPlan();
   const period = getMyBillingPeriod();
+  const willCancelAt = (supaSubscription && supaSubscription.cancel_at_period_end && supaSubscription.current_period_end)
+    ? supaSubscription.current_period_end : null;
   const planBadge = plan === 'pro'
     ? `<span class="plan-pill plan-pro">⭐ Pro${period === 'yearly' ? ' · €19.99/yr' : period === 'monthly' ? ' · €3/mo' : ''}</span>`
+       + (willCancelAt ? ` <span class="plan-pill" style="background:rgba(255,140,26,0.15); color:#ff8c1a; border:1px solid #ff8c1a;">${escapeHtml(t('account_cancels_on').replace('{date}', fmtDateTime(willCancelAt)))}</span>` : '')
     : `<span class="plan-pill plan-free">Free</span>`;
   // Pro users have two render paths:
   //   1. Real Stripe subscriber → has stripe_customer_id → "Manage" button
@@ -17596,30 +17638,45 @@ function renderAdminPlans() {
 
 async function adminUpdatePlan(userId, plan, billingPeriod) {
   if (!supaClient || !isAdminUser()) return;
+  // Preserve the existing current_period_end so switching monthly↔yearly
+  // doesn't blow away when the user is "paid up until X". For
+  // free-plan downgrades, we explicitly null it (no period applies).
+  // (Apr 2026 fix from ultrareview — was overwriting unconditionally.)
+  let preservedPeriodEnd = null;
+  if (plan === 'pro') {
+    const row = (adminDashboard.families || [])
+      .find(f => f.owner_user_id === userId);
+    preservedPeriodEnd = (row && row.current_period_end) || null;
+  }
   try {
     const { data, error } = await supaClient.rpc('admin_set_plan', {
       p_user_id: userId,
       p_plan: plan,
       p_status: 'active',
       p_billing_period: plan === 'pro' ? (billingPeriod || 'monthly') : null,
-      p_period_end: null
+      p_period_end: preservedPeriodEnd
     });
     if (error) throw error;
     const label = plan === 'pro'
       ? `pro (${billingPeriod || 'monthly'})`
       : 'free';
     toast(t('admin_plan_updated').replace('{plan}', label), 'success');
-    refreshAdminDashboard();
+    // Targeted invalidation: only the family-detail + overview RPCs
+    // change after a plan flip. Login-activity + signups-per-day are
+    // unrelated, no point re-fetching them. (Saves 2 RPCs per save.)
+    supaInvalidate('admin-fam-detail');
+    supaInvalidate('admin-overview');
+    loadAdminDashboard();
   } catch (e) {
     toast(e.message || String(e), 'error');
   }
 }
 window.adminUpdatePlan = adminUpdatePlan;
 
-function renderAdminFamilies() {
+// Returns { filtered, archivedCount, totalRows } so renderers can reuse
+// the same filter+sort pipeline without duplicating it.
+function getFilteredAdminFamilies() {
   const allRows = adminDashboard.families || [];
-  if (!allRows.length) return `<div class="admin-empty">${t('admin_no_families')}</div>`;
-  // Filter: hide archived unless user toggled showArchived.
   let rows = adminDashboard.showArchived ? allRows : allRows.filter(r => !r.archived_at);
   const archivedCount = allRows.filter(r => r.archived_at).length;
   const q = adminDashboard.search.toLowerCase();
@@ -17637,9 +17694,81 @@ function renderAdminFamilies() {
     }
     return dir === 'asc' ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
   });
+  return { filtered, archivedCount, totalRows: rows.length, allRows };
+}
+
+function renderAdminFamilyRowHtml(r) {
+  const adminPill = r.is_admin ? `<span class="admin-pill">admin</span>` : '';
+  const coin = fmtNumber(Math.round(Number(r.coin_total || 0) * 100) / 100);
+  const planClass = `plan-pill plan-${r.plan || 'free'}`;
+  const archivedClass = r.archived_at ? ' style="opacity:0.55;"' : '';
+  const archivedBadge = r.archived_at ? ` <span class="admin-pill" style="background:rgba(180,180,180,0.15); color:#888;">archived</span>` : '';
+  // Stripe scheduled-cancellation: user clicked "cancel" in the portal
+  // but the period hasn't ended yet. Show an amber pill so it stands out.
+  const cancelPill = (r.cancel_at_period_end && r.current_period_end)
+    ? ` <span class="admin-pill" style="background:rgba(255,140,26,0.15); color:#ff8c1a;" title="${escapeHtml(t('admin_cancels_at_tooltip'))}">cancels ${fmtDateTime(r.current_period_end)}</span>`
+    : '';
+  return `<tr${archivedClass}>
+    <td class="admin-cell-email">
+      <a href="#" onclick="event.preventDefault(); openAdminFamilyModal('${escapeHtml(r.family_id)}')" style="color: var(--gold-bright); text-decoration: none;">
+        ${escapeHtml(r.email || r.owner_user_id || '')}
+      </a>${adminPill}${archivedBadge}${cancelPill}
+    </td>
+    <td><span class="${planClass}">${escapeHtml(r.plan || 'free')}</span></td>
+    <td class="admin-cell-num">${r.hero_count}</td>
+    <td class="admin-cell-num">🪙 ${coin}</td>
+    <td class="admin-cell-num">${r.tx_count}</td>
+    <td class="admin-cell-num">${r.current_streak ? '🔥 ' + r.current_streak : '—'}</td>
+    <td>${r.last_sign_in_at ? fmtDateTime(r.last_sign_in_at) : '—'}</td>
+    <td>${r.family_updated ? fmtDateTime(r.family_updated) : '—'}</td>
+    <td>
+      <button class="btn-admin-icon" title="${escapeHtml(t('admin_drill_down'))}" onclick="openAdminFamilyModal('${escapeHtml(r.family_id)}')">🔍</button>
+      ${r.archived_at
+        ? `<button class="btn-admin-icon" title="${escapeHtml(t('admin_unarchive'))}" onclick="adminToggleArchive('${escapeHtml(r.family_id)}', false)">↩</button>`
+        : `<button class="btn-admin-icon" title="${escapeHtml(t('admin_archive'))}" onclick="adminToggleArchive('${escapeHtml(r.family_id)}', true)">🗄</button>`
+      }
+    </td>
+  </tr>`;
+}
+
+// Surgical update: replace only the <tbody> + footer count, keep search
+// input + sort headers + checkbox intact. The browser preserves focus
+// + selection range on the input automatically because we never touch
+// it. (Apr 2026 perf fix.)
+function replaceAdminFamiliesTableBody() {
+  const tbody = document.querySelector('#adminTabBody .admin-table tbody');
+  const footer = document.querySelector('#adminTabBody .admin-families-footer');
+  if (!tbody) {
+    // No table yet — full render.
+    const body = document.getElementById('adminTabBody');
+    body.innerHTML = renderAdminFamilies();
+    wireAdminFamilyHandlers();
+    return;
+  }
+  const r = getFilteredAdminFamilies();
+  tbody.innerHTML = r.filtered.map(renderAdminFamilyRowHtml).join('');
+  if (footer) {
+    footer.textContent =
+      `${r.filtered.length} / ${r.totalRows} ${t('admin_families_shown')}` +
+      (r.archivedCount > 0 && !adminDashboard.showArchived ? ` · ${r.archivedCount} ${t('admin_hidden_archived')}` : '');
+  }
+}
+window.replaceAdminFamiliesTableBody = replaceAdminFamiliesTableBody;
+
+function renderAdminFamilies() {
+  const r = getFilteredAdminFamilies();
+  if (!r.allRows.length) return `<div class="admin-empty">${t('admin_no_families')}</div>`;
+  const { filtered, archivedCount } = r;
+  const { col, dir } = adminDashboard.sort;
   const sortIcon = (c) => col === c ? (dir === 'asc' ? ' ▲' : ' ▼') : '';
-  const head = (c, label) =>
-    `<th data-sort-col="${c}" ${col === c ? 'data-sort-active="1"' : ''}>${escapeHtml(label)}${sortIcon(c)}</th>`;
+  // aria-sort tells screen readers the current sort state per column;
+  // tabindex + role="button" + the keydown handler in
+  // wireAdminFamilyHandlers() make headers reachable + activatable
+  // from the keyboard (was click-only before — Apr 2026 a11y fix).
+  const head = (c, label) => {
+    const ariaSort = col !== c ? 'none' : (dir === 'asc' ? 'ascending' : 'descending');
+    return `<th data-sort-col="${c}" role="button" tabindex="0" aria-sort="${ariaSort}" ${col === c ? 'data-sort-active="1"' : ''}>${escapeHtml(label)}${sortIcon(c)}</th>`;
+  };
   const tableHead = `
     <thead><tr>
       ${head('email',          t('admin_col_email'))}
@@ -17652,37 +17781,12 @@ function renderAdminFamilies() {
       ${head('family_updated', t('admin_col_last_active'))}
       <th>${escapeHtml(t('admin_col_actions'))}</th>
     </tr></thead>`;
-  const body = filtered.map(r => {
-    const adminPill = r.is_admin ? `<span class="admin-pill">admin</span>` : '';
-    const coin = fmtNumber(Math.round(Number(r.coin_total || 0) * 100) / 100);
-    const planClass = `plan-pill plan-${r.plan || 'free'}`;
-    const archivedClass = r.archived_at ? ' style="opacity:0.55;"' : '';
-    const archivedBadge = r.archived_at ? ` <span class="admin-pill" style="background:rgba(180,180,180,0.15); color:#888;">archived</span>` : '';
-    return `<tr${archivedClass}>
-      <td class="admin-cell-email">
-        <a href="#" onclick="event.preventDefault(); openAdminFamilyModal('${escapeHtml(r.family_id)}')" style="color: var(--gold-bright); text-decoration: none;">
-          ${escapeHtml(r.email || r.owner_user_id || '')}
-        </a>${adminPill}${archivedBadge}
-      </td>
-      <td><span class="${planClass}">${escapeHtml(r.plan || 'free')}</span></td>
-      <td class="admin-cell-num">${r.hero_count}</td>
-      <td class="admin-cell-num">🪙 ${coin}</td>
-      <td class="admin-cell-num">${r.tx_count}</td>
-      <td class="admin-cell-num">${r.current_streak ? '🔥 ' + r.current_streak : '—'}</td>
-      <td>${r.last_sign_in_at ? fmtDateTime(r.last_sign_in_at) : '—'}</td>
-      <td>${r.family_updated ? fmtDateTime(r.family_updated) : '—'}</td>
-      <td>
-        <button class="btn-admin-icon" title="${escapeHtml(t('admin_drill_down'))}" onclick="openAdminFamilyModal('${escapeHtml(r.family_id)}')">🔍</button>
-        ${r.archived_at
-          ? `<button class="btn-admin-icon" title="${escapeHtml(t('admin_unarchive'))}" onclick="adminToggleArchive('${escapeHtml(r.family_id)}', false)">↩</button>`
-          : `<button class="btn-admin-icon" title="${escapeHtml(t('admin_archive'))}" onclick="adminToggleArchive('${escapeHtml(r.family_id)}', true)">🗄</button>`
-        }
-      </td>
-    </tr>`;
-  }).join('');
+  const body = filtered.map(renderAdminFamilyRowHtml).join('');
+  const footerText = `${filtered.length} / ${r.totalRows} ${t('admin_families_shown')}${archivedCount > 0 && !adminDashboard.showArchived ? ` · ${archivedCount} ${t('admin_hidden_archived')}` : ''}`;
   return `
     <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px;">
-      <input type="text" class="admin-search" id="adminFamSearch" style="flex: 1; min-width: 200px; margin-bottom: 0;"
+      <label for="adminFamSearch" class="sr-only" data-i18n="admin_search_label">Search families</label>
+      <input type="text" class="admin-search" id="adminFamSearch" aria-label="${escapeHtml(t('admin_search_label'))}" style="flex: 1; min-width: 200px; margin-bottom: 0;"
              placeholder="${escapeHtml(t('admin_search_placeholder'))}"
              value="${escapeHtml(adminDashboard.search)}" />
       <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink); white-space: nowrap;">
@@ -17693,35 +17797,30 @@ function renderAdminFamilies() {
     <div style="overflow-x: auto;">
       <table class="admin-table">${tableHead}<tbody>${body}</tbody></table>
     </div>
-    <div style="font-size: 11px; color: var(--ink-muted); margin-top: 8px;">
-      ${filtered.length} / ${rows.length} ${t('admin_families_shown')}${archivedCount > 0 && !adminDashboard.showArchived ? ` · ${archivedCount} ${t('admin_hidden_archived')}` : ''}
-    </div>`;
+    <div class="admin-families-footer" style="font-size: 11px; color: var(--ink-muted); margin-top: 8px;">${footerText}</div>`;
 }
 
 function wireAdminFamilyHandlers() {
   const search = document.getElementById('adminFamSearch');
   if (search) {
+    // Re-render only <tbody> on keystroke instead of the whole panel.
+    // Avoids losing focus on the input + the cursor-restore band-aid,
+    // and stays smooth even at 100+ rows. (Apr 2026 perf fix from
+    // ultrareview.)
     search.addEventListener('input', (e) => {
       adminDashboard.search = e.target.value;
-      const body = document.getElementById('adminTabBody');
-      const cursor = e.target.selectionStart;
-      body.innerHTML = renderAdminFamilies();
-      wireAdminFamilyHandlers();
-      const fresh = document.getElementById('adminFamSearch');
-      if (fresh) { fresh.focus(); fresh.setSelectionRange(cursor, cursor); }
+      replaceAdminFamiliesTableBody();
     });
   }
   const showArch = document.getElementById('adminShowArchived');
   if (showArch) {
     showArch.addEventListener('change', () => {
       adminDashboard.showArchived = showArch.checked;
-      const body = document.getElementById('adminTabBody');
-      body.innerHTML = renderAdminFamilies();
-      wireAdminFamilyHandlers();
+      replaceAdminFamiliesTableBody();
     });
   }
   document.querySelectorAll('.admin-table th[data-sort-col]').forEach(th => {
-    th.addEventListener('click', () => {
+    const trigger = () => {
       const c = th.dataset.sortCol;
       if (adminDashboard.sort.col === c) {
         adminDashboard.sort.dir = adminDashboard.sort.dir === 'asc' ? 'desc' : 'asc';
@@ -17731,6 +17830,12 @@ function wireAdminFamilyHandlers() {
       const body = document.getElementById('adminTabBody');
       body.innerHTML = renderAdminFamilies();
       wireAdminFamilyHandlers();
+    };
+    th.addEventListener('click', trigger);
+    // Enter / Space activate when the th is keyboard-focused. Standard
+    // pattern for native-feeling accessible buttons inside table headers.
+    th.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); trigger(); }
     });
   });
 }
