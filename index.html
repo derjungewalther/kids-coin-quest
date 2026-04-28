@@ -4440,14 +4440,13 @@
           <input type="text" id="actName" data-i18n-placeholder="quest_name_ph" placeholder="e.g. Slay the dust dragons" />
         </div>
         <div>
-          <label data-i18n="gold_reward">Gold Reward</label>
+          <label data-i18n="reward_or_penalty">Reward (+) or Penalty (−)</label>
           <div style="display:flex; gap:6px; align-items: stretch;">
             <button type="button" class="quest-sign-toggle" id="actSignToggle"
                     aria-label="Toggle reward / penalty" aria-pressed="false"
                     onclick="toggleQuestSign()" title="">+</button>
-            <input type="text" inputmode="decimal" id="actAmount" placeholder="1.00" data-i18n-num-placeholder="1" style="flex: 1;" />
+            <input type="text" inputmode="decimal" id="actAmount" placeholder="1.00" data-i18n-num-placeholder="1" style="flex: 1; min-width: 0;" />
           </div>
-          <div id="actSignHint" style="font-size: 11px; color: var(--ink-muted); margin-top: 4px; min-height: 14px;"></div>
         </div>
         <button class="btn btn-primary" onclick="addActivity()" data-i18n="proclaim">⚔ Proclaim</button>
       </div>
@@ -5608,9 +5607,9 @@ const TRANSLATIONS = {
     admin_restore_confirm: 'Restore this family\'s state to the backup from {date}? The current state will be saved as a separate backup so you can undo.',
     admin_restore_success: '✓ Restored from {date}. The current state was snapshotted first.',
     admin_backups_note: 'One snapshot per day, created on the user\'s first sign-in of the day. Restore saves the current state as a pre-restore backup so you can roll back.',
+    reward_or_penalty: 'Reward (+) or Penalty (−)',
     penalty_toggle_off: 'Currently a reward (+). Click to make it a penalty (−).',
     penalty_toggle_on: 'Currently a penalty (−). Click to make it a reward (+).',
-    penalty_hint: 'Penalty: subtracts coins for misbehavior. No XP, no streak.',
     penalty_proclaimed: '⚠ Penalty proclaimed.',
     penalty_badge: 'Penalty',
     penalty_note_template: '⚠ {name} {icon} · −🪙 {n}',
@@ -6263,9 +6262,9 @@ const TRANSLATIONS = {
     admin_restore_confirm: 'Diese Familie auf den Stand vom {date} zurücksetzen? Der aktuelle Stand wird als separates Backup gesichert — Undo möglich.',
     admin_restore_success: '✓ Wiederhergestellt vom {date}. Der vorherige Stand wurde zuvor gesichert.',
     admin_backups_note: 'Ein Snapshot pro Tag, beim ersten Login des Users. Wiederherstellen sichert den aktuellen Stand zuerst als Pre-Restore-Backup, damit du zurückkannst.',
+    reward_or_penalty: 'Belohnung (+) oder Strafe (−)',
     penalty_toggle_off: 'Aktuell eine Belohnung (+). Klick für eine Strafe (−).',
     penalty_toggle_on: 'Aktuell eine Strafe (−). Klick für eine Belohnung (+).',
-    penalty_hint: 'Strafe: zieht Münzen ab bei Fehlverhalten. Keine XP, kein Streak.',
     penalty_proclaimed: '⚠ Strafe verkündet.',
     penalty_badge: 'Strafe',
     penalty_note_template: '⚠ {name} {icon} · −🪙 {n}',
@@ -10623,9 +10622,10 @@ function toggleQuestSign() {
   const isPenalty = btn.classList.toggle('is-penalty');
   btn.textContent = isPenalty ? '−' : '+';
   btn.setAttribute('aria-pressed', isPenalty ? 'true' : 'false');
+  // Tooltip explains what the toggle does on hover; no inline hint
+  // div, which used to make the form column taller and pushed the
+  // Proclaim button out of alignment.
   btn.title = isPenalty ? t('penalty_toggle_on') : t('penalty_toggle_off');
-  const hint = document.getElementById('actSignHint');
-  if (hint) hint.textContent = isPenalty ? t('penalty_hint') : '';
 }
 window.toggleQuestSign = toggleQuestSign;
 
