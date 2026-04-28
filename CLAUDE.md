@@ -54,6 +54,60 @@ from jsDelivr-over-GitHub for the heavy mp3s, same-origin for the manifest.
 3. **State explicitly that Netlify will deploy in ~1-2 min** and tell Sebastian to hard-refresh.
 4. If audio was generated: confirm jsDelivr typically picks up new mp3s within a few minutes too — but the manifest is same-origin so that's never the bottleneck.
 
+## Visual sanity check for frontend changes (mandatory)
+
+**Whenever you touch a UI component** — new modal, new form, new tab,
+new button, restyled CSS, edited admin dashboard / pricing modal /
+adventure picker / hero card / pricing form / quest form / kid card /
+admin tab / etc. — **before committing**, take a Playwright
+screenshot and `Read` it inline. Don't guess at layout from the code.
+
+Why: alignment, contrast, baseline, wrapping, overflow, and
+responsive sizing fail in non-obvious ways when the change is small
+on the source side. Sebastian has caught at least 2 layout bugs that
+would have been obvious from a 3-second screenshot (quest-form
+penalty toggle pushed Verkünden out of alignment; hero-card streak
+pills repeating across cards). Skipping the screenshot wastes a
+round-trip with him.
+
+**Pattern (10-second cost):**
+
+```js
+// Throw-away script in scripts/_snap.mjs (rm after use)
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage();
+await p.setViewportSize({ width: 1280, height: 900 });
+// Pre-seed minimum state so the component you care about renders
+await p.addInitScript(() => {
+  localStorage.setItem('piggyBankState', JSON.stringify({
+    kids: [/* whatever the component needs */],
+    activities: [/* ... */],
+    transactions: [],
+    settings: { lang:'de', landingDismissed: true, narratorOn: false, currency: '🪙' }
+  }));
+});
+await p.goto('http://localhost:8765/index.html', { waitUntil: 'domcontentloaded' });
+await p.waitForFunction(() => typeof window.toggleLang === 'function');
+// Navigate to the surface you changed
+await p.evaluate(() => window.switchTab && window.switchTab('activities'));
+await p.waitForTimeout(300);
+// Screenshot only the relevant container — full page is noisy
+const el = await p.locator('#actName').locator('xpath=ancestor::div[contains(@class,"section")][1]');
+await el.screenshot({ path: '/tmp/snap.png' });
+await b.close();
+```
+
+Then `Read /tmp/snap.png` to see what Sebastian will see. If it
+looks bad, fix it BEFORE committing. If you changed both EN and DE
+copy or a state-toggling component (toggle, dropdown, tabs), screenshot
+each visible state.
+
+**Skip when:** SQL-only changes, Edge Function code, narration text
+content (`text:` field on adventures — voice/text only, no visual),
+test-file-only changes, audio mp3 generation. Anything that touches
+HTML structure or CSS — screenshot.
+
 ## Service-worker cache busting
 
 Bump `CACHE_VERSION` in `sw.js` (kcq-v9 → kcq-v10) when shipping changes Sebastian needs to see immediately. The activate handler purges old caches. After bumping, the test in `tests/narration-pipeline.spec.mjs` line ~138 needs to also be ≥ the new version — soft floor only, so v9 → v10 doesn't break the test.
