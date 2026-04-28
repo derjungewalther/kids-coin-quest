@@ -76,18 +76,40 @@ Deno.serve(async (req) => {
 
     let customerId = subRow?.stripe_customer_id;
     if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: { supabase_user_id: user.id },
-      });
+      // Idempotency key based on user_id: if a parallel call (rapid
+      // double-click on Upgrade) hits Stripe for the same user, both
+      // requests return the SAME customer instead of creating two.
+      // Stripe holds the key for 24h. (Apr 2026 fix from ultrareview.)
+      const customer = await stripe.customers.create(
+        {
+          email: user.email,
+          metadata: { supabase_user_id: user.id },
+        },
+        { idempotencyKey: `kcq-customer-${user.id}` },
+      );
       customerId = customer.id;
       // Persist it so the webhook can resolve user_id from customer_id.
-      await supaAdmin
+      // Re-fetch first to avoid clobbering a parallel write that beat
+      // us to it.
+      const { data: latest } = await supaAdmin
         .from('subscriptions')
-        .upsert(
-          { user_id: user.id, stripe_customer_id: customerId },
-          { onConflict: 'user_id' },
-        );
+        .select('stripe_customer_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      const existing = latest?.stripe_customer_id;
+      if (existing && existing !== customerId) {
+        // A parallel request already wrote a different customer.
+        // Keep the existing one and use it for this checkout to
+        // avoid orphaning a Stripe customer.
+        customerId = existing;
+      } else if (!existing) {
+        await supaAdmin
+          .from('subscriptions')
+          .upsert(
+            { user_id: user.id, stripe_customer_id: customerId },
+            { onConflict: 'user_id' },
+          );
+      }
     }
 
     const appUrl = Deno.env.get('APP_URL') || 'https://kidscoinquest.app';
