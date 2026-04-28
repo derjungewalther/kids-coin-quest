@@ -2667,6 +2667,52 @@
   .plan-pill.plan-pro    { background: rgba(244,211,94,0.18); color: var(--gold-bright); border-color: var(--gold-dark); }
   .plan-pill.plan-family { background: rgba(168,85,247,0.18); color: #c084fc; border-color: #a855f7; }
 
+  /* === Negative quests / penalties (Apr 2026) — for "you hit your
+     sister, -2 coins" type discipline. amount < 0 marks the row. */
+  .quest-sign-toggle {
+    width: 36px;
+    background: rgba(127,204,151,0.18);
+    border: 1px solid #2d6a4f;
+    color: #2d6a4f;
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 900;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .quest-sign-toggle:hover { background: rgba(127,204,151,0.28); }
+  .quest-sign-toggle.is-penalty {
+    background: rgba(255,128,128,0.18);
+    border-color: #c25a1a;
+    color: #c25a1a;
+  }
+  .quest-sign-toggle.is-penalty:hover { background: rgba(255,128,128,0.28); }
+
+  .activity-row.is-penalty {
+    background: rgba(255,128,128,0.06);
+    border-left: 3px solid #c25a1a;
+  }
+  .activity-row.is-penalty .activity-amount {
+    color: #c25a1a;
+    font-weight: 700;
+  }
+  .penalty-badge {
+    display: inline-block;
+    background: rgba(194,90,26,0.15);
+    color: #c25a1a;
+    font-size: 10px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .quest-picker option.is-penalty,
+  .quest-picker select option.is-penalty { color: #c25a1a; }
+
   /* Visually-hidden but screen-reader-readable. Standard pattern from
      WCAG techniques. Used for hidden form labels where the visible
      placeholder is enough for sighted users but AT users need explicit
@@ -4395,7 +4441,13 @@
         </div>
         <div>
           <label data-i18n="gold_reward">Gold Reward</label>
-          <input type="text" inputmode="decimal" id="actAmount" placeholder="1.00" data-i18n-num-placeholder="1" />
+          <div style="display:flex; gap:6px; align-items: stretch;">
+            <button type="button" class="quest-sign-toggle" id="actSignToggle"
+                    aria-label="Toggle reward / penalty" aria-pressed="false"
+                    onclick="toggleQuestSign()" title="">+</button>
+            <input type="text" inputmode="decimal" id="actAmount" placeholder="1.00" data-i18n-num-placeholder="1" style="flex: 1;" />
+          </div>
+          <div id="actSignHint" style="font-size: 11px; color: var(--ink-muted); margin-top: 4px; min-height: 14px;"></div>
         </div>
         <button class="btn btn-primary" onclick="addActivity()" data-i18n="proclaim">⚔ Proclaim</button>
       </div>
@@ -5556,6 +5608,12 @@ const TRANSLATIONS = {
     admin_restore_confirm: 'Restore this family\'s state to the backup from {date}? The current state will be saved as a separate backup so you can undo.',
     admin_restore_success: '✓ Restored from {date}. The current state was snapshotted first.',
     admin_backups_note: 'One snapshot per day, created on the user\'s first sign-in of the day. Restore saves the current state as a pre-restore backup so you can roll back.',
+    penalty_toggle_off: 'Currently a reward (+). Click to make it a penalty (−).',
+    penalty_toggle_on: 'Currently a penalty (−). Click to make it a reward (+).',
+    penalty_hint: 'Penalty: subtracts coins for misbehavior. No XP, no streak.',
+    penalty_proclaimed: '⚠ Penalty proclaimed.',
+    penalty_badge: 'Penalty',
+    penalty_note_template: '⚠ {name} {icon} · −🪙 {n}',
     pricing_stripe_not_configured: 'Stripe checkout is not deployed yet. Ping support@kidscoinquest.app.',
     pricing_upgrade_success: 'Welcome to Pro! Your features are unlocked.',
     pricing_upgrade_canceled: 'Upgrade canceled. You can come back any time.',
@@ -6205,6 +6263,12 @@ const TRANSLATIONS = {
     admin_restore_confirm: 'Diese Familie auf den Stand vom {date} zurücksetzen? Der aktuelle Stand wird als separates Backup gesichert — Undo möglich.',
     admin_restore_success: '✓ Wiederhergestellt vom {date}. Der vorherige Stand wurde zuvor gesichert.',
     admin_backups_note: 'Ein Snapshot pro Tag, beim ersten Login des Users. Wiederherstellen sichert den aktuellen Stand zuerst als Pre-Restore-Backup, damit du zurückkannst.',
+    penalty_toggle_off: 'Aktuell eine Belohnung (+). Klick für eine Strafe (−).',
+    penalty_toggle_on: 'Aktuell eine Strafe (−). Klick für eine Belohnung (+).',
+    penalty_hint: 'Strafe: zieht Münzen ab bei Fehlverhalten. Keine XP, kein Streak.',
+    penalty_proclaimed: '⚠ Strafe verkündet.',
+    penalty_badge: 'Strafe',
+    penalty_note_template: '⚠ {name} {icon} · −🪙 {n}',
     pricing_stripe_not_configured: 'Stripe-Checkout ist noch nicht deployed. Wende dich an support@kidscoinquest.app.',
     pricing_upgrade_success: 'Willkommen bei Pro! Deine Features sind freigeschaltet.',
     pricing_upgrade_canceled: 'Upgrade abgebrochen. Du kannst jederzeit wiederkommen.',
@@ -9051,12 +9115,18 @@ function renderKids() {
                   const st = a.statType || 'brave';
                   const cad = a.cadence || 'once';
                   const done = cad !== 'once' && isQuestDoneWithinCadence(k.id, a);
-                  // Visual prefix: ✓ done, 🔄 daily, 📆 weekly, blank for "once"
-                  const prefix = done ? '✓ '
+                  const isPenalty = Number(a.amount) < 0;
+                  // Visual prefix: ⚠ penalty (overrides others), ✓ done, 🔄 daily, 📆 weekly, blank
+                  const prefix = isPenalty ? '⚠ '
+                    : done ? '✓ '
                     : cad === 'daily'  ? '🔄 '
                     : cad === 'weekly' ? '📆 '
                     : '';
-                  return `<option value="${a.id}">${prefix}${a.icon} ${escapeHtml(L(a.name))} · ${STAT_META[st].icon} +${fmt(a.amount)}</option>`;
+                  // Penalty rows show the negative amount with a minus sign;
+                  // earn rows keep the conventional +. Class lets the option
+                  // render in red where the browser supports it.
+                  const amountStr = isPenalty ? `−${fmt(Math.abs(a.amount))}` : `+${fmt(a.amount)}`;
+                  return `<option value="${a.id}"${isPenalty ? ' class="is-penalty"' : ''}>${prefix}${a.icon} ${escapeHtml(L(a.name))} · ${STAT_META[st].icon} ${amountStr}</option>`;
                 }).join('')}
               </select>
               <button class="quest-done-btn" onclick="earnFromSelect('${k.id}')" aria-label="${escapeHtml(t('done_short'))}">✓ ${escapeHtml(t('done_short'))}</button>
@@ -9127,10 +9197,43 @@ function previewQuest(kidId) {
   prev.textContent = `+${fmt(a.amount)} · +${a.amount} ${statLabel(st)} XP`;
 }
 
+// Penalty path for negative-amount activities. Separate from earn() so
+// the reward flow stays unchanged. Logs as type='penalty' in the
+// Chronicle so it renders distinct from earn/payout/donate.
+function applyPenalty(k, a) {
+  const delta = a.amount; // negative
+  k.balance = Math.round((k.balance + delta) * 100) / 100;
+  // No XP gain, no streak bump, no goal check — this isn't progress.
+  // We DO mark family active so the day still counts on the family
+  // streak (the parent did SOMETHING with the app today).
+  familyMarkActive();
+  const noteTemplate = t('penalty_note_template');
+  const noteStr = noteTemplate
+    .replace('{icon}', a.icon || '⚠')
+    .replace('{name}', L(a.name))
+    .replace('{n}', fmtNumber(Math.abs(delta)));
+  logTx(k.id, 'penalty', delta, noteStr, {
+    activityId: a.id,
+    event: 'penalty',
+    payload: { activityId: a.id, questIcon: a.icon, questName: L(a.name), amount: delta }
+  });
+  save();
+  renderKids();
+  // No celebratory coin sound; play the soft chime used for confirms.
+  if (typeof playChime === 'function') playChime();
+  toast(noteStr, 'info');
+}
+
 function earn(kidId, actId) {
   const k = kidById(kidId);
   const a = state.activities.find(x => x.id === actId);
   if (!k || !a) return;
+  // Penalty quests (amount < 0) take a different code path: subtract
+  // coins, do NOT bump streak (would be perverse), do NOT award XP
+  // (penalties don't level you up). Balance is allowed to go negative
+  // — it's a teaching tool, the kid sees they "owe" coins.
+  if (a.amount < 0) return applyPenalty(k, a);
+
   k.balance += a.amount;
   k.totalEarned = (k.totalEarned || 0) + a.amount;
   bumpStreak(k);
@@ -10511,22 +10614,44 @@ function renderIconPicker() {
   });
 }
 
+// Penalty/reward sign toggle. Default state is +. Clicking flips to −,
+// which marks the next added activity as a penalty (negative amount).
+// State stored on the toggle button so the UI is the source of truth.
+function toggleQuestSign() {
+  const btn = document.getElementById('actSignToggle');
+  if (!btn) return;
+  const isPenalty = btn.classList.toggle('is-penalty');
+  btn.textContent = isPenalty ? '−' : '+';
+  btn.setAttribute('aria-pressed', isPenalty ? 'true' : 'false');
+  btn.title = isPenalty ? t('penalty_toggle_on') : t('penalty_toggle_off');
+  const hint = document.getElementById('actSignHint');
+  if (hint) hint.textContent = isPenalty ? t('penalty_hint') : '';
+}
+window.toggleQuestSign = toggleQuestSign;
+
 function addActivity() {
   const name = document.getElementById('actName').value.trim();
-  const amount = parseNum(document.getElementById('actAmount').value);
+  let amount = parseNum(document.getElementById('actAmount').value);
+  const isPenalty = !!document.getElementById('actSignToggle')?.classList.contains('is-penalty');
+  // Toggle controls sign — the input itself stays positive in the form.
+  if (isPenalty) amount = -Math.abs(amount);
   const statType = document.getElementById('actStat').value;
   const cadenceSel = document.getElementById('actCadence');
   const cadence = (cadenceSel && cadenceSel.value) || 'once';
   if (!name) { toast('Give the quest a name', 'error'); return; }
-  if (!amount || amount <= 0) { toast('Set a valid reward', 'error'); return; }
+  if (!amount || amount === 0) { toast('Set a valid amount', 'error'); return; }
   state.activities.push({ id: id(), name, amount, icon: selectedIcon, statType, cadence });
   save();
   document.getElementById('actName').value = '';
   document.getElementById('actAmount').value = '';
   if (cadenceSel) cadenceSel.value = 'once';
+  // Reset sign toggle to + so the next quest doesn't accidentally
+  // become a penalty.
+  const signBtn = document.getElementById('actSignToggle');
+  if (signBtn && signBtn.classList.contains('is-penalty')) toggleQuestSign();
   renderActivities();
   renderKids();
-  toast('Quest proclaimed!', 'success');
+  toast(isPenalty ? t('penalty_proclaimed') : 'Quest proclaimed!', 'success');
 }
 
 function deleteActivity(aid) {
@@ -10561,12 +10686,15 @@ function renderActivities() {
       ['daily',  t('cadence_daily')],
       ['weekly', t('cadence_weekly')]
     ].map(([v, label]) => `<option value="${v}"${v === cad ? ' selected' : ''}>${escapeHtml(label)}</option>`).join('');
+    const isPenalty = Number(a.amount) < 0;
+    const penaltyClass = isPenalty ? ' is-penalty' : '';
+    const penaltyBadge = isPenalty ? ` <span class="penalty-badge">${escapeHtml(t('penalty_badge'))}</span>` : '';
     const amountStr = formatDecimalLocaleEditable(a.amount);
     return `
-    <tr>
-      <td style="font-size:24px;">${a.icon}</td>
-      <td><input type="text" value="${escapeHtml(L(a.name))}" onchange="updateActivity('${a.id}','name',this.value)" /></td>
-      <td><input type="text" inputmode="decimal" value="${amountStr}" onchange="updateActivity('${a.id}','amount',this.value)" style="max-width:100px;" /></td>
+    <tr class="activity-row${penaltyClass}">
+      <td style="font-size:24px;">${a.icon}${isPenalty ? ' ⚠' : ''}</td>
+      <td><input type="text" value="${escapeHtml(L(a.name))}" onchange="updateActivity('${a.id}','name',this.value)" />${penaltyBadge}</td>
+      <td class="activity-amount"><input type="text" inputmode="decimal" value="${amountStr}" onchange="updateActivity('${a.id}','amount',this.value)" style="max-width:100px;" /></td>
       <td><select onchange="updateActivity('${a.id}','statType',this.value)" style="max-width:140px;">${opts}</select></td>
       <td><select onchange="updateActivity('${a.id}','cadence',this.value)" style="max-width:170px;">${cadOpts}</select></td>
       <td><button class="btn-quest-remove" onclick="deleteActivity('${a.id}')" title="${escapeHtml(t('remove'))}" aria-label="${escapeHtml(t('remove'))}">✕</button></td>
