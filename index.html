@@ -16679,8 +16679,19 @@ function supaDedupe(key, fn) {
 function supaInvalidate(key) { _supaInflight.delete(key); }
 
 let supaSession = null;
+// Expose the auth state on window via a getter/setter so DevTools and
+// Playwright tests can inspect/mutate them without adding test-only
+// branches into the production logic. The getters reflect the real
+// `let` variables, so isPro() / getMyPlan() / narrate() / etc see
+// the mocked values immediately.
+Object.defineProperty(window, 'supaSession', {
+  get() { return supaSession; }, set(v) { supaSession = v; }, configurable: true
+});
 let supaProfile = null;       // { user_id, email, is_admin }
 let supaSubscription = null;  // { user_id, plan, status, billing_period, current_period_end }
+Object.defineProperty(window, 'supaSubscription', {
+  get() { return supaSubscription; }, set(v) { supaSubscription = v; }, configurable: true
+});
 const FREE_TIER_HERO_LIMIT = 2;
 window.FREE_TIER_HERO_LIMIT = FREE_TIER_HERO_LIMIT;
 
@@ -17531,7 +17542,11 @@ function renderAdminVisibility() {
 // All queries are admin-gated server-side; client also short-circuits
 // when isAdminUser() === false.
 // =============================================================
-const adminDashboard = {
+// Window-exposed for tests + DevTools introspection (the `const` declaration
+// is lexical-only, so window.adminDashboard wouldn't otherwise reflect it).
+window.adminDashboard = {};
+const adminDashboard = window.adminDashboard;
+Object.assign(adminDashboard, {
   tab: 'overview',
   overview: null,        // jsonb stats blob
   families: null,        // detailed family rows (incl. archived_at + plan)
@@ -17540,7 +17555,7 @@ const adminDashboard = {
   search: '',
   sort: { col: 'family_updated', dir: 'desc' },
   showArchived: false    // filter: include soft-deleted families
-};
+});
 
 function switchAdminTab(tab) {
   adminDashboard.tab = tab;
