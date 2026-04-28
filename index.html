@@ -4956,7 +4956,7 @@
           <li>✓ <span data-i18n="pricing_feature_2_heroes">2 heroes</span></li>
           <li>✓ <span data-i18n="pricing_feature_basic_quests">All quests &amp; rewards</span></li>
           <li>✓ <span data-i18n="pricing_feature_streaks">Family streak system</span></li>
-          <li>✗ <span data-i18n="pricing_feature_no_nova" style="color: var(--ink-muted);">Web Speech narration</span></li>
+          <li>✓ <span data-i18n="pricing_feature_nova_free">Premium Nova narration</span></li>
         </ul>
       </div>
 
@@ -4971,9 +4971,9 @@
         <ul class="pricing-features">
           <li>✓ <span data-i18n="pricing_feature_8_adv">All 8 adventures</span></li>
           <li>✓ <span data-i18n="pricing_feature_unlimited_heroes">Unlimited heroes</span></li>
-          <li>✓ <span data-i18n="pricing_feature_nova">Premium Nova narration (OpenAI)</span></li>
           <li>✓ <span data-i18n="pricing_feature_cloud">Cross-device cloud sync</span></li>
           <li>✓ <span data-i18n="pricing_feature_custom">Unlimited custom adventures</span></li>
+          <li>✓ <span data-i18n="pricing_feature_priority">Priority support</span></li>
         </ul>
       </div>
     </div>
@@ -5586,10 +5586,10 @@ const TRANSLATIONS = {
     pricing_feature_unlimited_heroes: 'Unlimited heroes',
     pricing_feature_basic_quests: 'All quests & rewards',
     pricing_feature_streaks: 'Family streak system',
-    pricing_feature_no_nova: 'Web Speech only (robotic)',
-    pricing_feature_nova: 'Premium Nova narration (OpenAI)',
+    pricing_feature_nova_free: 'Premium Nova narration (all adventures)',
     pricing_feature_cloud: 'Cross-device cloud sync',
     pricing_feature_custom: 'Unlimited custom adventures',
+    pricing_feature_priority: 'Priority support',
     pricing_upgrade_btn: 'Upgrade to Pro',
     pricing_maybe_later: 'Maybe later',
     pricing_stripe_footer: 'Secure checkout via Stripe · cancel anytime in your account.',
@@ -6241,10 +6241,10 @@ const TRANSLATIONS = {
     pricing_feature_unlimited_heroes: 'Unbegrenzte Helden',
     pricing_feature_basic_quests: 'Alle Quests & Belohnungen',
     pricing_feature_streaks: 'Familien-Streak-System',
-    pricing_feature_no_nova: 'Browser-Stimme (robotisch)',
-    pricing_feature_nova: 'Premium Nova-Vertonung (OpenAI)',
+    pricing_feature_nova_free: 'Premium Nova-Vertonung (alle Abenteuer)',
     pricing_feature_cloud: 'Geräteübergreifende Cloud-Sync',
     pricing_feature_custom: 'Unbegrenzte eigene Abenteuer',
+    pricing_feature_priority: 'Priority-Support',
     pricing_upgrade_btn: 'Auf Pro upgraden',
     pricing_maybe_later: 'Vielleicht später',
     pricing_stripe_footer: 'Sicherer Checkout über Stripe · jederzeit im Konto kündbar.',
@@ -6785,22 +6785,11 @@ function narrate(text) {
   stopPrerenderedAudio();
   const trimmed = String(text).trim();
   const lang = state.settings.lang === 'de' ? 'de' : 'en';
-  // Free-tier gate: skip the premium-audio path entirely. Free users
-  // hear Web Speech (always available, robotic). Pro users get Nova.
-  // We check this AFTER stopNarration so an in-flight Pro session that
-  // just downgraded gets cut off cleanly.
-  if (!isPro()) {
-    if (!narratorSupported()) return;
-    const clean = trimmed.replace(/[⚔⚜✨🌟🪄🎵🏹🧙‍♂️🧝‍♀️🛡️🗡️🐉🎩📿⛑️🎓👑🔮🔨⚡🧪📖🏅👕🦺🥋👖🧵👢👟🥾💍🧠💪💛🤍🏡🌲💎🗼🌑🔥🌋🎲🏆🎁🟢🔴💰📊⭐🔒👋📷📜✎]/gu, '');
-    const u = new SpeechSynthesisUtterance(clean);
-    u.lang = lang === 'de' ? 'de-DE' : 'en-US';
-    u.rate = state.settings.narratorRate || 1.0;
-    u.pitch = state.settings.narratorPitch || 1.0;
-    const voice = pickBestVoice(lang);
-    if (voice) { u.voice = voice; u.lang = voice.lang; }
-    window.speechSynthesis.speak(u);
-    return;
-  }
+  // Nova narration is available to ALL users (free + pro). It's part
+  // of the experience, not a paywall feature. The premium-audio path
+  // tries the manifest first; falls through to Web Speech only when
+  // the text isn't pre-rendered (e.g., custom hero names) or play()
+  // is blocked. (Apr 2026: was briefly Pro-only; reversed per user.)
   // Try pre-rendered audio first. Async, but sync-looking fallback is fine.
   (async () => {
     const manifest = await loadNarratorManifest();
@@ -16688,6 +16677,9 @@ Object.defineProperty(window, 'supaSession', {
   get() { return supaSession; }, set(v) { supaSession = v; }, configurable: true
 });
 let supaProfile = null;       // { user_id, email, is_admin }
+Object.defineProperty(window, 'supaProfile', {
+  get() { return supaProfile; }, set(v) { supaProfile = v; }, configurable: true
+});
 let supaSubscription = null;  // { user_id, plan, status, billing_period, current_period_end }
 Object.defineProperty(window, 'supaSubscription', {
   get() { return supaSubscription; }, set(v) { supaSubscription = v; }, configurable: true
@@ -16698,19 +16690,25 @@ window.FREE_TIER_HERO_LIMIT = FREE_TIER_HERO_LIMIT;
 // isPro: true iff the user is signed in AND has an active or trialing
 // 'pro' subscription. Anonymous + free + canceled all count as "not Pro".
 // Used by the feature gates: hero recruit, adventure picker, narrator.
+//
+// Admins ALWAYS count as Pro, regardless of their subscriptions row —
+// they're the people running the app and need full access for testing,
+// support, and dogfooding. Without this, Sebastian (admin, never paid
+// via Stripe) would silently get Web Speech instead of Nova narration
+// because his subscriptions.plan is 'free'.
 function isPro() {
+  if (isAdminUser()) return true;
   if (!supaSession || !supaSubscription) return false;
   if (supaSubscription.plan !== 'pro') return false;
   if (!['active', 'trialing'].includes(supaSubscription.status)) return false;
   return true;
 }
-// Returns the EFFECTIVE plan — the one that drives badges and feature
-// gates. Mirror isPro()'s status check: a row that says plan='pro' but
-// status='canceled' isn't really Pro anymore, so report 'free'. (Apr
-// 2026 fix from ultrareview — was causing the Account-panel "⭐ Pro"
-// pill to show for canceled subs while feature gates correctly locked,
-// confusing users.)
+// Returns the EFFECTIVE plan. Admins always read as 'pro' so the
+// Account-panel pill says "⭐ Pro" and feature gates open. Mirror
+// isPro()'s status check for non-admins: a row that says plan='pro'
+// but status='canceled' isn't really Pro anymore, so report 'free'.
 function getMyPlan() {
+  if (isAdminUser()) return 'pro';
   if (!supaSession) return 'free';
   if (!supaSubscription) return 'free';
   if (supaSubscription.plan !== 'pro') return supaSubscription.plan || 'free';

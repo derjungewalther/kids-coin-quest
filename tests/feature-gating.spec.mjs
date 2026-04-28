@@ -77,6 +77,20 @@ test.describe('Feature gating · isPro / getMyPlan', () => {
     expect(r.plan).toBe('free');
     expect(r.pro).toBe(false);
   });
+
+  test('admin always counts as Pro, even with plan=free subscription', async ({ page }) => {
+    // Admins shouldn't be feature-gated — they need full access for
+    // testing, support, dogfooding. Without this exemption, the team
+    // running the app silently gets Web Speech instead of Nova etc.
+    const r = await page.evaluate(() => {
+      window.supaSession = { user: { id: 'admin1', email: 'admin@example.com' } };
+      window.supaProfile = { user_id: 'admin1', email: 'admin@example.com', is_admin: true };
+      window.supaSubscription = { plan: 'free', status: 'active', billing_period: null };
+      return { plan: window.getMyPlan(), pro: window.isPro() };
+    });
+    expect(r.plan).toBe('pro');
+    expect(r.pro).toBe(true);
+  });
 });
 
 test.describe('Feature gating · hero limit', () => {
@@ -199,36 +213,30 @@ test.describe('Feature gating · adventure tier lock', () => {
   });
 });
 
-test.describe('Feature gating · narrator', () => {
+test.describe('Narrator · Nova for everyone (free + pro)', () => {
 
-  test('free user → narrate() falls through to Web Speech, no premium fetch', async ({ page }) => {
-    // Spy on speechSynthesis.speak + intercept any audio fetch.
-    const audioFetches = [];
-    page.on('request', r => {
-      const u = r.url();
-      if (/\/audio\/[a-f0-9]{16}\.mp3$/i.test(u)) audioFetches.push(u);
-    });
-    const result = await page.evaluate(() => {
-      // Free anonymous user.
+  // Nova narration is NOT a paywall feature — it's part of the
+  // experience for all users. Apr 2026: a brief gating attempt was
+  // reversed because users (incl. Sebastian) lost the premium voice
+  // for adventures they'd been hearing it on.
+
+  test('free user → narrate() takes the premium path (calls loadNarratorManifest)', async ({ page }) => {
+    const r = await page.evaluate(async () => {
+      // Anonymous / free — no session, no subscription.
       window.state.settings.narratorOn = true;
-      let speakCalls = 0;
-      const orig = window.speechSynthesis.speak.bind(window.speechSynthesis);
-      window.speechSynthesis.speak = (u) => { speakCalls++; /* don't actually speak */ };
-      window.narrate('Hello world');
-      // Revert
-      window.speechSynthesis.speak = orig;
-      return { speakCalls };
+      let manifestCalls = 0;
+      const orig = window.loadNarratorManifest;
+      window.loadNarratorManifest = (...a) => { manifestCalls++; return orig(...a); };
+      window.playPrerenderedAudio = async () => true;
+      window.narrate('A unique phrase 12345');
+      await new Promise(r => setTimeout(r, 200));
+      window.loadNarratorManifest = orig;
+      return { manifestCalls };
     });
-    // Wait for any in-flight async fetch attempts to resolve.
-    await page.waitForTimeout(400);
-    expect(result.speakCalls).toBe(1);
-    expect(audioFetches.length).toBe(0);
+    expect(r.manifestCalls).toBeGreaterThanOrEqual(1);
   });
 
-  test('Pro user → narrate() takes the premium path (calls loadNarratorManifest)', async ({ page }) => {
-    // We don't watch network — boot may have already fetched the
-    // manifest, so a second narrate() call hits cache. Instead we spy
-    // on loadNarratorManifest to verify the premium codepath ran.
+  test('pro user → narrate() also takes the premium path', async ({ page }) => {
     const r = await page.evaluate(async () => {
       window.supaSession = { user: { id: 'u1' } };
       window.supaSubscription = { plan: 'pro', status: 'active', billing_period: 'monthly' };
@@ -236,10 +244,8 @@ test.describe('Feature gating · narrator', () => {
       let manifestCalls = 0;
       const orig = window.loadNarratorManifest;
       window.loadNarratorManifest = (...a) => { manifestCalls++; return orig(...a); };
-      // Don't actually play audio.
       window.playPrerenderedAudio = async () => true;
-      window.narrate('A unique-ish phrase that probably is not in the manifest 12345');
-      // Give the async path inside narrate() a tick.
+      window.narrate('Another unique phrase 67890');
       await new Promise(r => setTimeout(r, 200));
       window.loadNarratorManifest = orig;
       return { manifestCalls };
@@ -253,8 +259,6 @@ test.describe('Feature gating · narrator', () => {
       if (/\/audio\/[a-f0-9]{16}\.mp3$/i.test(r.url())) audioFetches.push(r.url());
     });
     const r = await page.evaluate(() => {
-      window.supaSession = { user: { id: 'u1' } };
-      window.supaSubscription = { plan: 'pro', status: 'active', billing_period: 'monthly' };
       window.state.settings.narratorOn = false;
       let speakCalls = 0;
       const orig = window.speechSynthesis.speak.bind(window.speechSynthesis);
