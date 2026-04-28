@@ -5549,6 +5549,13 @@ const TRANSLATIONS = {
     pricing_admin_comp_hint: 'Pro granted by support · contact us to change',
     account_cancels_on: 'cancels {date}',
     admin_cancels_at_tooltip: 'User scheduled cancellation via Stripe portal — Pro until period end',
+    admin_h_backups: '🗄 Daily Backups',
+    admin_no_backups: 'No backups yet — they\'re created automatically on the user\'s next sign-in.',
+    admin_col_backup_date: 'Date',
+    admin_restore_btn: '↩ Restore',
+    admin_restore_confirm: 'Restore this family\'s state to the backup from {date}? The current state will be saved as a separate backup so you can undo.',
+    admin_restore_success: '✓ Restored from {date}. The current state was snapshotted first.',
+    admin_backups_note: 'One snapshot per day, created on the user\'s first sign-in of the day. Restore saves the current state as a pre-restore backup so you can roll back.',
     pricing_stripe_not_configured: 'Stripe checkout is not deployed yet. Ping support@kidscoinquest.app.',
     pricing_upgrade_success: 'Welcome to Pro! Your features are unlocked.',
     pricing_upgrade_canceled: 'Upgrade canceled. You can come back any time.',
@@ -6191,6 +6198,13 @@ const TRANSLATIONS = {
     pricing_admin_comp_hint: 'Pro vom Support gewährt · Änderung über Support',
     account_cancels_on: 'läuft {date} aus',
     admin_cancels_at_tooltip: 'User hat über Stripe-Portal gekündigt — Pro bis Periodenende',
+    admin_h_backups: '🗄 Tägliche Backups',
+    admin_no_backups: 'Noch keine Backups — werden beim nächsten Login des Users automatisch erstellt.',
+    admin_col_backup_date: 'Datum',
+    admin_restore_btn: '↩ Wiederherstellen',
+    admin_restore_confirm: 'Diese Familie auf den Stand vom {date} zurücksetzen? Der aktuelle Stand wird als separates Backup gesichert — Undo möglich.',
+    admin_restore_success: '✓ Wiederhergestellt vom {date}. Der vorherige Stand wurde zuvor gesichert.',
+    admin_backups_note: 'Ein Snapshot pro Tag, beim ersten Login des Users. Wiederherstellen sichert den aktuellen Stand zuerst als Pre-Restore-Backup, damit du zurückkannst.',
     pricing_stripe_not_configured: 'Stripe-Checkout ist noch nicht deployed. Wende dich an support@kidscoinquest.app.',
     pricing_upgrade_success: 'Willkommen bei Pro! Deine Features sind freigeschaltet.',
     pricing_upgrade_canceled: 'Upgrade abgebrochen. Du kannst jederzeit wiederkommen.',
@@ -16835,6 +16849,19 @@ async function applySession(session) {
     supaSubscription = null;
   }
   await cloudLoad();
+  // Daily backup: fire-and-forget. RPC is idempotent — same-day repeat
+  // calls return {created:false}. Failure is silent (typically
+  // because the user's Supabase project hasn't run the
+  // 2026-04-28-backups migration yet). Backups land in family_backups
+  // and are listed/restorable from the admin Family drill-down modal.
+  try {
+    supaClient.rpc('create_my_backup_if_due').then(({ data, error }) => {
+      if (error) return; // silent — old schema or RLS issue
+      if (data && data.created && state.settings && state.settings.narratorDebug) {
+        console.log('[KCQ backup] daily snapshot saved', data);
+      }
+    });
+  } catch (e) { /* silent */ }
   renderAccountPanel();
   renderAdminVisibility();
   applyLandingVisibility();
@@ -17882,10 +17909,18 @@ async function openAdminFamilyModal(familyId) {
   modal.classList.add('open');
   modal.setAttribute('aria-hidden', 'false');
   try {
-    const { data, error } = await supaClient.rpc('admin_family_detail', { p_family_id: familyId });
-    if (error) throw error;
+    // Fetch detail + backups in parallel — both RPCs are admin-gated.
+    // The backups list is rendered as its own section in the modal so
+    // admins can pick a snapshot and restore it. Backups RPC may fail
+    // gracefully if the 2026-04-28-backups migration hasn't been run.
+    const [detailR, backupsR] = await Promise.all([
+      supaClient.rpc('admin_family_detail', { p_family_id: familyId }),
+      supaClient.rpc('admin_list_family_backups', { p_family_id: familyId })
+    ]);
+    if (detailR.error) throw detailR.error;
     const body = document.getElementById('adminFamilyModalBody');
-    body.innerHTML = renderAdminFamilyDetail(data);
+    const backups = backupsR && !backupsR.error ? (backupsR.data || []) : [];
+    body.innerHTML = renderAdminFamilyDetail(detailR.data, backups);
   } catch (e) {
     document.getElementById('adminFamilyModalBody').innerHTML =
       `<div style="color:#ff8080;">${escapeHtml(e.message || String(e))}</div>`;
@@ -17898,7 +17933,7 @@ function closeAdminFamilyModal() {
 }
 window.closeAdminFamilyModal = closeAdminFamilyModal;
 
-function renderAdminFamilyDetail(d) {
+function renderAdminFamilyDetail(d, backups) {
   if (!d) return `<div class="admin-empty">${t('admin_no_data')}</div>`;
   const s = d.state || {};
   const kids = Array.isArray(s.kids) ? s.kids : [];
@@ -17951,12 +17986,80 @@ function renderAdminFamilyDetail(d) {
     <h4 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:12px; letter-spacing:1px; text-transform: uppercase; margin: 16px 0 4px;">${t('admin_h_recent_tx')}</h4>
     ${lastTx || `<div class="admin-empty">${t('admin_no_tx')}</div>`}
 
+    ${renderAdminFamilyBackups(d.family_id, backups)}
+
     <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--parchment-darker); font-size: 11px; color: var(--ink-muted);">
       ${t('admin_drill_meta')}: ${d.family_id} · ${escapeHtml(d.owner_user_id || '')}<br>
       ${t('admin_col_signup')}: ${d.user_created ? fmtDateTime(d.user_created) : '—'} ·
       ${t('admin_col_last_login')}: ${d.last_sign_in_at ? fmtDateTime(d.last_sign_in_at) : '—'}
     </div>`;
 }
+
+// Backup list section in the family drill-down modal. One row per
+// snapshot, restore button calls admin_restore_family_backup(). The
+// restore RPC saves a pre-restore snapshot under TODAY's date so the
+// admin can roll back the restore by restoring today's snapshot.
+function renderAdminFamilyBackups(familyId, backups) {
+  const list = Array.isArray(backups) ? backups : [];
+  if (!list.length) {
+    return `
+      <h4 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:12px; letter-spacing:1px; text-transform: uppercase; margin: 16px 0 4px;">${t('admin_h_backups')}</h4>
+      <div class="admin-empty">${t('admin_no_backups')}</div>`;
+  }
+  const rows = list.map(b => {
+    const coin = fmtNumber(Math.round(Number(b.coin_total || 0)));
+    return `<tr>
+      <td>${escapeHtml(String(b.backup_date).slice(0, 10))}</td>
+      <td class="admin-cell-num">${b.hero_count}</td>
+      <td class="admin-cell-num">🪙 ${coin}</td>
+      <td class="admin-cell-num">${b.tx_count}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="adminRestoreBackup('${escapeHtml(b.id)}', '${escapeHtml(familyId)}', '${escapeHtml(String(b.backup_date).slice(0,10))}')">
+          ${t('admin_restore_btn')}
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+  return `
+    <h4 style="font-family:'Cinzel',serif; color: var(--gold-dark); font-size:12px; letter-spacing:1px; text-transform: uppercase; margin: 16px 0 4px;">
+      ${t('admin_h_backups')} <span style="color: var(--ink-muted); font-weight: normal; font-size: 11px;">· ${list.length}</span>
+    </h4>
+    <div style="overflow-x: auto;">
+      <table class="admin-table" style="font-size: 12px;">
+        <thead><tr>
+          <th>${t('admin_col_backup_date')}</th>
+          <th>${t('admin_col_heroes')}</th>
+          <th>${t('admin_col_coins')}</th>
+          <th>${t('admin_col_tx')}</th>
+          <th>${t('admin_col_actions')}</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div style="font-size: 11px; color: var(--ink-muted); margin-top: 6px; font-style: italic;">
+      ${t('admin_backups_note')}
+    </div>`;
+}
+
+// Restore: confirm + call RPC + reopen modal so the admin sees fresh
+// state. Pre-restore snapshot is taken server-side so this is safe to
+// undo by restoring today's backup.
+async function adminRestoreBackup(backupId, familyId, backupDate) {
+  if (!supaClient || !isAdminUser()) return;
+  if (!confirm(t('admin_restore_confirm').replace('{date}', backupDate))) return;
+  try {
+    const { error } = await supaClient.rpc('admin_restore_family_backup', { p_backup_id: backupId });
+    if (error) throw error;
+    toast(t('admin_restore_success').replace('{date}', backupDate), 'success');
+    // Reopen the modal so the admin sees the restored state + the new
+    // pre-restore snapshot in the backup list.
+    supaInvalidate('admin-fam-detail');
+    openAdminFamilyModal(familyId);
+  } catch (e) {
+    toast(e.message || String(e), 'error');
+  }
+}
+window.adminRestoreBackup = adminRestoreBackup;
 
 // Wire up the plan-update buttons in the Plans tab.
 document.addEventListener('click', (e) => {
