@@ -35,7 +35,9 @@ from jsDelivr-over-GitHub for the heavy mp3s, same-origin for the manifest.
 
 **Always do this:**
 
-1. Show the SQL **inline as a code block in chat**, in addition to writing it to a file. Sebastian doesn't read files in his editor — he wants to copy-paste straight from chat into Supabase.
+1. Show the **full SQL inline as a code block in chat** (not just "see file X"). Sebastian copies-pastes from chat → Supabase SQL editor. Never make him open a file in his editor first.
+   - Even for big migrations: paste the whole thing, even if it's 200 lines.
+   - Same applies to runbook commands (`supabase functions deploy ...`) — paste verbatim, don't reference docs.
 2. Give the direct SQL-editor URL (`https://supabase.com/dashboard/project/dyfomoaxreoaceaakusg/sql/new`) so it's one click.
 3. State explicitly that it's idempotent / safe to re-run.
 4. After he runs it, prompt him to **hard-refresh the live site** (`Cmd+Shift+R`) so the SW pulls fresh code.
